@@ -20,10 +20,11 @@ const QUICK_CHIPS = [
   { label: 'wtf attention', cmd: 'wtf attention' },
   { label: 'wtf backprop', cmd: 'wtf backprop' },
   { label: 'wtf agent-harness', cmd: 'wtf agent-harness' },
-  { label: 'wtf grpo', cmd: 'wtf grpo' },
-  { label: 'wtf flow-matching', cmd: 'wtf flow-matching' },
-  { label: 'lab loss-landscape', cmd: 'lab loss-landscape' },
-  { label: 'ascii on', cmd: 'ascii on' },
+  { label: 'wtf orchestration', cmd: 'wtf orchestration' },
+  { label: 'wtf sdk', cmd: 'wtf sdk' },
+  { label: 'wtf docker', cmd: 'wtf docker' },
+  { label: 'wtf vlm', cmd: 'wtf vlm' },
+  { label: 'papers', cmd: 'papers' },
 ];
 
 export const CommandLineBar: React.FC<CommandLineBarProps> = ({

@@ -96,7 +96,7 @@ export const FileTreeExplorer: React.FC<FileTreeExplorerProps> = ({
         </div>
 
         <div className="text-[10px]" style={{ color: 'var(--accent-primary)' }}>
-          8M
+          10M
         </div>
       </aside>
     );
@@ -161,7 +161,7 @@ export const FileTreeExplorer: React.FC<FileTreeExplorerProps> = ({
           className="px-2 pt-2 pb-1 text-[10px] uppercase tracking-wider flex items-center justify-between"
           style={{ color: 'var(--text-muted)' }}
         >
-          <span>├─ /curriculum (00..07)</span>
+          <span>├─ /curriculum (00..09)</span>
           <span>[WTF?]</span>
         </div>
 

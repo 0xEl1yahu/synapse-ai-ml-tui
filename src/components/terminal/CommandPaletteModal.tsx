@@ -298,11 +298,13 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
           {[
             'attention',
             'agent harness',
-            'backprop',
+            'orchestration',
+            'sdk',
+            'docker',
+            'vlm',
             'grpo',
             'flow matching',
             'sae',
-            'kv cache',
           ].map((preset) => (
             <button
               key={preset}

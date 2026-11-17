@@ -100,6 +100,38 @@ const FEATURED_WTF_QUESTIONS: {
     sceneId: 'latent-galaxy',
     tag: 'CLASSICAL_ML',
   },
+  {
+    label: 'WTF is Multi-Agent Orchestration?',
+    question: 'How do Lead-Subagent topologies, Git Worktrees, and MCP scale coding agents without context rot?',
+    moduleId: '09_prod_sdk_orchestration_deploy',
+    subTopicId: 'wtf-is-multi-agent-orchestration',
+    sceneId: 'neural-lattice',
+    tag: 'ORCHESTRATION',
+  },
+  {
+    label: 'WTF is PyTorch compile & OpenAI/DeepSeek SDK?',
+    question: 'Why are zero-copy NumPy strides 100x faster, and how does TorchInductor fuse GPU kernels?',
+    moduleId: '09_prod_sdk_orchestration_deploy',
+    subTopicId: 'wtf-is-numpy-pytorch-sdk-internals',
+    sceneId: 'neural-lattice',
+    tag: 'SDKS_&_PYTORCH',
+  },
+  {
+    label: 'WTF is Docker, Cog & 5D GPU Sharding?',
+    question: 'How do you package CUDA/vLLM containers with Cog and shard 16-bytes/param across FSDP GPUs?',
+    moduleId: '09_prod_sdk_orchestration_deploy',
+    subTopicId: 'wtf-is-docker-cog-gpu-deploy',
+    sceneId: 'neural-lattice',
+    tag: 'DOCKER_&_GPU_OPS',
+  },
+  {
+    label: 'WTF are VLMs (ViT/CLIP), Audio RVQ & GNNs?',
+    question: 'How do Vision Transformers patchify images, RVQ codecs discretize voice, and E(3) GNNs model molecules?',
+    moduleId: '08_multimodal_world_gnn',
+    subTopicId: 'wtf-is-vit-clip-vlm',
+    sceneId: 'latent-galaxy',
+    tag: 'MULTIMODAL_&_VLA',
+  },
 ];
 
 export default function App() {
@@ -472,14 +504,14 @@ export default function App() {
                 </div>
               </section>
 
-              {/* COMPLETE 8-LAYER AI/ML TAXONOMY MATRIX (00 TO 07) */}
+              {/* COMPLETE 10-LAYER AI/ML TAXONOMY MATRIX (00 TO 09) */}
               <section className="space-y-3">
                 <div className="flex items-center justify-between font-mono text-xs border-b border-[var(--border-grid)] pb-1.5">
                   <span className="text-[var(--accent-primary)] font-bold">
-                    ┌─ [COMPLETE_AI_ML_ARCHITECTURE_STACK // LAYERS_00_TO_07]
+                    ┌─ [COMPLETE_AI_ML_ARCHITECTURE_STACK // LAYERS_00_TO_09]
                   </span>
                   <span className="text-[var(--text-secondary)]">
-                    {filteredModulesForOverview.length} LAYERS_MOUNTED | 24 DEEP-DIVE TOPICS
+                    {filteredModulesForOverview.length} LAYERS_MOUNTED | {totalSubTopicsCount} DEEP-DIVE TOPICS
                   </span>
                 </div>
 

@@ -441,7 +441,7 @@ def dpo_loss(pi_win_logp, pi_lose_logp, ref_win_logp, ref_lose_logp, beta: float
         keyTakeaways: [
           'GRPO eliminates the Critic network completely, saving ~50% of RL training memory.',
           'Group-relative advantage A_i = (r_i - mu_r) / sigma_r acts as a natural, adaptive curriculum baseline for every prompt difficulty.',
-          'Reinforcement Learning with Verifiable Rewards (RLVR) is immune to neural reward-model hacking because a unit test or math checker cannot sweet-talked.',
+          'Reinforcement Learning with Verifiable Rewards (RLVR) is immune to neural reward-model hacking because a unit test or math checker cannot be sweet-talked.',
         ],
         mathFormulas: [
           {
@@ -536,7 +536,7 @@ def grpo_step_loss(logp_new, logp_old, logp_ref, group_rewards, clip_eps=0.2, be
         plainEnglish:
           'A language model has no hands, no memory between calls, and no ability to run code on its own—it literally just takes an array of token IDs and outputs probabilities for the next token. The "Agent Harness" is the deterministic systems runtime (like Claude Code, Antigravity, or a custom ReAct loop) wrapped around the model. When you type "Fix the bug in auth.py", the Harness assembles a context payload containing a System Prompt plus strict JSON schemas of available tools (read_file, edit_file, run_command). As the LLM streams tokens, it emits reasoning tokens followed by a special stop sequence (<|tool_call|>) and a structured JSON call. The Harness intercepts that stream, pauses the GPU, validates permissions, executes the real shell/filesystem operation in a sandbox, formats the stdout/stderr as a <tool_result> message, appends it directly onto the existing KV-cache prefix, and resumes generation in a closed feedback loop!',
         whyItMatters:
-          'In production AI engineering, 80% of reliability comes from the Agent Harness—tool ergonomics, context compaction, deterministic verification gates,KV-cache prefix reuse, and sandbox boundaries—not just swapping model checkpoints.',
+          'In production AI engineering, 80% of reliability comes from the Agent Harness—tool ergonomics, context compaction, deterministic verification gates, KV-cache prefix reuse, and sandbox boundaries—not just swapping model checkpoints.',
         realWorldSystems: [
           'Antigravity / Claude Code / Cursor Agent Harnesses',
           'Model Context Protocol (MCP) Tool Servers',
@@ -875,7 +875,7 @@ class SparseAutoencoder(nn.Module):
           'Ragas / Braintrust Production Eval Pipelines',
         ],
         summary:
-          'Rigorous AI evaluation combines deterministic functional graders, pass@k sampling estimators, and Rohan-style TPR/TNR bias-corrected LLM judges.',
+          'Rigorous AI evaluation combines deterministic functional graders, pass@k sampling estimators, and Rogan-Gladen TPR/TNR bias-corrected LLM judges.',
         deepDiveParagraphs: [
           'For code generation and reasoning tasks, greedy decoding (pass@1) hides whether a model possesses a capability in its distribution. Chen et al. (Codex) introduced the unbiased pass@k estimator: generate n >= k samples per problem, count c passing samples, and compute pass@k = 1 - comb(n - c, k) / comb(n, k).',
           'When using an LLM-as-a-Judge for open-ended outputs, naive pairwise comparisons suffer from position bias (preferring the first option), verbosity bias (preferring longer answers), and self-preference bias. Instead of multi-point 1–10 scales (which have high variance), production evals use binary pass/fail criteria backed by a human-labeled alignment set to measure the judge\'s True Positive Rate (TPR) and True Negative Rate (TNR).',
@@ -1196,7 +1196,7 @@ class ResidualVectorQuantizer(nn.Module):
         summary:
           'GNNs generalize convolutions to arbitrary topologies via permutation-equivariant message passing, while E(3)-equivariant networks preserve 3D rotational and translational symmetries.',
         deepDiveParagraphs: [
-          'In a Message Passing Neural Network (MPNN), node i updates its state at layer l+1 via h_i^{(l+1)} = phi(h_i^{(l)},bigoplus_{j in N(i)} psi(h_i^{(l)}, h_j^{(l)}, e_{ij})), where bigoplus is a permutation-invariant aggregator. Note that a Transformer is literally a Graph Neural Network operating on a fully-connected graph where attention weights alpha_{ij} are dynamically computed edge weights!',
+          'In a Message Passing Neural Network (MPNN), node i updates its state at layer l+1 via h_i^{(l+1)} = phi(h_i^{(l)}, Aggregate_{j in N(i)} psi(h_i^{(l)}, h_j^{(l)}, e_{ij})), where Aggregate is a permutation-invariant operator (sum, mean, or max). Note that a Transformer is literally a Graph Neural Network operating on a fully connected graph where attention weights alpha_{ij} are dynamically computed edge weights!',
           'In 3D physical systems (atoms with feature h_i and 3D coordinate x_i in R^3), Satorras et al. (E(n)-Equivariant GNN) proved you can achieve exact rotational, translational, and reflectional equivariance without expensive spherical harmonics simply by conditioning messages on pairwise squared distances ||x_i - x_j||^2 (which are scalar invariants!) and updating coordinates along relative displacement vectors (x_i - x_j).',
         ],
         keyTakeaways: [
@@ -1253,7 +1253,7 @@ class EquivariantGNNLayer(nn.Module):
           },
         ],
         pitfalls: [
-          'Over-smoothing & Over-squashing: Deep GNNs exponentially compress exponentially growing k-hop trees into a fixed-size vector while blurring local node distinctions.',
+          'Over-smoothing & Over-squashing: Deep GNNs compress exponentially growing k-hop neighborhood trees into a fixed-size vector while blurring local node distinctions.',
         ],
       },
     ],
