@@ -174,7 +174,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
           <div className="font-mono text-xs text-[var(--accent-primary)] mb-1">
             $ wtf {activeSubTopic.commandSlug.replace(/^wtf-is-/, '')}
           </div>
-          <h1 className="text-xl md:text-2xl font-bold font-mono text-[var(--text-primary)]">
+          <h1 className="text-xl md:text-2xl font-bold font-display text-[var(--text-primary)]">
             {activeSubTopic.title}
           </h1>
           <div className="mt-2 text-sm text-[var(--accent-warn)] font-mono">

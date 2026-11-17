@@ -1,5 +1,6 @@
 import React from 'react';
 import { LearningResource, SubTopic, TaxonomyModule, WebGLSceneId } from '../../types';
+import { EcosystemToolBadge } from './EcosystemLogos';
 
 export interface InspectorSidebarProps {
   module: TaxonomyModule;
@@ -63,12 +64,7 @@ export const InspectorSidebar: React.FC<InspectorSidebarProps> = ({
         </div>
         <div className="flex flex-wrap gap-1">
           {module.coreTools.map((tool) => (
-            <span
-              key={tool}
-              className="px-1.5 py-0.5 bg-[var(--bg-canvas)] border border-[var(--border-grid)] text-[10px] text-[var(--accent-param)]"
-            >
-              {tool}
-            </span>
+            <EcosystemToolBadge key={tool} name={tool} />
           ))}
         </div>
       </div>

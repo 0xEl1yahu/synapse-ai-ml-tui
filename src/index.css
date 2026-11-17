@@ -2,6 +2,9 @@
 
 :root,
 [data-theme="phosphor"] {
+  --font-display: 'Space Grotesk', 'JetBrains Mono', monospace;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg-canvas: #08090C;
   --bg-pane: #0D0F14;
   --bg-elevated: #141820;
@@ -67,11 +70,16 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--bg-canvas);
   color: var(--text-primary);
   margin: 0;
   padding: 0;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
 }
 
 .font-mono,
@@ -79,7 +87,9 @@ code,
 pre,
 kbd,
 .tui-chrome {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "zero" 1, "ss01" 1;
 }
 
 /* Custom sleek terminal scrollbars */

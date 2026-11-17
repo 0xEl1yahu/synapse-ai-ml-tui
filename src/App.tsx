@@ -13,6 +13,11 @@ import { AgentHarnessSimulator } from './components/curriculum/AgentHarnessSimul
 import { WebGLViewportShell } from './components/webgl/WebGLViewportShell';
 import { GitGraphRoadmap } from './components/roadmap/GitGraphRoadmap';
 import { ResourceDirectoryPane } from './components/resources/ResourceDirectoryPane';
+import {
+  WTFBrandLogo,
+  EcosystemLogoStrip,
+  EcosystemToolBadge,
+} from './components/terminal/EcosystemLogos';
 
 const STORAGE_KEYS = {
   SUBTOPICS: 'wtfis_ai_completed_subtopics_v1',
@@ -283,18 +288,21 @@ export default function App() {
                 {/* Left Column: Mission & Philosophy */}
                 <div className="lg:col-span-6 p-5 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[var(--border-grid)] space-y-4">
                   <div className="space-y-3">
-                    <div className="inline-flex items-center gap-2 px-2 py-0.5 border border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 font-mono text-[11px] text-[var(--accent-primary)]">
-                      <span>WTFIS.AI // 100% FREE & OPEN AI/ML ENGINEERING PLAYGROUND</span>
+                    <div className="inline-flex items-center gap-2 px-2.5 py-1 border border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 font-mono text-[11px] text-[var(--accent-primary)]">
+                      <WTFBrandLogo className="w-4 h-4 shrink-0" />
+                      <span>WTFIS.AI // 100% FREE &amp; OPEN AI/ML ENGINEERING PLAYGROUND</span>
                     </div>
 
-                    <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-tight text-[var(--text-primary)] leading-tight">
+                    <h1 className="text-2xl md:text-3xl font-bold font-display tracking-tight text-[var(--text-primary)] leading-tight">
                       LEARN IT. INTERACT WITH IT. BREAK IT. BUILD WITH IT.
                     </h1>
 
                     <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                       AI education is broken—split between watered-down hype threads, $10,000 bootcamps, and dense academic gatekeeping.{' '}
-                      <strong className="text-[var(--text-primary)]">WTFIS.AI</strong> bridges the gap: every concept starts in plain English, connects to an interactive 3D WebGL & systems lab where you can break hyperparameters live, decodes the exact mathematics, and gives you runnable from-scratch code.
+                      <strong className="text-[var(--text-primary)]">WTFIS.AI</strong> bridges the gap: every concept starts in plain English, connects to an interactive 3D WebGL &amp; systems lab where you can break hyperparameters live, decodes the exact mathematics, and gives you runnable from-scratch code.
                     </p>
+
+                    <EcosystemLogoStrip isLightMode={activeTheme === 'paper-lab'} />
 
                     {/* Instant Search Trigger Input */}
                     <div className="pt-1">
@@ -524,7 +532,15 @@ export default function App() {
                       </div>
 
                       <div className="px-4 py-2 bg-[var(--bg-elevated)] border-t border-[var(--border-grid)] flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] text-[var(--text-secondary)]">
-                        <span>TOOLS: {mod.coreTools.join(' • ')}</span>
+                        <div className="flex flex-wrap items-center gap-1">
+                          {mod.coreTools.map((tool) => (
+                            <EcosystemToolBadge
+                              key={tool}
+                              name={tool}
+                              isLightMode={activeTheme === 'paper-lab'}
+                            />
+                          ))}
+                        </div>
                         <span>EST: {mod.estimatedHours}H</span>
                       </div>
                     </div>

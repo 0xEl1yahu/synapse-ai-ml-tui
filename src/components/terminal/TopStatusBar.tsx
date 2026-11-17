@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Terminal,
   Search,
   Sparkles,
   CheckSquare,
@@ -8,6 +7,7 @@ import {
   Sliders,
 } from 'lucide-react';
 import { ThemeId, TrackId, ViewMode } from '../../types';
+import { WTFBrandLogo } from './EcosystemLogos';
 
 export interface TopStatusBarProps {
   activeView: ViewMode;
@@ -87,8 +87,8 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
             }}
             title="Return to WTFIS.AI Home Index"
           >
-            <Terminal className="w-3.5 h-3.5 shrink-0" />
-            <span>WTFIS.AI</span>
+            <WTFBrandLogo className="w-4 h-4 shrink-0" />
+            <span className="font-display tracking-tight text-sm">WTFIS.AI</span>
             <span
               className="text-[10px] px-1.5 py-0.5 border font-normal hidden sm:inline-block"
               style={{
