@@ -105,7 +105,7 @@ export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config }
             </mesh>
 
             {/* Token Label & Live Softmax Weight Badge */}
-            <Html position={[0, -0.55, 0.55]} center distanceFactor={13}>
+            <Html position={[0, -0.55, 0.55]} center distanceFactor={13} zIndexRange={[4, 0]}>
               <button
                 type="button"
                 onClick={(e) => {
@@ -218,8 +218,8 @@ export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config }
           })}
         </group>
 
-        <Html position={[0, -2.05, 0]} center distanceFactor={14}>
-          <div className="border border-[#1E2430] bg-[#08090C]/90 px-2 py-0.5 font-mono text-[9px] text-[#06B6D4] whitespace-nowrap">
+        <Html position={[0, -2.05, 0]} center distanceFactor={14} zIndexRange={[4, 0]}>
+          <div className="pointer-events-none border border-[#1E2430] bg-[#08090C]/90 px-2 py-0.5 font-mono text-[9px] text-[#06B6D4] whitespace-nowrap">
             RoPE PHASE RING: R(m*theta_i) // {isUniformEntropy ? 'WARN: HIGH_TEMP ENTROPY FLATTENING' : isArgmaxSpike ? 'MODE: HARD_ARGMAX_SPIKE' : 'CAUSAL_MASK: ACTIVE'}
           </div>
         </Html>

@@ -45,22 +45,22 @@ const FRAGMENT_SHADER = `
     vec3 cyberCyan = vec3(0.024, 0.714, 0.831);
     vec3 warningAmber = vec3(0.961, 0.620, 0.043);
 
-    vec3 baseColor = mix(phosphorEmerald * 0.45, deepCarbon, smoothstep(0.0, 0.38, normH));
-    baseColor = mix(baseColor, cyberCyan * 0.35, smoothstep(0.38, 0.75, normH));
-    baseColor = mix(baseColor, warningAmber * 0.55, smoothstep(0.75, 1.0, normH));
+    vec3 baseColor = mix(phosphorEmerald * 0.68, deepCarbon * 1.4, smoothstep(0.0, 0.38, normH));
+    baseColor = mix(baseColor, cyberCyan * 0.52, smoothstep(0.38, 0.75, normH));
+    baseColor = mix(baseColor, warningAmber * 0.72, smoothstep(0.75, 1.0, normH));
 
     // Topographic contour lines
     float contourFreq = 7.5;
     float contour = abs(fract(vElevation * contourFreq) - 0.5);
-    float contourLine = 1.0 - smoothstep(0.0, 0.065, contour);
+    float contourLine = 1.0 - smoothstep(0.0, 0.075, contour);
 
     // Coordinate grid lines
-    float gridX = 1.0 - smoothstep(0.0, 0.035, abs(fract(vWorldPos.x * 1.0) - 0.5));
-    float gridZ = 1.0 - smoothstep(0.0, 0.035, abs(fract(vWorldPos.z * 1.0) - 0.5));
-    float grid = max(gridX, gridZ) * 0.22;
+    float gridX = 1.0 - smoothstep(0.0, 0.04, abs(fract(vWorldPos.x * 1.0) - 0.5));
+    float gridZ = 1.0 - smoothstep(0.0, 0.04, abs(fract(vWorldPos.z * 1.0) - 0.5));
+    float grid = max(gridX, gridZ) * 0.32;
 
-    vec3 finalColor = baseColor + contourLine * phosphorEmerald * 0.62 + grid * cyberCyan;
-    gl_FragColor = vec4(finalColor, 0.92);
+    vec3 finalColor = baseColor + contourLine * phosphorEmerald * 0.78 + grid * cyberCyan;
+    gl_FragColor = vec4(finalColor, 0.94);
   }
 `;
 
@@ -274,9 +274,9 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
           emissive={isDiverging ? '#EF4444' : '#F59E0B'}
           emissiveIntensity={0.85}
         />
-        <Html position={[0, 0.45, 0]} center distanceFactor={13}>
+        <Html position={[0, 0.45, 0]} center distanceFactor={13} zIndexRange={[4, 0]}>
           <div
-            className={`px-1.5 py-0.5 font-mono text-[9px] font-bold border whitespace-nowrap ${
+            className={`pointer-events-none px-1.5 py-0.5 font-mono text-[9px] font-bold border whitespace-nowrap ${
               isDiverging
                 ? 'border-[#EF4444] bg-[#EF4444]/20 text-[#EF4444]'
                 : 'border-[#F59E0B] bg-[#08090C]/90 text-[#F59E0B]'
@@ -291,8 +291,8 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
       <mesh ref={momMeshRef} position={[spawnPoint[0], 1, spawnPoint[1]]}>
         <sphereGeometry args={[0.2, 16, 16]} />
         <meshStandardMaterial color="#06B6D4" emissive="#06B6D4" emissiveIntensity={0.8} />
-        <Html position={[0, -0.42, 0]} center distanceFactor={13}>
-          <div className="border border-[#06B6D4] bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#06B6D4] whitespace-nowrap">
+        <Html position={[0, -0.42, 0]} center distanceFactor={13} zIndexRange={[4, 0]}>
+          <div className="pointer-events-none border border-[#06B6D4] bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#06B6D4] whitespace-nowrap">
             SGD+MOMENTUM
           </div>
         </Html>
@@ -302,8 +302,8 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
       <mesh ref={adamMeshRef} position={[spawnPoint[0], 1, spawnPoint[1]]}>
         <sphereGeometry args={[0.22, 16, 16]} />
         <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={0.95} />
-        <Html position={[0.45, 0.32, 0]} center distanceFactor={13}>
-          <div className="border border-[#10B981] bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#10B981] whitespace-nowrap">
+        <Html position={[0.45, 0.32, 0]} center distanceFactor={13} zIndexRange={[4, 0]}>
+          <div className="pointer-events-none border border-[#10B981] bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#10B981] whitespace-nowrap">
             AdamW (ADAPTIVE)
           </div>
         </Html>
@@ -315,8 +315,8 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
           <cylinderGeometry args={[0.04, 0.04, 1.4, 8]} />
           <meshBasicMaterial color="#10B981" wireframe />
         </mesh>
-        <Html position={[0, 0.9, 0]} center distanceFactor={14}>
-          <div className="border border-[#10B981]/60 bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] text-[#10B981] whitespace-nowrap">
+        <Html position={[0, 0.9, 0]} center distanceFactor={14} zIndexRange={[4, 0]}>
+          <div className="pointer-events-none border border-[#10B981]/60 bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] text-[#10B981] whitespace-nowrap">
             GLOBAL_MINIMUM L*(w)
           </div>
         </Html>
@@ -331,8 +331,9 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
         ]}
         center
         distanceFactor={15}
+        zIndexRange={[4, 0]}
       >
-        <div className="border border-[#1E2430] bg-[#08090C]/85 px-1.5 py-0.5 font-mono text-[9px] text-[#94A3B8] whitespace-nowrap">
+        <div className="pointer-events-none border border-[#1E2430] bg-[#08090C]/85 px-1.5 py-0.5 font-mono text-[9px] text-[#94A3B8] whitespace-nowrap">
           INIT w0=({spawnPoint[0].toFixed(1)}, {spawnPoint[1].toFixed(1)}) [CLICK TERRAIN TO RE-DROP]
         </div>
       </Html>

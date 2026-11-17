@@ -304,7 +304,7 @@ export const ResourceDirectoryPane: React.FC<ResourceDirectoryPaneProps> = ({
             }}
           >
             <span
-              className="font-bold select-none"
+              className="font-bold select-none whitespace-nowrap shrink-0"
               style={{ color: 'var(--accent-primary)' }}
             >
               grep -i

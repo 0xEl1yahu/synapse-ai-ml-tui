@@ -204,16 +204,16 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
       </div>
 
       {/* Bottom Tier: Primary View Mode Multiplexer Tabs + Track Flag + ASCII Shader Toggle */}
-      <div className="flex flex-wrap items-center justify-between min-h-[34px]">
+      <div className="flex items-center justify-between min-h-[34px] overflow-x-auto no-scrollbar">
         {/* View Mode Tabs */}
-        <nav className="flex items-center overflow-x-auto no-scrollbar">
+        <nav className="flex items-center shrink-0">
           {VIEW_TABS.map((tab) => {
             const isActive = activeView === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => onViewChange(tab.id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 border-r text-[11px] tracking-tight whitespace-nowrap transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2.5 py-1.5 border-r text-[11px] tracking-tight whitespace-nowrap transition-colors cursor-pointer"
                 style={{
                   borderColor: 'var(--border-grid)',
                   backgroundColor: isActive ? 'var(--bg-elevated)' : 'transparent',
@@ -223,27 +223,26 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
                     : '2px solid transparent',
                 }}
               >
-                <span style={{ color: 'var(--text-muted)' }}>[{tab.code}:</span>
-                <span className="font-semibold hidden md:inline">{tab.label}</span>
-                <span className="font-semibold md:hidden">{tab.shortLabel}</span>
-                <span style={{ color: 'var(--text-muted)' }}>]</span>
+                <span style={{ color: 'var(--text-muted)' }}>{tab.code}:</span>
+                <span className="font-semibold hidden xl:inline">{tab.label}</span>
+                <span className="font-semibold xl:hidden">{tab.shortLabel}</span>
               </button>
             );
           })}
         </nav>
 
         {/* Right Controls: Track Selector & Real-Time ASCII Shader Toggle */}
-        <div className="flex items-center ml-auto">
+        <div className="flex items-center shrink-0 ml-auto">
           {/* Track Selector */}
           <div
-            className="hidden md:flex items-center gap-1.5 px-2.5 py-1 border-l text-[11px]"
+            className="hidden lg:flex items-center gap-1 px-2 py-1 border-l text-[11px] whitespace-nowrap"
             style={{ borderColor: 'var(--border-grid)' }}
           >
             <Compass
-              className="w-3 h-3"
+              className="w-3 h-3 shrink-0"
               style={{ color: 'var(--accent-param)' }}
             />
-            <span style={{ color: 'var(--text-muted)' }}>--track=</span>
+            <span style={{ color: 'var(--text-muted)' }}>track:</span>
             <div className="flex items-center gap-1">
               {TRACK_OPTIONS.map((track) => {
                 const active = activeTrack === track.id;
@@ -274,7 +273,7 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
           {/* ASCII Post-Processing Shader Toggle */}
           <button
             onClick={onToggleAscii}
-            className="flex items-center gap-1.5 px-3 py-1.5 border-l text-[11px] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 border-l text-[11px] whitespace-nowrap transition-colors cursor-pointer"
             style={{
               borderColor: 'var(--border-grid)',
               backgroundColor: renderAscii ? 'var(--bg-elevated)' : 'transparent',
@@ -282,8 +281,8 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
             }}
             title="Toggle real-time ASCII glyph post-processing shader on all 3D scenes"
           >
-            <Sparkles className="w-3 h-3" />
-            <span className="hidden sm:inline">ASCII_SHADER:</span>
+            <Sparkles className="w-3 h-3 shrink-0" />
+            <span className="hidden sm:inline">ASCII:</span>
             <span
               className="font-bold"
               style={{
@@ -293,18 +292,6 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
               [{renderAscii ? 'ON' : 'OFF'}]
             </span>
           </button>
-
-          {/* Status Indicator */}
-          <div
-            className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 border-l text-[10px]"
-            style={{
-              borderColor: 'var(--border-grid)',
-              color: 'var(--text-muted)',
-            }}
-          >
-            <Sliders className="w-3 h-3" style={{ color: 'var(--accent-primary)' }} />
-            <span>60FPS_WEBGL</span>
-          </div>
         </div>
       </div>
     </header>

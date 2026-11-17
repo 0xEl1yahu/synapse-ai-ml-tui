@@ -39,7 +39,7 @@ export const MODULES_PART_2: TaxonomyModule[] = [
         whyItMatters:
           'Tokenization controls context window efficiency, multilingual fertility, arithmetic accuracy, and code indentation overhead. Scaling laws dictate whether you should train a 70B model for 1T tokens or an 8B model for 15T tokens so inference fits on a single GPU.',
         realWorldSystems: [
-          'OpenAI tiktoken (cl100k_base / o200k_base)',
+          'OpenAI tiktoken (the open-source fast BPE tokenizer library behind GPT-4 / GPT-4o)',
           'Llama-3 / DeepSeek-V3 Pre-Training Pipelines',
           'Speculative Decoding (Draft + Parallel Verifier Engines)',
         ],

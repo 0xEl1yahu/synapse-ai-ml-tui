@@ -295,24 +295,22 @@ export default function App() {
       {/* Main Middle Split-Pane Workbench */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Left Directory Tree Explorer */}
-        <div className="w-64 lg:w-72 shrink-0 h-full border-r border-[var(--border-grid)] hidden md:block overflow-hidden">
-          <FileTreeExplorer
-            modules={TAXONOMY_MODULES}
-            activeView={activeView}
-            activeModuleId={activeModule.id}
-            activeSubTopicId={activeSubTopic.id}
-            activeSceneId={activeSceneId}
-            completedSubTopics={completedSubTopics}
-            onSelectOverview={() => setActiveView('overview')}
-            onSelectSubTopic={handleSelectSubTopic}
-            onSelectScene={(sceneId) => {
-              setActiveSceneId(sceneId);
-              setActiveView('webgl-lab');
-            }}
-            onSelectRoadmap={() => setActiveView('roadmap')}
-            onSelectResources={() => setActiveView('resources')}
-          />
-        </div>
+        <FileTreeExplorer
+          modules={TAXONOMY_MODULES}
+          activeView={activeView}
+          activeModuleId={activeModule.id}
+          activeSubTopicId={activeSubTopic.id}
+          activeSceneId={activeSceneId}
+          completedSubTopics={completedSubTopics}
+          onSelectOverview={() => setActiveView('overview')}
+          onSelectSubTopic={handleSelectSubTopic}
+          onSelectScene={(sceneId) => {
+            setActiveSceneId(sceneId);
+            setActiveView('webgl-lab');
+          }}
+          onSelectRoadmap={() => setActiveView('roadmap')}
+          onSelectResources={() => setActiveView('resources')}
+        />
 
         {/* Center Active Viewport Buffer */}
         <main className="flex-1 min-w-0 h-full overflow-y-auto bg-[var(--bg-canvas)]">

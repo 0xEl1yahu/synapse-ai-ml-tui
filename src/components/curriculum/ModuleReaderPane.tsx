@@ -78,8 +78,8 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
 
   return (
     <div className="flex flex-col h-full overflow-y-auto bg-[var(--bg-canvas)] text-[var(--text-primary)]">
-      {/* Sticky Module, SubTopic & Stage Switcher Header */}
-      <div className="sticky top-0 z-20 bg-[var(--bg-pane)] border-b border-[var(--border-grid)] px-4 py-2.5">
+      {/* Slim Sticky Action Bar (Never crowds reading viewport) */}
+      <div className="sticky top-0 z-30 bg-[var(--bg-pane)] border-b border-[var(--border-grid)] px-4 py-2">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
           <div className="flex items-center gap-2">
             <span className="px-1.5 py-0.5 bg-[var(--accent-primary)] text-black font-bold">
@@ -122,9 +122,11 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
             </button>
           </div>
         </div>
+      </div>
 
-        {/* SubTopic Navigation Tabs */}
-        <div className="flex flex-wrap gap-1.5 mt-2 font-mono">
+      {/* Scrollable SubTopic & Stage Switcher Toolbar */}
+      <div className="bg-[var(--bg-pane)]/60 border-b border-[var(--border-grid)] px-4 md:px-6 py-3 space-y-2.5">
+        <div className="flex flex-wrap gap-1.5 font-mono">
           {module.subTopics.map((st, idx) => {
             const isSelected = st.id === activeSubTopic.id;
             const isDone = completedSubTopics.includes(st.id);
@@ -147,7 +149,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
         </div>
 
         {/* Guided 6-Stage Learning Loop Filter Bar */}
-        <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[var(--border-grid)] overflow-x-auto font-mono text-[10px]">
+        <div className="flex items-center gap-1 pt-2 border-t border-[var(--border-grid)] overflow-x-auto font-mono text-[10px]">
           <span className="text-[var(--text-muted)] mr-1 shrink-0">STAGE_FOCUS:</span>
           {STAGE_PILLS.map((pill) => {
             const active = stageFilter === pill.id;
@@ -170,7 +172,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
       </div>
 
       {/* Main Content Container */}
-      <div className="p-4 md:p-6 max-w-5xl space-y-6">
+      <div className="p-5 md:p-8 max-w-5xl space-y-7">
         {/* Title & WTF Question Banner */}
         <div className="border border-[var(--border-grid)] bg-[var(--bg-pane)] p-4">
           <div className="font-mono text-xs text-[var(--accent-primary)] mb-1">

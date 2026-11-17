@@ -179,19 +179,19 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
       </points>
 
       {/* 3D Terminal HUD Callouts */}
-      <Html position={[-4.2, 2.9, 0]} center>
-        <div className="bg-[#08090C]/90 border border-[#F59E0B] px-2 py-1 font-mono text-[10px] text-[#F59E0B] whitespace-nowrap">
+      <Html position={[-4.2, 2.9, 0]} center zIndexRange={[4, 0]}>
+        <div className="pointer-events-none bg-[#08090C]/90 border border-[#F59E0B] px-2 py-1 font-mono text-[10px] text-[#F59E0B] whitespace-nowrap">
           t = 0.0 // SOURCE PRIOR x_0 ~ N(0, I)
         </div>
       </Html>
 
-      <Html position={[4.0, 2.9, 0]} center>
-        <div className="bg-[#08090C]/90 border border-[#10B981] px-2 py-1 font-mono text-[10px] text-[#10B981] whitespace-nowrap">
+      <Html position={[4.0, 2.9, 0]} center zIndexRange={[4, 0]}>
+        <div className="pointer-events-none bg-[#08090C]/90 border border-[#10B981] px-2 py-1 font-mono text-[10px] text-[#10B981] whitespace-nowrap">
           t = 1.0 // TARGET DATA MANIFOLD p_1(x)
         </div>
       </Html>
 
-      <Html position={[0, -3.3, 0]} center>
+      <Html position={[0, -3.3, 0]} center zIndexRange={[4, 0]}>
         <div className="bg-[#0D0F14]/95 border border-[var(--border-grid)] px-3 py-2 font-mono text-[11px] text-[var(--text-primary)] flex items-center gap-3 whitespace-nowrap">
           <button
             type="button"

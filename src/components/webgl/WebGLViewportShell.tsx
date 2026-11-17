@@ -136,25 +136,31 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 bg-[var(--bg-pane)] border-b border-[var(--border-grid)] text-xs">
         <div className="flex flex-wrap items-center gap-1">
           <span className="text-[var(--accent-primary)] font-bold mr-1">
-            ┌─ [WEBGL2_LAB]
+            [WEBGL2_LAB]
           </span>
-          {SCENE_TABS.map((tab) => {
-            const isSelected = tab.id === activeScene;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => onSceneChange?.(tab.id)}
-                className={`px-2 py-0.5 text-[11px] border transition-colors cursor-pointer ${
-                  isSelected
-                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-semibold'
-                    : 'border-[var(--border-grid)] bg-[var(--bg-canvas)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                [{tab.code}]
-              </button>
-            );
-          })}
+          {compact ? (
+            <span className="px-2 py-0.5 text-[11px] border border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] font-semibold">
+              {activeMeta.code}
+            </span>
+          ) : (
+            SCENE_TABS.map((tab) => {
+              const isSelected = tab.id === activeScene;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => onSceneChange?.(tab.id)}
+                  className={`px-2 py-0.5 text-[11px] border transition-colors cursor-pointer ${
+                    isSelected
+                      ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-semibold'
+                      : 'border-[var(--border-grid)] bg-[var(--bg-canvas)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  [{tab.code}]
+                </button>
+              );
+            })
+          )}
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -208,7 +214,8 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
       {/* Main 3D WebGL Canvas Container */}
       <div
         ref={containerRef}
-        className={`relative w-full ${compact ? 'h-[360px]' : 'flex-1 min-h-[420px]'} bg-[#08090C] overflow-hidden`}
+        style={{ contain: 'layout paint' }}
+        className={`relative isolate z-0 w-full ${compact ? 'h-[340px]' : 'flex-1 min-h-[420px]'} bg-[#08090C] overflow-hidden`}
       >
         <Canvas
           gl={{ preserveDrawingBuffer: true, antialias: true }}

@@ -177,8 +177,8 @@ export const SuperpositionSAEScene: React.FC<SuperpositionSAESceneProps> = ({ co
                 />
               </mesh>
               {isActive && (
-                <Html position={[0, 0, 0.8]} center>
-                  <div className="bg-[#08090C]/95 border border-[#10B981] px-2 py-1 font-mono text-[10px] text-[#10B981] whitespace-nowrap">
+                <Html position={[0, 0, 0.8]} center zIndexRange={[4, 0]}>
+                  <div className="pointer-events-none bg-[#08090C]/95 border border-[#10B981] px-2 py-1 font-mono text-[10px] text-[#10B981] whitespace-nowrap">
                     SAE_MONOSEMANTIC_ACTIVE: {label} (a={((1 - maxInterference * 0.4) * 3.8).toFixed(2)})
                   </div>
                 </Html>
@@ -189,7 +189,7 @@ export const SuperpositionSAEScene: React.FC<SuperpositionSAESceneProps> = ({ co
       </group>
 
       {/* Bottom Interactive Polytope Mode Selector */}
-      <Html position={[0, -3.35, 0]} center>
+      <Html position={[0, -3.35, 0]} center zIndexRange={[4, 0]}>
         <div className="bg-[#0D0F14]/95 border border-[var(--border-grid)] px-3 py-2 font-mono text-[11px] text-[var(--text-primary)] flex items-center gap-3 whitespace-nowrap">
           <span className="text-[#94A3B8]">PACK M FEATURES IN R^3:</span>
           {[

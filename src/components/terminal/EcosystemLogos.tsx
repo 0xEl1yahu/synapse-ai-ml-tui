@@ -128,7 +128,7 @@ function resolveLogoKey(rawToolName: string): string | null {
   if (lower.includes('qdrant')) return 'qdrant';
   if (lower.includes('pgvector') || lower.includes('postgres')) return 'postgresql';
   if (lower.includes('docker')) return 'docker';
-  if (lower.includes('triton') || lower.includes('flashattention') || lower.includes('nvidia'))
+  if (lower.includes('triton') || lower.includes('flashattention') || lower.includes('nvidia') || lower.includes('cuda'))
     return 'nvidia';
   if (lower.includes('tensorflow')) return 'tensorflow';
   if (lower.includes('gemini')) return 'gemini';
@@ -163,7 +163,7 @@ export const EcosystemToolBadge: React.FC<{
           />
           <circle cx="9.8" cy="5.2" r="1.1" fill="#EE4C2C" />
         </svg>
-      ) : lower.includes('huggingface') || lower.includes('diffusers') || lower.includes('trl') ? (
+      ) : lower.includes('huggingface') || lower.includes('hugging face') || lower.includes('diffusers') || lower.includes('trl') ? (
         /* Custom HuggingFace / Open-Weights Tensor Glyph */
         <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 shrink-0" fill="none">
           <rect x="2" y="2" width="12" height="12" stroke="#F59E0B" strokeWidth="1.5" />
@@ -196,15 +196,15 @@ export const EcosystemLogoStrip: React.FC<{ isLightMode?: boolean }> = ({
   const featuredStack = [
     'Python',
     'PyTorch',
-    'NumPy & einops',
-    'HuggingFace TRL',
-    'DeepSeek MLA/GRPO',
-    'Anthropic SAE/MCP',
-    'OpenAI tiktoken',
-    'NVIDIA FlashAttention',
-    'Qdrant HNSW',
+    'NumPy',
+    'OpenAI GPT / SDK',
+    'Anthropic Claude / MCP',
+    'DeepSeek R1 / MLA',
+    'Hugging Face',
+    'NVIDIA CUDA',
+    'Qdrant Vector DB',
     'pgvector',
-    'Docker Sandbox',
+    'Docker',
   ];
 
   return (

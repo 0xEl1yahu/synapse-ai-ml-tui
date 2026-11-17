@@ -72,20 +72,20 @@ export const AsciiOverlayRenderer: React.FC<AsciiOverlayRendererProps> = ({
                   const blue = imgData[idx + 2];
 
                   const luma = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
-                  if (luma < 0.045) continue;
+                  if (luma < 0.015) continue;
 
                   const rampIdx = Math.min(
                     ASCII_RAMP.length - 1,
-                    Math.floor(Math.pow(luma, 0.78) * ASCII_RAMP.length)
+                    Math.floor(Math.pow(luma, 0.65) * ASCII_RAMP.length)
                   );
                   const glyph = ASCII_RAMP[rampIdx];
                   if (glyph === ' ') continue;
 
                   // Boost saturation/brightness while preserving emerald/amber/cyan/crimson hue
-                  const boost = 1.45;
-                  const br = Math.min(255, Math.floor(red * boost + 18));
-                  const bg = Math.min(255, Math.floor(green * boost + 24));
-                  const bb = Math.min(255, Math.floor(blue * boost + 18));
+                  const boost = 1.75;
+                  const br = Math.min(255, Math.floor(red * boost + 24));
+                  const bg = Math.min(255, Math.floor(green * boost + 32));
+                  const bb = Math.min(255, Math.floor(blue * boost + 24));
 
                   oCtx.fillStyle = `rgb(${br}, ${bg}, ${bb})`;
                   oCtx.fillText(glyph, c * cellW, y);
