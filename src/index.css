@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+:root,
+[data-theme="phosphor"] {
+  --bg-canvas: #08090C;
+  --bg-pane: #0D0F14;
+  --bg-elevated: #141820;
+  --border-grid: #1E2430;
+  --border-active: #10B981;
+  --text-primary: #ECFDF5;
+  --text-secondary: #94A3B8;
+  --text-muted: #475569;
+  --accent-primary: #10B981;
+  --accent-warn: #F59E0B;
+  --accent-param: #06B6D4;
+  --accent-danger: #EF4444;
+}
+
+[data-theme="amber-crt"] {
+  --bg-canvas: #0C0906;
+  --bg-pane: #120E0A;
+  --bg-elevated: #1C150E;
+  --border-grid: #2E2214;
+  --border-active: #F59E0B;
+  --text-primary: #FEF3C7;
+  --text-secondary: #D97706;
+  --text-muted: #78350F;
+  --accent-primary: #F59E0B;
+  --accent-warn: #EF4444;
+  --accent-param: #FBBF24;
+  --accent-danger: #DC2626;
+}
+
+[data-theme="cyber-cyan"] {
+  --bg-canvas: #060A0E;
+  --bg-pane: #0B1118;
+  --bg-elevated: #111B26;
+  --border-grid: #1B2C3E;
+  --border-active: #06B6D4;
+  --text-primary: #ECFEFF;
+  --text-secondary: #7DD3FC;
+  --text-muted: #334155;
+  --accent-primary: #06B6D4;
+  --accent-warn: #F59E0B;
+  --accent-param: #38BDF8;
+  --accent-danger: #EF4444;
+}
+
+[data-theme="paper-lab"] {
+  --bg-canvas: #F4F3EF;
+  --bg-pane: #EAE8E1;
+  --bg-elevated: #DFDDD4;
+  --border-grid: #C8C5B8;
+  --border-active: #0F766E;
+  --text-primary: #111315;
+  --text-secondary: #3F464E;
+  --text-muted: #71787F;
+  --accent-primary: #0D9488;
+  --accent-warn: #D97706;
+  --accent-param: #0284C7;
+  --accent-danger: #DC2626;
+}
+
+* {
+  box-sizing: border-box;
+  border-radius: 0px !important;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
+
+.font-mono,
+code,
+pre,
+kbd,
+.tui-chrome {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Custom sleek terminal scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+  border-left: 1px solid var(--border-grid);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-grid);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* Subtle CRT scanline overlay helper */
+.tui-scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.22) 50%
+  );
+  background-size: 100% 4px;
+}
+
+@keyframes pulse-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor {
+  animation: pulse-cursor 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
