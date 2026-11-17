@@ -307,7 +307,7 @@ export default function App() {
                           value={overviewFilter}
                           onChange={(e) => setOverviewFilter(e.target.value)}
                           placeholder="Filter topics: attention, backprop, agent harness, hessian, grpo, flow matching, sae..."
-                          className="w-full bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
+                          className="w-full bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)] px-1"
                         />
                         <button
                           type="button"
@@ -541,6 +541,8 @@ export default function App() {
               onSelectSubTopic={(subId) => setActiveSubTopicId(subId)}
               completedSubTopics={completedSubTopics}
               onToggleComplete={handleToggleSubTopicComplete}
+              onNavigateModule={handleSelectSubTopic}
+              allModules={TAXONOMY_MODULES}
               onOpenFullLab={(sceneId) => {
                 setActiveSceneId(sceneId);
                 setActiveView('webgl-lab');
@@ -558,8 +560,34 @@ export default function App() {
           )}
 
           {activeView === 'webgl-lab' && (
-            <div className="h-full flex flex-col p-3 gap-3">
-              <div className="flex-1 min-h-[480px]">
+            <div className="h-full flex flex-col p-3 gap-3 overflow-y-auto">
+              {/* Coupled Theory Bridge Banner inside Fullscreen Lab */}
+              <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-[var(--bg-pane)] border border-[var(--border-grid)] font-mono text-xs shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="px-1.5 py-0.5 bg-[var(--accent-primary)] text-black font-bold">
+                    AI_SYSTEMS_LAB // ACTIVE_SCENE: {activeSceneId.toUpperCase()}
+                  </span>
+                  <span className="text-[var(--text-secondary)]">
+                    Principle: Learn It ▸ Interact With It ▸ Break It ▸ Understand It
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const coupledMod =
+                        TAXONOMY_MODULES.find((m) => m.defaultSceneId === activeSceneId) ||
+                        TAXONOMY_MODULES[0];
+                      handleSelectSubTopic(coupledMod.id, coupledMod.subTopics[0].id);
+                    }}
+                    className="px-2.5 py-1 border border-[var(--accent-primary)] bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-bold hover:bg-[var(--accent-primary)]/25 cursor-pointer"
+                  >
+                    [READ_COUPLED_THEORY_&_MATH_FOR_THIS_LAB ❯]
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1 min-h-[500px]">
                 <WebGLViewportShell
                   activeScene={activeSceneId}
                   onSceneChange={setActiveSceneId}

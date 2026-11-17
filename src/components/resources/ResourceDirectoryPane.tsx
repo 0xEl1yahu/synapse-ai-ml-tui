@@ -314,7 +314,7 @@ export const ResourceDirectoryPane: React.FC<ResourceDirectoryPaneProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Filter by title, author (Karpathy, 3Blue1Brown, FlashAttention...), or topic..."
-              className="w-full bg-transparent outline-none font-mono text-xs"
+              className="w-full bg-transparent focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)] px-1 font-mono text-xs"
               style={{ color: 'var(--text-primary)' }}
             />
             {searchQuery && (

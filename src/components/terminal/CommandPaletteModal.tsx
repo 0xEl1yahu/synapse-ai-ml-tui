@@ -269,7 +269,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder='Ask "WTF is attention?", "agent harness", "backprop", "GRPO", "LoRA", "SAE"...'
-            className="w-full bg-transparent outline-none text-sm font-mono"
+            className="w-full bg-transparent focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)] px-1 text-sm font-mono"
             style={{ color: 'var(--text-primary)' }}
           />
           {query && (

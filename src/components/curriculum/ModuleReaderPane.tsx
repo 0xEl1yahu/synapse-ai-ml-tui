@@ -11,7 +11,28 @@ export interface ModuleReaderPaneProps {
   onToggleComplete: (subTopicId: string) => void;
   renderWebGLSlot?: React.ReactNode;
   onOpenFullLab: (sceneId: WebGLSceneId) => void;
+  onNavigateModule?: (moduleId: string, subTopicId: string) => void;
+  allModules?: TaxonomyModule[];
 }
+
+type ReaderSectionFilter =
+  | 'ALL_STAGES'
+  | '01_PLAIN_ENGLISH'
+  | '02_3D_LAB'
+  | '03_ARCHITECTURE'
+  | '04_MATH'
+  | '05_CODE'
+  | '06_BREAK_IT';
+
+const STAGE_PILLS: { id: ReaderSectionFilter; label: string }[] = [
+  { id: 'ALL_STAGES', label: '[ALL: FULL_LOOP]' },
+  { id: '01_PLAIN_ENGLISH', label: '[01: WTF_PLAIN_ENGLISH]' },
+  { id: '02_3D_LAB', label: '[02: 3D_LAB_&_SIM]' },
+  { id: '03_ARCHITECTURE', label: '[03: ARCHITECTURE]' },
+  { id: '04_MATH', label: '[04: MATH_DECODED]' },
+  { id: '05_CODE', label: '[05: RUNNABLE_CODE]' },
+  { id: '06_BREAK_IT', label: '[06: BREAK_IT!]' },
+];
 
 export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
   module,
@@ -21,12 +42,28 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
   onToggleComplete,
   renderWebGLSlot,
   onOpenFullLab,
+  onNavigateModule,
+  allModules = [],
 }) => {
   const [showEmbedded3D, setShowEmbedded3D] = useState<boolean>(true);
+  const [stageFilter, setStageFilter] = useState<ReaderSectionFilter>('ALL_STAGES');
   const [copiedCodeIdx, setCopiedCodeIdx] = useState<number | null>(null);
   const [simulatedCodeIdx, setSimulatedCodeIdx] = useState<number | null>(null);
 
   const isCompleted = completedSubTopics.includes(activeSubTopic.id);
+
+  // Compute Previous / Next SubTopic across all 8 modules for sequential flow
+  const flatTopics = allModules.flatMap((m) =>
+    m.subTopics.map((st) => ({ moduleId: m.id, moduleNum: m.number, subTopic: st }))
+  );
+  const currentFlatIdx = flatTopics.findIndex(
+    (item) => item.moduleId === module.id && item.subTopic.id === activeSubTopic.id
+  );
+  const prevItem = currentFlatIdx > 0 ? flatTopics[currentFlatIdx - 1] : null;
+  const nextItem =
+    currentFlatIdx >= 0 && currentFlatIdx < flatTopics.length - 1
+      ? flatTopics[currentFlatIdx + 1]
+      : null;
 
   const handleCopyCode = (code: string, idx: number) => {
     navigator.clipboard?.writeText(code);
@@ -34,16 +71,21 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
     setTimeout(() => setCopiedCodeIdx(null), 1800);
   };
 
+  const showSection = (target: ReaderSectionFilter) =>
+    stageFilter === 'ALL_STAGES' || stageFilter === target;
+
   return (
     <div className="flex flex-col h-full overflow-y-auto bg-[var(--bg-canvas)] text-[var(--text-primary)]">
-      {/* Sticky Module & SubTopic Header */}
+      {/* Sticky Module, SubTopic & Stage Switcher Header */}
       <div className="sticky top-0 z-20 bg-[var(--bg-pane)] border-b border-[var(--border-grid)] px-4 py-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
           <div className="flex items-center gap-2">
             <span className="px-1.5 py-0.5 bg-[var(--accent-primary)] text-black font-bold">
               LAYER_{module.number} // {module.layerCategory}
             </span>
-            <span className="text-[var(--text-secondary)]">{module.filePath}</span>
+            <span className="text-[var(--text-secondary)] hidden sm:inline">
+              {module.filePath}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -80,7 +122,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
         </div>
 
         {/* SubTopic Navigation Tabs */}
-        <div className="flex flex-wrap gap-1.5 mt-2.5 font-mono">
+        <div className="flex flex-wrap gap-1.5 mt-2 font-mono">
           {module.subTopics.map((st, idx) => {
             const isSelected = st.id === activeSubTopic.id;
             const isDone = completedSubTopics.includes(st.id);
@@ -101,6 +143,28 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
             );
           })}
         </div>
+
+        {/* Guided 6-Stage Learning Loop Filter Bar */}
+        <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[var(--border-grid)] overflow-x-auto font-mono text-[10px]">
+          <span className="text-[var(--text-muted)] mr-1 shrink-0">STAGE_FOCUS:</span>
+          {STAGE_PILLS.map((pill) => {
+            const active = stageFilter === pill.id;
+            return (
+              <button
+                key={pill.id}
+                type="button"
+                onClick={() => setStageFilter(pill.id)}
+                className={`px-1.5 py-0.5 border shrink-0 transition-colors cursor-pointer ${
+                  active
+                    ? 'border-[var(--accent-param)] bg-[var(--accent-param)]/15 text-[var(--accent-param)] font-bold'
+                    : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {pill.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Main Content Container */}
@@ -114,178 +178,237 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
             {activeSubTopic.title}
           </h1>
           <div className="mt-2 text-sm text-[var(--accent-warn)] font-mono">
-            ❯ QUESTION: "{activeSubTopic.wtfQuestion}"
+            ❯ QUESTION: &quot;{activeSubTopic.wtfQuestion}&quot;
           </div>
         </div>
 
         {/* 01 // PLAIN ENGLISH EXPLANATION (ZERO GATEKEEPING) */}
-        <section className="border border-[var(--accent-primary)]/60 bg-[var(--bg-pane)] p-4">
-          <div className="flex items-center justify-between font-mono text-xs text-[var(--accent-primary)] font-bold mb-2 pb-1.5 border-b border-[var(--border-grid)]">
-            <span>01 // WTF_IS_IT? (PLAIN_ENGLISH_NO_JARGON)</span>
-            <span>[ZERO_GATEKEEPING_MODE]</span>
-          </div>
-          <p className="text-sm md:text-[15px] leading-relaxed text-[var(--text-primary)]">
-            {activeSubTopic.plainEnglish}
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 pt-3 border-t border-[var(--border-grid)]">
-            <div>
-              <div className="font-mono text-[11px] text-[var(--accent-param)] font-semibold mb-1">
-                WHY_IT_MATTERS_IN_PRODUCTION:
-              </div>
-              <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
-                {activeSubTopic.whyItMatters}
-              </p>
+        {showSection('01_PLAIN_ENGLISH') && (
+          <section className="border border-[var(--accent-primary)]/60 bg-[var(--bg-pane)] p-4">
+            <div className="flex items-center justify-between font-mono text-xs text-[var(--accent-primary)] font-bold mb-2 pb-1.5 border-b border-[var(--border-grid)]">
+              <span>01 // WTF_IS_IT? (PLAIN_ENGLISH_NO_JARGON)</span>
+              <span>[ZERO_GATEKEEPING_MODE]</span>
             </div>
-            <div>
-              <div className="font-mono text-[11px] text-[var(--accent-warn)] font-semibold mb-1">
-                WHERE_IT_RUNS_IN_REAL_SYSTEMS:
+            <p className="text-sm md:text-[15px] leading-relaxed text-[var(--text-primary)]">
+              {activeSubTopic.plainEnglish}
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 pt-3 border-t border-[var(--border-grid)]">
+              <div>
+                <div className="font-mono text-[11px] text-[var(--accent-param)] font-semibold mb-1">
+                  WHY_IT_MATTERS_IN_PRODUCTION:
+                </div>
+                <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
+                  {activeSubTopic.whyItMatters}
+                </p>
               </div>
-              <ul className="space-y-1 font-mono text-xs text-[var(--text-primary)]">
-                {activeSubTopic.realWorldSystems.map((sys) => (
-                  <li key={sys} className="flex items-center gap-1.5">
-                    <span className="text-[var(--accent-primary)]">▸</span>
-                    <span>{sys}</span>
+              <div>
+                <div className="font-mono text-[11px] text-[var(--accent-warn)] font-semibold mb-1">
+                  WHERE_IT_RUNS_IN_REAL_SYSTEMS:
+                </div>
+                <ul className="space-y-1 font-mono text-xs text-[var(--text-primary)]">
+                  {activeSubTopic.realWorldSystems.map((sys) => (
+                    <li key={sys} className="flex items-center gap-1.5">
+                      <span className="text-[var(--accent-primary)]">▸</span>
+                      <span>{sys}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* 02 // INTERACTIVE 3D WEBGL & AGENT HARNESS SANDBOX */}
+        {showSection('02_3D_LAB') && (
+          <>
+            {showEmbedded3D && renderWebGLSlot && (
+              <section className="space-y-2">
+                <div className="flex items-center justify-between font-mono text-xs text-[var(--accent-param)]">
+                  <span>
+                    02 // INTERACTIVE_3D_SYSTEMS_SANDBOX (LEARN_IT ▸ INTERACT ▸ BREAK_IT)
+                  </span>
+                  <span>[SCENE: {module.defaultSceneId.toUpperCase()}]</span>
+                </div>
+                {renderWebGLSlot}
+              </section>
+            )}
+
+            {(module.id === '06_ai_systems_ops' ||
+              activeSubTopic.id.includes('agent') ||
+              activeSubTopic.id.includes('attention')) && <AgentHarnessSimulator />}
+          </>
+        )}
+
+        {/* 03 // TECHNICAL & ARCHITECTURAL DEEP DIVE */}
+        {showSection('03_ARCHITECTURE') && (
+          <section className="border border-[var(--border-grid)] bg-[var(--bg-pane)] p-4 space-y-4">
+            <div className="font-mono text-xs text-[var(--accent-primary)] font-bold pb-1.5 border-b border-[var(--border-grid)]">
+              03 // FIRST-PRINCIPLES_&_FRONTIER_ARCHITECTURE_DEEP_DIVE
+            </div>
+
+            <pre className="p-3 bg-[var(--bg-canvas)] border border-[var(--border-grid)] font-mono text-[11px] text-[var(--accent-primary)] overflow-x-auto leading-snug">
+              {module.asciiArchitectureDiagram}
+            </pre>
+
+            <div className="space-y-3 text-sm leading-relaxed text-[var(--text-primary)]">
+              {activeSubTopic.deepDiveParagraphs.map((para, i) => (
+                <p key={i} className="leading-relaxed">
+                  {para}
+                </p>
+              ))}
+            </div>
+
+            {/* Key Takeaways */}
+            <div className="p-3 bg-[var(--bg-canvas)] border border-[var(--border-grid)]">
+              <div className="font-mono text-xs text-[var(--accent-primary)] font-bold mb-2">
+                ◆ KEY_ENGINEERING_INVARIANT_TAKEAWAYS:
+              </div>
+              <ul className="space-y-1.5 text-xs md:text-sm">
+                {activeSubTopic.keyTakeaways.map((kt, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="font-mono text-[var(--accent-primary)] font-bold">
+                      [0{idx + 1}]
+                    </span>
+                    <span>{kt}</span>
                   </li>
                 ))}
               </ul>
             </div>
-          </div>
-        </section>
-
-        {/* 02 // INTERACTIVE 3D WEBGL & AGENT HARNESS SANDBOX */}
-        {showEmbedded3D && renderWebGLSlot && (
-          <section className="space-y-2">
-            <div className="flex items-center justify-between font-mono text-xs text-[var(--accent-param)]">
-              <span>02 // INTERACTIVE_3D_SYSTEMS_SANDBOX (LEARN_IT ▸ INTERACT ▸ BREAK_IT)</span>
-              <span>[SCENE: {module.defaultSceneId.toUpperCase()}]</span>
-            </div>
-            {renderWebGLSlot}
           </section>
         )}
 
-        {(module.id === '06_ai_systems_ops' ||
-          activeSubTopic.id.includes('agent') ||
-          activeSubTopic.id.includes('attention')) && <AgentHarnessSimulator />}
-
-        {/* 03 // TECHNICAL & ARCHITECTURAL DEEP DIVE */}
-        <section className="border border-[var(--border-grid)] bg-[var(--bg-pane)] p-4 space-y-4">
-          <div className="font-mono text-xs text-[var(--accent-primary)] font-bold pb-1.5 border-b border-[var(--border-grid)]">
-            03 // FIRST-PRINCIPLES_&_FRONTIER_ARCHITECTURE_DEEP_DIVE
-          </div>
-
-          <pre className="p-3 bg-[var(--bg-canvas)] border border-[var(--border-grid)] font-mono text-[11px] text-[var(--accent-primary)] overflow-x-auto leading-snug">
-            {module.asciiArchitectureDiagram}
-          </pre>
-
-          <div className="space-y-3 text-sm leading-relaxed text-[var(--text-primary)]">
-            {activeSubTopic.deepDiveParagraphs.map((para, i) => (
-              <p key={i} className="leading-relaxed">
-                {para}
-              </p>
-            ))}
-          </div>
-
-          {/* Key Takeaways */}
-          <div className="p-3 bg-[var(--bg-canvas)] border border-[var(--border-grid)]">
-            <div className="font-mono text-xs text-[var(--accent-primary)] font-bold mb-2">
-              ◆ KEY_ENGINEERING_INVARIANT_TAKEAWAYS:
+        {/* 04 // THE MATHEMATICS (DECODED) */}
+        {showSection('04_MATH') && (
+          <section className="space-y-3">
+            <div className="font-mono text-xs text-[var(--accent-primary)] font-bold">
+              04 // THE_MATHEMATICS_DECODED (INTERACTIVE_SYMBOL_PROBES)
             </div>
-            <ul className="space-y-1.5 text-xs md:text-sm">
-              {activeSubTopic.keyTakeaways.map((kt, idx) => (
+            {activeSubTopic.mathFormulas.map((formula) => (
+              <InteractiveFormulaBlock key={formula.id} formula={formula} />
+            ))}
+          </section>
+        )}
+
+        {/* 05 // RUNNABLE CODE BLUEPRINTS */}
+        {showSection('05_CODE') && (
+          <section className="space-y-3">
+            <div className="font-mono text-xs text-[var(--accent-primary)] font-bold">
+              05 // FROM-SCRATCH_CODE_IMPLEMENTATION
+            </div>
+            {activeSubTopic.codeExamples.map((ex, idx) => (
+              <div
+                key={ex.title}
+                className="border border-[var(--border-grid)] bg-[var(--bg-pane)] font-mono"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 bg-[var(--bg-elevated)] border-b border-[var(--border-grid)] text-xs">
+                  <div>
+                    <span className="text-[var(--accent-param)] font-bold mr-2">
+                      [{ex.language.toUpperCase()}]
+                    </span>
+                    <span className="text-[var(--text-primary)] font-semibold">
+                      {ex.title}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSimulatedCodeIdx(simulatedCodeIdx === idx ? null : idx)
+                      }
+                      className="px-2 py-0.5 border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/15 text-[11px] cursor-pointer"
+                    >
+                      [{simulatedCodeIdx === idx ? 'HIDE_TRACE' : 'RUN_VERIFICATION_TRACE ❯'}]
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyCode(ex.code, idx)}
+                      className="px-2 py-0.5 border border-[var(--border-grid)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] cursor-pointer"
+                    >
+                      [{copiedCodeIdx === idx ? 'COPIED ✓' : 'COPY_CODE'}]
+                    </button>
+                  </div>
+                </div>
+                <div className="px-3 py-1.5 text-xs text-[var(--text-secondary)] font-sans border-b border-[var(--border-grid)]">
+                  {ex.description}
+                </div>
+                <pre className="p-3 bg-[var(--bg-canvas)] text-xs text-[var(--text-primary)] overflow-x-auto leading-relaxed">
+                  {ex.code}
+                </pre>
+                {simulatedCodeIdx === idx && (
+                  <div className="p-3 bg-[var(--bg-elevated)] border-t border-[var(--accent-primary)] text-[11px] text-[var(--accent-primary)]">
+                    <div>
+                      $ python3 -c &quot;verify_{activeSubTopic.commandSlug.replace(/-/g, '_')}()&quot;
+                    </div>
+                    <div className="text-[var(--text-secondary)] mt-1">
+                      [STDOUT] Initializing tensor shapes &amp; analytical gradient check...
+                    </div>
+                    <div className="text-[var(--accent-primary)] font-bold mt-0.5">
+                      [PASS ✓] Forward/Backward numerical invariant verified (max_rel_err = 1.42e-7, exit_code = 0)
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </section>
+        )}
+
+        {/* 06 // BREAK IT: FAILURE MODES, OVERFITTING & SILENT BUGS */}
+        {showSection('06_BREAK_IT') && (
+          <section className="border border-[var(--accent-danger)]/70 bg-[var(--bg-pane)] p-4 font-mono">
+            <div className="flex items-center justify-between text-xs text-[var(--accent-danger)] font-bold pb-2 mb-2 border-b border-[var(--border-grid)]">
+              <span>06 // BREAK_IT: PRODUCTION_FAILURE_MODES_&_SILENT_BUGS</span>
+              <span>[!DIAGNOSTIC_CHECKLIST]</span>
+            </div>
+            <ul className="space-y-2 text-xs font-sans text-[var(--text-primary)]">
+              {activeSubTopic.pitfalls.map((pitfall, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="font-mono text-[var(--accent-primary)] font-bold">
-                    [0{idx + 1}]
+                  <span className="font-mono text-[var(--accent-danger)] font-bold">
+                    [!BUG_0{idx + 1}]
                   </span>
-                  <span>{kt}</span>
+                  <span className="leading-relaxed">{pitfall}</span>
                 </li>
               ))}
             </ul>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* 04 // THE MATHEMATICS (DECODED) */}
-        <section className="space-y-3">
-          <div className="font-mono text-xs text-[var(--accent-primary)] font-bold">
-            04 // THE_MATHEMATICS_DECODED (INTERACTIVE_SYMBOL_PROBES)
-          </div>
-          {activeSubTopic.mathFormulas.map((formula) => (
-            <InteractiveFormulaBlock key={formula.id} formula={formula} />
-          ))}
-        </section>
-
-        {/* 05 // RUNNABLE CODE BLUEPRINTS */}
-        <section className="space-y-3">
-          <div className="font-mono text-xs text-[var(--accent-primary)] font-bold">
-            05 // FROM-SCRATCH_CODE_IMPLEMENTATION
-          </div>
-          {activeSubTopic.codeExamples.map((ex, idx) => (
-            <div
-              key={ex.title}
-              className="border border-[var(--border-grid)] bg-[var(--bg-pane)] font-mono"
+        {/* Bottom Sequential Navigation Footer (Prev / Next Topic Across All 24 Modules) */}
+        <footer className="pt-4 border-t border-[var(--border-grid)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 font-mono text-xs">
+          {prevItem && onNavigateModule ? (
+            <button
+              type="button"
+              onClick={() => onNavigateModule(prevItem.moduleId, prevItem.subTopic.id)}
+              className="p-3 border border-[var(--border-grid)] bg-[var(--bg-pane)] hover:border-[var(--accent-primary)] text-left flex-1 cursor-pointer"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 bg-[var(--bg-elevated)] border-b border-[var(--border-grid)] text-xs">
-                <div>
-                  <span className="text-[var(--accent-param)] font-bold mr-2">
-                    [{ex.language.toUpperCase()}]
-                  </span>
-                  <span className="text-[var(--text-primary)] font-semibold">{ex.title}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSimulatedCodeIdx(simulatedCodeIdx === idx ? null : idx)
-                    }
-                    className="px-2 py-0.5 border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/15 text-[11px] cursor-pointer"
-                  >
-                    [{simulatedCodeIdx === idx ? 'HIDE_TRACE' : 'RUN_VERIFICATION_TRACE ❯'}]
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleCopyCode(ex.code, idx)}
-                    className="px-2 py-0.5 border border-[var(--border-grid)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] cursor-pointer"
-                  >
-                    [{copiedCodeIdx === idx ? 'COPIED ✓' : 'COPY_CODE'}]
-                  </button>
-                </div>
+              <div className="text-[10px] text-[var(--text-secondary)]">
+                ◂ PREV_CONCEPT (MOD_{prevItem.moduleNum})
               </div>
-              <div className="px-3 py-1.5 text-xs text-[var(--text-secondary)] font-sans border-b border-[var(--border-grid)]">
-                {ex.description}
+              <div className="text-xs font-bold text-[var(--text-primary)] mt-0.5 truncate">
+                {prevItem.subTopic.title}
               </div>
-              <pre className="p-3 bg-[var(--bg-canvas)] text-xs text-[var(--text-primary)] overflow-x-auto leading-relaxed">
-                {ex.code}
-              </pre>
-              {simulatedCodeIdx === idx && (
-                <div className="p-3 bg-[#050709] border-t border-[var(--accent-primary)] text-[11px] text-[var(--accent-primary)]">
-                  <div>$ python3 -c "verify_{activeSubTopic.commandSlug.replace(/-/g, '_')}()"</div>
-                  <div className="text-[var(--text-secondary)] mt-1">
-                    [STDOUT] Initializing tensor shapes & analytical gradient check...
-                  </div>
-                  <div className="text-[#10B981] mt-0.5">
-                    [PASS ✓] Forward/Backward numerical invariant verified (max_rel_err = 1.42e-7, exit_code = 0)
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </section>
+            </button>
+          ) : (
+            <div className="flex-1" />
+          )}
 
-        {/* 06 // BREAK IT: FAILURE MODES, OVERFITTING & SILENT BUGS */}
-        <section className="border border-[#EF4444]/70 bg-[var(--bg-pane)] p-4 font-mono">
-          <div className="flex items-center justify-between text-xs text-[#EF4444] font-bold pb-2 mb-2 border-b border-[var(--border-grid)]">
-            <span>06 // BREAK_IT: PRODUCTION_FAILURE_MODES_&_SILENT_BUGS</span>
-            <span>[!DIAGNOSTIC_CHECKLIST]</span>
-          </div>
-          <ul className="space-y-2 text-xs font-sans text-[var(--text-primary)]">
-            {activeSubTopic.pitfalls.map((pitfall, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="font-mono text-[#EF4444] font-bold">[!BUG_0{idx + 1}]</span>
-                <span className="leading-relaxed">{pitfall}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+          {nextItem && onNavigateModule ? (
+            <button
+              type="button"
+              onClick={() => onNavigateModule(nextItem.moduleId, nextItem.subTopic.id)}
+              className="p-3 border border-[var(--accent-primary)] bg-[var(--bg-pane)] hover:bg-[var(--accent-primary)]/10 text-right flex-1 cursor-pointer"
+            >
+              <div className="text-[10px] text-[var(--accent-primary)]">
+                NEXT_CONCEPT (MOD_{nextItem.moduleNum}) ▸
+              </div>
+              <div className="text-xs font-bold text-[var(--text-primary)] mt-0.5 truncate">
+                {nextItem.subTopic.title}
+              </div>
+            </button>
+          ) : (
+            <div className="flex-1" />
+          )}
+        </footer>
       </div>
     </div>
   );

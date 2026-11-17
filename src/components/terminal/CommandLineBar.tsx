@@ -272,7 +272,7 @@ export const CommandLineBar: React.FC<CommandLineBarProps> = ({
               }
             }}
             placeholder="Type a command: 'wtf attention', 'wtf agent-harness', 'lab loss-landscape', 'ascii on', 'help'..."
-            className="w-full bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none text-xs"
+            className="w-full bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)] px-1 text-xs"
           />
         </form>
 

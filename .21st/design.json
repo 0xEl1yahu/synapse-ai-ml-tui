@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "project": {
+    "name": "wtfis-ai",
+    "productType": "Interactive AI/ML Educational Terminal & 3D WebGL Systems Lab",
+    "stack": [
+      "react",
+      "tailwind-v4",
+      "three",
+      "react-three-fiber",
+      "vite"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/index.css"
+    ],
+    "components": [
+      "src/components/terminal",
+      "src/components/curriculum",
+      "src/components/webgl",
+      "src/components/roadmap",
+      "src/components/resources"
+    ],
+    "assets": [],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "dark",
+    "colors": {
+      "--bg-canvas": { "value": "#08090C", "source": "src/index.css" },
+      "--bg-pane": { "value": "#0D0F14", "source": "src/index.css" },
+      "--bg-elevated": { "value": "#141820", "source": "src/index.css" },
+      "--border-grid": { "value": "#1E2430", "source": "src/index.css" },
+      "--border-active": { "value": "#10B981", "source": "src/index.css" },
+      "--text-primary": { "value": "#ECFDF5", "source": "src/index.css" },
+      "--text-secondary": { "value": "#94A3B8", "source": "src/index.css" },
+      "--text-muted": { "value": "#475569", "source": "src/index.css" },
+      "--accent-primary": { "value": "#10B981", "source": "src/index.css" },
+      "--accent-warn": { "value": "#F59E0B", "source": "src/index.css" },
+      "--accent-param": { "value": "#06B6D4", "source": "src/index.css" },
+      "--accent-danger": { "value": "#EF4444", "source": "src/index.css" }
+    },
+    "typography": {
+      "mono": "JetBrains Mono",
+      "sans": "Inter"
+    },
+    "spacing": {},
+    "radius": {
+      "default": "0px"
+    },
+    "shadows": {},
+    "motion": {},
+    "density": "compact-technical"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": [
+      "tui-split-pane",
+      "command-palette-argument-chips",
+      "webgl-shader-hud",
+      "progressive-disclosure-stages"
+    ]
+  },
+  "constraints": {
+    "must": [
+      "Preserve zero-radius 1px solid var(--border-grid) structural TUI grid",
+      "Every interactive input must provide a visible focus-visible ring or border state",
+      "Every WebGL 3D scene must support live parameter manipulation, a BREAK_IT failure preset, and --render=ascii mode"
+    ],
+    "avoid": [
+      "Indigo/violet/purple (#6366f1, #8b5cf6) AI slop colors",
+      "Floating rounded-xl shadow cards",
+      "Emoji icons"
+    ]
+  },
+  "decisions": [
+    "Guided 6-stage learning progression inside ModuleReaderPane (Plain English -> 3D Lab -> Architecture -> Math -> Code -> Failure Modes)",
+    "Argument-chip CLI & CommandPalette inspired by 21st.dev command-palette patterns"
+  ],
+  "evidence": [
+    { "fact": "design.colorMode:dark", "source": "src/index.css" },
+    { "fact": "design.tokens", "source": "src/index.css" }
+  ],
+  "generatedAt": "2026-11-17T22:22:00.000Z"
+}
