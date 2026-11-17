@@ -11,9 +11,34 @@ export type WebGLSceneId =
 export type ViewMode =
   | 'overview'      // WTFIS.AI Landing Hero + Neural Lattice 3D + "WTF is...?" Search & Quick Start
   | 'module'        // "WTF is...?" Deep-dive reader + Plain-English -> Math -> Code -> Failure Modes + coupled 3D Lab
+  | 'papers'        // Interactive Paper Dissector ("WTF is this Paper?": Attention Is All You Need, ResNet, LoRA, FlashAttention, DeepSeek-R1, etc.)
   | 'roadmap'       // Learning Through Building: Interactive git-graph DAG + Track selector + Milestone Projects
   | 'resources'     // Filterable Zero-Gatekeeping Resource Database
   | 'webgl-lab';    // AI Systems Lab: Fullscreen Interactive Systems & WebGL Sandbox (Neural Net, Attention, RL/Agent Harness, Evals)
+
+export interface CanonicalPaper {
+  id: string;
+  shortSlug: string;          // e.g. 'attention-is-all-you-need', 'resnet', 'lora', 'flashattention', 'deepseek-r1-grpo'
+  title: string;
+  authors: string;
+  year: number;
+  venueOrArxiv: string;
+  url: string;
+  moduleId: string;
+  coupledSceneId: WebGLSceneId;
+  wtfInvention: string;       // 1-sentence plain-English breakthrough
+  whatBrokeBefore: string;    // Exact failure mode before this paper existed
+  coreEquation: string;       // Symbolic equation
+  tensorFlowAscii: string;    // Annotated tensor shape step-through diagram
+  equationSteps: {
+    stepTitle: string;
+    expression: string;
+    tensorShapes: string;
+    plainMeaning: string;
+  }[];
+  minimalCode: string;        // 15-30 line exact PyTorch reproduction of the paper's core mechanism
+  productionImpact: string[];
+}
 
 export type TrackId = 'builder' | 'ml-engineer' | 'researcher';
 

@@ -27,9 +27,10 @@ export interface TopStatusBarProps {
 const VIEW_TABS: { id: ViewMode; code: string; label: string; shortLabel: string }[] = [
   { id: 'overview', code: '01', label: 'HOME_&_WTF_INDEX', shortLabel: 'WTF_INDEX' },
   { id: 'module', code: '02', label: 'WTF_IS_LIBRARY', shortLabel: 'LIBRARY' },
-  { id: 'webgl-lab', code: '03', label: 'AI_SYSTEMS_LAB', shortLabel: '3D_SYSTEMS_LAB' },
-  { id: 'roadmap', code: '04', label: 'BUILD_ROADMAP', shortLabel: 'ROADMAP' },
-  { id: 'resources', code: '05', label: 'OPEN_RESOURCES', shortLabel: 'RESOURCES' },
+  { id: 'papers', code: '03', label: 'PAPERS_DECODED', shortLabel: 'PAPERS' },
+  { id: 'webgl-lab', code: '04', label: 'AI_SYSTEMS_LAB', shortLabel: '3D_LAB' },
+  { id: 'roadmap', code: '05', label: 'BUILD_ROADMAP', shortLabel: 'ROADMAP' },
+  { id: 'resources', code: '06', label: 'OPEN_RESOURCES', shortLabel: 'RESOURCES' },
 ];
 
 const TRACK_OPTIONS: { id: TrackId; label: string }[] = [

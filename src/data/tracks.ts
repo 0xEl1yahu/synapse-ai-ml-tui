@@ -181,6 +181,28 @@ export const ROADMAP_NODES: RoadmapNode[] = [
     deliverable: 'Train an overcomplete Sparse Autoencoder on residual stream activations, steer generation via a forward hook, and build a TPR/TNR-calibrated eval harness.',
     verificationCheck: 'Demonstrate deterministic activation steering and compute bias-corrected true success rates on a 200-case eval suite.',
   },
+  {
+    id: 'node-08-multimodal-vla-gnn',
+    moduleId: '08_multimodal_world_gnn',
+    title: '08.A // Multimodal VLMs (ViT/SigLIP), Audio RVQ, VLA Robotics & E(3) GNNs',
+    command: 'wtf vlm',
+    tracks: ['researcher', 'ml-engineer', 'builder'],
+    dependencies: ['node-04-flow-matching'],
+    estimatedWeeks: 2,
+    deliverable: 'Build a ViT + MLP Multimodal VLM projector, an RVQ Straight-Through audio quantizer, and an E(3)-equivariant molecular graph layer.',
+    verificationCheck: 'Verify E(3) rotational equivariance f(Rx + t) == R f(x) + t to machine precision.',
+  },
+  {
+    id: 'node-09-sdk-orchestration-docker',
+    moduleId: '09_prod_sdk_orchestration_deploy',
+    title: '09.A // Production SDKs, Parallel Subagent Orchestration, Cog & GPU Docker',
+    command: 'wtf orchestration',
+    tracks: ['builder', 'ml-engineer'],
+    dependencies: ['node-06-agent-harness', 'node-06-gpu-serving'],
+    estimatedWeeks: 2,
+    deliverable: 'Build an AsyncOpenAI/DeepSeek Lead-Subagent Orchestrator with Git Worktree isolation and package a compiled PyTorch/vLLM service with Docker & Cog.',
+    verificationCheck: 'Container boots with --gpus all, passes healthcheck, and executes parallel subagent tasks with zero file race conditions.',
+  },
 ];
 
 export const MILESTONE_PROJECTS: MilestoneProject[] = [

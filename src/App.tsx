@@ -10,6 +10,8 @@ import { CommandPaletteModal } from './components/terminal/CommandPaletteModal';
 import { InspectorSidebar } from './components/terminal/InspectorSidebar';
 import { ModuleReaderPane } from './components/curriculum/ModuleReaderPane';
 import { AgentHarnessSimulator } from './components/curriculum/AgentHarnessSimulator';
+import { PaperDissectorPane } from './components/curriculum/PaperDissectorPane';
+import { VRAMSystemsCalculator } from './components/curriculum/VRAMSystemsCalculator';
 import { WebGLViewportShell } from './components/webgl/WebGLViewportShell';
 import { GitGraphRoadmap } from './components/roadmap/GitGraphRoadmap';
 import { ResourceDirectoryPane } from './components/resources/ResourceDirectoryPane';
@@ -195,6 +197,7 @@ export default function App() {
 
   const activePath = useMemo(() => {
     if (activeView === 'overview') return '~/wtfis-ai/README.wtf';
+    if (activeView === 'papers') return '~/wtfis-ai/papers-decoded/attention_is_all_you_need.tex';
     if (activeView === 'roadmap') return `~/wtfis-ai/roadmap.dag (${activeTrack})`;
     if (activeView === 'resources') return '~/wtfis-ai/resources.db';
     if (activeView === 'webgl-lab') return `~/wtfis-ai/systems-lab/${activeSceneId}.glsl`;
@@ -378,6 +381,13 @@ export default function App() {
                     </button>
                     <button
                       type="button"
+                      onClick={() => setActiveView('papers')}
+                      className="px-3 py-1.5 border border-[var(--accent-warn)] text-[var(--accent-warn)] hover:bg-[var(--accent-warn)]/15 font-semibold cursor-pointer"
+                    >
+                      [PAPERS_DECODED: ATTENTION_IS_ALL_YOU_NEED ❯]
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setActiveView('roadmap')}
                       className="px-3 py-1.5 border border-[var(--border-grid)] text-[var(--text-primary)] hover:border-[var(--accent-primary)] cursor-pointer"
                     >
@@ -398,8 +408,9 @@ export default function App() {
                 </div>
               </div>
 
-              {/* INTERACTIVE AGENT HARNESS TRACE ON HOME WORKBENCH */}
+              {/* INTERACTIVE AGENT HARNESS TRACE & GPU VRAM CALCULATOR ON HOME WORKBENCH */}
               <AgentHarnessSimulator />
+              <VRAMSystemsCalculator />
 
               {/* THREE ENTRY TRACKS: WHERE SHOULD YOU START? */}
               <section className="space-y-3">
@@ -613,6 +624,19 @@ export default function App() {
                 />
               </div>
             </div>
+          )}
+
+          {activeView === 'papers' && (
+            <PaperDissectorPane
+              onOpenModule={(modId) => {
+                const m = TAXONOMY_MODULES.find((x) => x.id === modId) || TAXONOMY_MODULES[0];
+                handleSelectSubTopic(m.id, m.subTopics[0].id);
+              }}
+              onLaunch3DScene={(sceneId) => {
+                setActiveSceneId(sceneId);
+                setActiveView('webgl-lab');
+              }}
+            />
           )}
 
           {activeView === 'roadmap' && (

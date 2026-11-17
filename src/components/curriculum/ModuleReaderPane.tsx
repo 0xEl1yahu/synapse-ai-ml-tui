@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { SubTopic, TaxonomyModule, WebGLSceneId } from '../../types';
 import { InteractiveFormulaBlock } from './InteractiveFormulaBlock';
 import { AgentHarnessSimulator } from './AgentHarnessSimulator';
+import { VRAMSystemsCalculator } from './VRAMSystemsCalculator';
+import { BrokenModelDiagnostic } from './BrokenModelDiagnostic';
 
 export interface ModuleReaderPaneProps {
   module: TaxonomyModule;
@@ -235,8 +237,15 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
             )}
 
             {(module.id === '06_ai_systems_ops' ||
+              module.id === '09_prod_sdk_orchestration_deploy' ||
               activeSubTopic.id.includes('agent') ||
               activeSubTopic.id.includes('attention')) && <AgentHarnessSimulator />}
+
+            {(module.id === '03_sequence_arch' ||
+              module.id === '04_generative_ai' ||
+              module.id === '05_post_training_rl' ||
+              module.id === '06_ai_systems_ops' ||
+              module.id === '09_prod_sdk_orchestration_deploy') && <VRAMSystemsCalculator />}
           </>
         )}
 
@@ -355,21 +364,25 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
 
         {/* 06 // BREAK IT: FAILURE MODES, OVERFITTING & SILENT BUGS */}
         {showSection('06_BREAK_IT') && (
-          <section className="border border-[var(--accent-danger)]/70 bg-[var(--bg-pane)] p-4 font-mono">
-            <div className="flex items-center justify-between text-xs text-[var(--accent-danger)] font-bold pb-2 mb-2 border-b border-[var(--border-grid)]">
-              <span>06 // BREAK_IT: PRODUCTION_FAILURE_MODES_&_SILENT_BUGS</span>
-              <span>[!DIAGNOSTIC_CHECKLIST]</span>
+          <section className="space-y-3">
+            <div className="border border-[var(--accent-danger)]/70 bg-[var(--bg-pane)] p-4 font-mono">
+              <div className="flex items-center justify-between text-xs text-[var(--accent-danger)] font-bold pb-2 mb-2 border-b border-[var(--border-grid)]">
+                <span>06 // BREAK_IT: PRODUCTION_FAILURE_MODES_&_SILENT_BUGS</span>
+                <span>[!DIAGNOSTIC_CHECKLIST]</span>
+              </div>
+              <ul className="space-y-2 text-xs font-sans text-[var(--text-primary)]">
+                {activeSubTopic.pitfalls.map((pitfall, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="font-mono text-[var(--accent-danger)] font-bold">
+                      [!BUG_0{idx + 1}]
+                    </span>
+                    <span className="leading-relaxed">{pitfall}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="space-y-2 text-xs font-sans text-[var(--text-primary)]">
-              {activeSubTopic.pitfalls.map((pitfall, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <span className="font-mono text-[var(--accent-danger)] font-bold">
-                    [!BUG_0{idx + 1}]
-                  </span>
-                  <span className="leading-relaxed">{pitfall}</span>
-                </li>
-              ))}
-            </ul>
+
+            <BrokenModelDiagnostic />
           </section>
         )}
 

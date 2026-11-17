@@ -207,6 +207,41 @@ export const CLI_MAN_PAGES: Record<
     moduleId: '07_interp_evals',
     subTopicId: 'wtf-is-ai-evals',
   },
+  vlm: {
+    title: 'WTF is a Vision Transformer (ViT), CLIP & Vision-Language Model?',
+    summary: '16x16 image patchification, CLIP/SigLIP contrastive alignment, and multimodal MLP projectors.',
+    command: 'wtf vlm',
+    moduleId: '08_multimodal_world_gnn',
+    subTopicId: 'wtf-is-vit-clip-vlm',
+  },
+  gnn: {
+    title: 'WTF are Graph Neural Networks (GNNs) & E(3)-Equivariant AI?',
+    summary: 'Permutation-invariant message passing and 3D rotational/translational equivariance for molecules.',
+    command: 'wtf gnn',
+    moduleId: '08_multimodal_world_gnn',
+    subTopicId: 'wtf-is-gnn-geometric',
+  },
+  docker: {
+    title: 'WTF is Docker for AI, Cog & Distributed 5D GPU Training?',
+    summary: 'NVIDIA Container Toolkit, Replicate Cog (cog.yaml), and ZeRO/FSDP 16-bytes-per-param sharding.',
+    command: 'wtf docker',
+    moduleId: '09_prod_sdk_orchestration_deploy',
+    subTopicId: 'wtf-is-docker-cog-gpu-deploy',
+  },
+  orchestration: {
+    title: 'WTF is Multi-Agent Orchestration (Lead-Subagent, DAGs, Worktrees & MCP)?',
+    summary: 'Context isolation via parallel subagents, Git worktrees, DAG task graphs, and Model Context Protocol.',
+    command: 'wtf orchestration',
+    moduleId: '09_prod_sdk_orchestration_deploy',
+    subTopicId: 'wtf-is-multi-agent-orchestration',
+  },
+  sdk: {
+    title: 'WTF Happens Under the Hood of NumPy, PyTorch (torch.compile) & OpenAI/DeepSeek SDKs?',
+    summary: 'Zero-copy tensor strides, TorchInductor Triton kernel fusion, and universal AsyncOpenAI SSE streaming.',
+    command: 'wtf sdk',
+    moduleId: '09_prod_sdk_orchestration_deploy',
+    subTopicId: 'wtf-is-numpy-pytorch-sdk-internals',
+  },
 };
 
 export function findModuleByIdOrSlug(query: string): TaxonomyModule | undefined {

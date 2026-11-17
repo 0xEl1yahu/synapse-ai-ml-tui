@@ -151,6 +151,14 @@ export const CommandLineBar: React.FC<CommandLineBarProps> = ({
         onNavigateView('overview');
         return;
       }
+      if (arg.includes('paper') || arg.includes('arxiv')) {
+        onNavigateView('papers');
+        setConsoleLog({
+          cmd: trimmed,
+          output: 'Mounted ~/wtfis-ai/papers-decoded/ (Attention Is All You Need, ResNet, LoRA, FlashAttention, DeepSeek-R1...)',
+        });
+        return;
+      }
       if (arg.includes('roadmap') || arg.includes('dag')) {
         onNavigateView('roadmap');
         return;
@@ -175,6 +183,15 @@ export const CommandLineBar: React.FC<CommandLineBarProps> = ({
         setConsoleLog({ cmd: trimmed, output: `Mounted ${modMatch.filePath}` });
         return;
       }
+    }
+
+    if (verb === 'paper' || verb === 'papers') {
+      onNavigateView('papers');
+      setConsoleLog({
+        cmd: trimmed,
+        output: '[PAPERS_DECODED]: Opened Canonical Paper Dissector (Attention Is All You Need, ResNet, LoRA, FlashAttention, RoPE, GRPO, DPO, Flow Matching, PagedAttention, SAEs)',
+      });
+      return;
     }
 
     if (verb === 'wtf' || verb === 'man') {
