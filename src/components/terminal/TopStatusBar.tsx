@@ -157,13 +157,13 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({
           <div
             className="hidden lg:flex items-center gap-2 px-3 py-2 border-l text-[11px]"
             style={{ borderColor: 'var(--border-grid)' }}
-            title={`${completedCount} of ${totalCount} subtopics marked understood`}
+            title={`${completedCount} of ${totalCount} subtopics reviewed`}
           >
             <CheckSquare
               className="w-3.5 h-3.5"
               style={{ color: 'var(--accent-primary)' }}
             />
-            <span style={{ color: 'var(--text-muted)' }}>MASTERY:</span>
+            <span style={{ color: 'var(--text-muted)' }}>REVIEWED:</span>
             <span style={{ color: 'var(--text-primary)' }}>
               {completedCount}/{totalCount}
             </span>

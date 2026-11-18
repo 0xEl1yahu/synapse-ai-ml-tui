@@ -1,4 +1,5 @@
 import { CurriculumSymbol } from '../terminal/CurriculumSymbol';
+import { readStorage, writeStorage } from '../../storage';
 import React, { useState } from 'react';
 import { SubTopic, TaxonomyModule, WebGLSceneId } from '../../types';
 import { LEARNING_RESOURCES } from '../../data/resources';
@@ -94,6 +95,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
     (stageFilter === 'ALL_STAGES' || stageFilter === target);
   const readings = LEARNING_RESOURCES.filter(resource => activeSubTopic.readingIds?.includes(resource.id));
   const check = activeSubTopic.knowledgeCheck;
+  const exercise = activeSubTopic.practice;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto bg-[var(--bg-canvas)] text-[var(--text-primary)]">
@@ -139,7 +141,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
                   : 'border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/15'
               }`}
             >
-              {isCompleted ? '[✓ TOPIC_MASTERED]' : '[MARK_UNDERSTOOD ✓]'}
+              {isCompleted ? '[✓ REVIEWED]' : '[MARK_REVIEWED ✓]'}
             </button>
           </div>
         </div>
@@ -267,6 +269,10 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
               </div>
             )}
           </section>
+        )}
+
+        {exercise && (showSection('01_PLAIN_ENGLISH') || showSection('05_CODE')) && (
+          <NumericPractice key={activeSubTopic.id} topicId={activeSubTopic.id} exercise={exercise} />
         )}
 
         {/* 02 // INTERACTIVE 3D WEBGL & AGENT HARNESS SANDBOX */}
@@ -466,3 +472,42 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
 };
 
 export default ModuleReaderPane;
+
+function NumericPractice({ topicId, exercise }: {
+  topicId: string;
+  exercise: { inputLabel: string; starter: number; multiplier: number; offset: number; divisor: number; solution: string };
+}) {
+  const key = `wtfis_ai_mastered_${topicId}`;
+  const [mastered, setMastered] = useState(() => readStorage('localStorage', key) === '1');
+  const [input, setInput] = useState(String(exercise.starter));
+  const [answer, setAnswer] = useState('');
+  const [feedback, setFeedback] = useState('');
+  return (
+    <section className="space-y-3 border border-[var(--border-grid)] p-4">
+      <h2 className="font-bold">{mastered ? 'Practice · Mastered' : 'Practice'}</h2>
+      <form className="flex flex-wrap items-end gap-3" onSubmit={event => {
+        event.preventDefault();
+        const expected = (Number(input) * exercise.multiplier + exercise.offset) / exercise.divisor;
+        if (Math.abs(Number(answer) - expected) < 0.000001) {
+          setMastered(true);
+          writeStorage('localStorage', key, '1');
+          setFeedback('Correct.');
+        } else {
+          setFeedback('Try again. You can review the worked solution below.');
+        }
+      }}>
+        <label className="flex flex-col gap-1">{exercise.inputLabel}
+          <input className="w-32 border border-[var(--border-grid)] p-1" type="number" step="any" required
+            value={input} onChange={event => { setInput(event.target.value); setFeedback(''); }} />
+        </label>
+        <label className="flex flex-col gap-1">Predicted output
+          <input className="w-32 border border-[var(--border-grid)] p-1" type="number" step="any" required
+            value={answer} onChange={event => setAnswer(event.target.value)} />
+        </label>
+        <button className="border border-[var(--accent-primary)] px-2 py-1" type="submit">Check answer</button>
+      </form>
+      <p role="status">{feedback}</p>
+      <details><summary>Worked solution</summary><p>{exercise.solution}</p></details>
+    </section>
+  );
+}

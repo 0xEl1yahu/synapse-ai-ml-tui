@@ -1,5 +1,6 @@
 import { CurriculumSymbol } from './components/terminal/CurriculumSymbol';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { readLocation } from './navigation';
 import { readStorage, writeStorage } from './storage';
 import { ThemeId, TrackId, ViewMode, WebGLSceneId } from './types';
 import { TAXONOMY_MODULES, CLI_MAN_PAGES } from './data/taxonomy';
@@ -142,12 +143,43 @@ export default function App({ focusOnEntry = false }: { focusOnEntry?: boolean }
   useEffect(() => {
     if (focusOnEntry) overviewHeading.current?.focus({ preventScroll: true });
   }, [focusOnEntry]);
-  const [activeView, setActiveView] = useState<ViewMode>('overview');
-  const [activeModuleId, setActiveModuleId] = useState<string>(TAXONOMY_MODULES[0].id);
-  const [activeSubTopicId, setActiveSubTopicId] = useState<string>(
-    TAXONOMY_MODULES[0].subTopics[0].id
-  );
-  const [activeSceneId, setActiveSceneId] = useState<WebGLSceneId>('neural-lattice');
+  const [initialLocation] = useState(readLocation);
+  const [activeView, setActiveView] = useState<ViewMode>(initialLocation.view);
+  const [activeModuleId, setActiveModuleId] = useState(initialLocation.moduleId);
+  const [activeSubTopicId, setActiveSubTopicId] = useState(initialLocation.topicId);
+  const [activeSceneId, setActiveSceneId] = useState<WebGLSceneId>(initialLocation.sceneId);
+  const [activePaperId, setActivePaperId] = useState(initialLocation.paperId);
+  const restoringLocation = useRef(false);
+
+  useEffect(() => {
+    function restore() {
+      const next = readLocation();
+      restoringLocation.current = true;
+      setActiveView(next.view);
+      setActiveModuleId(next.moduleId);
+      setActiveSubTopicId(next.topicId);
+      setActiveSceneId(next.sceneId);
+      setActivePaperId(next.paperId);
+    }
+    window.addEventListener('popstate', restore);
+    return () => window.removeEventListener('popstate', restore);
+  }, []);
+
+  useEffect(() => {
+    if (restoringLocation.current) {
+      restoringLocation.current = false;
+      return;
+    }
+    const hash = activeView === 'module' ? `#lesson/${activeSubTopicId}`
+      : activeView === 'papers' ? `#paper/${activePaperId}`
+      : activeView === 'webgl-lab' ? `#lab/${activeSceneId}`
+      : activeView === 'overview' ? '' : `#${activeView}`;
+    if (hash !== window.location.hash) {
+      const url = window.location.pathname + window.location.search + hash;
+      if (hash || readLocation().view !== 'overview') window.history.pushState(null, '', url);
+      else window.history.replaceState(null, '', url);
+    }
+  }, [activeView, activeSubTopicId, activeSceneId, activePaperId]);
   const [renderAscii, setRenderAscii] = useState<boolean>(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState<boolean>(false);
   const [overviewFilter, setOverviewFilter] = useState<string>('');
@@ -751,6 +783,9 @@ export default function App({ focusOnEntry = false }: { focusOnEntry?: boolean }
 
           {activeView === 'papers' && (
             <PaperDissectorPane
+              key={activePaperId}
+              selectedPaperId={activePaperId}
+              onSelectPaper={setActivePaperId}
               onOpenModule={handleSelectSubTopic}
               onLaunch3DScene={(sceneId) => {
                 setActiveSceneId(sceneId);

@@ -8,7 +8,7 @@ const entryKey = 'wtfis_ai_entered_v1';
 type CurriculumComponent = typeof import('./App').default;
 
 function Site() {
-  const [returning] = useState(() => readStorage('sessionStorage', entryKey) === '1');
+  const [returning] = useState(() => Boolean(window.location.hash) || readStorage('sessionStorage', entryKey) === '1');
   const [opening, setOpening] = useState(returning);
   const [failed, setFailed] = useState(false);
   const [Curriculum, setCurriculum] = useState<CurriculumComponent | null>(null);

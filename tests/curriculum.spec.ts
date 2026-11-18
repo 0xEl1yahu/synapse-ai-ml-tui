@@ -17,7 +17,7 @@ test('keyboard entry leads to the first lesson and refresh keeps the curriculum 
   await page.getByRole('button', { name: 'Code', exact: true }).click();
   await expect(page.getByText('Calculate an average', { exact: true })).toBeVisible();
   await page.reload();
-  await expect(start).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'WTF is Python?' })).toBeVisible();
   await expect(enter).toHaveCount(0);
 });
 
@@ -110,4 +110,59 @@ test('lab selectors expose names and update the probe by keyboard', async ({ pag
   await page.getByRole('button', { name: /04:TRANSFORMER_ATTN/ }).click();
   await page.getByRole('combobox', { name: 'Query token' }).selectOption('2');
   await expect(page.getByRole('status').filter({ hasText: 'Query test' })).toBeVisible();
+});
+
+test('beginner practice distinguishes review from a passed check', async ({ page }) => {
+  await page.goto('/#lesson/wtf-is-python');
+  await page.getByRole('button', { name: /MARK_REVIEWED/ }).click();
+  await expect(page.getByRole('button', { name: /REVIEWED/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Practice.*Mastered/ })).toHaveCount(0);
+  await page.getByRole('spinbutton', { name: 'Last delivery time' }).fill('60');
+  const answer = page.getByRole('spinbutton', { name: 'Predicted output' });
+  await answer.fill('20');
+  await page.getByRole('button', { name: 'Check answer' }).click();
+  await expect(page.getByText(/Try again/)).toBeVisible();
+  await answer.fill('30');
+  await page.getByRole('button', { name: 'Check answer' }).click();
+  await expect(page.getByRole('heading', { name: /Practice.*Mastered/ })).toBeVisible();
+  for (const title of [/WTF is a Python list/, /WTF is a Python function/, /WTF is a Python loop/, /WTF is prediction error/, /WTF is a Matrix/]) {
+    await page.getByRole('button', { name: /NEXT_CONCEPT/ }).click();
+    await expect(page.getByRole('heading', { name: title })).toBeVisible();
+  }
+});
+
+test('paper and lab locations can be shared and traversed in browser history', async ({ page }) => {
+  const paper = CANONICAL_PAPERS.find(item => item.shortSlug === 'flashattention')!;
+  await page.goto('/#lesson/wtf-is-python');
+  await page.getByRole('button', { name: /03:.*PAPERS/ }).click();
+  await page.getByRole('button', { name: /MOUNT.*FlashAttention: Fast/ }).click();
+  await expect(page).toHaveURL(new RegExp('#paper/' + paper.id + '$'));
+  await page.getByRole('button', { name: /LAUNCH_COUPLED_3D_LAB/ }).click();
+  await expect(page).toHaveURL(new RegExp('#lab/' + paper.coupledSceneId + '$'));
+  await page.goBack();
+  await expect(page.getByRole('button', { name: /MOUNTED.*FlashAttention: Fast/ })).toBeVisible();
+  await page.goForward();
+  await page.reload();
+  await expect(page.getByText(new RegExp('ACTIVE_SCENE: ' + paper.coupledSceneId, 'i'))).toBeVisible();
+  const fresh = await page.context().newPage();
+  await fresh.goto('/#paper/' + paper.id);
+  await expect(fresh.getByRole('button', { name: /MOUNTED.*FlashAttention: Fast/ })).toBeVisible();
+});
+
+test('phone paper actions and resource filters remain reachable', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto('/#paper/' + CANONICAL_PAPERS[0].id);
+  const labAction = page.getByRole('button', { name: /LAUNCH_COUPLED_3D_LAB/ });
+  await expect(labAction).toBeVisible();
+  expect(await labAction.evaluate(el => el.getBoundingClientRect().right)).toBeLessThanOrEqual(320);
+  await page.getByRole('button', { name: /06:.*RESOURCES/ }).click();
+  const query = page.getByPlaceholder(/Filter by title/);
+  await query.fill('Karpathy');
+  const more = page.getByRole('button', { name: 'More filters' });
+  await more.click();
+  await page.getByRole('button', { name: 'BEGINNER', exact: true }).click();
+  await more.click();
+  await expect(query).toHaveValue('Karpathy');
+  await expect(page.getByRole('button', { name: 'Clear filters' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: /results/ })).toBeVisible();
 });

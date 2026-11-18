@@ -31,6 +31,7 @@ export const MODULES_PART_1: TaxonomyModule[] = [
     subTopics: [
       {
         id: "wtf-is-python",
+        practice: { inputLabel: "Last delivery time", starter: 30, multiplier: 1, offset: 30, divisor: 3, solution: "Add 10, 20, and your input, then divide by 3. An input of 30 gives 20." },
         libraries: [{
           name: "Python statistics",
           url: "https://docs.python.org/3/library/statistics.html",
@@ -57,6 +58,194 @@ export const MODULES_PART_1: TaxonomyModule[] = [
         pitfalls: ["An empty list has no average. Check that it contains at least one observation."],
         knowledgeCheck: {"question": "If the last delivery takes 60 minutes instead of 30, what will Python display?", "answer": "30.0. The total is now 90 and there are still three deliveries. Changing one input changes the result without rewriting the calculation."},
         readingIds: ["res-cs50p", "res-python-video", "res-neural-intro"],
+      },
+      {
+        "id": "wtf-is-lists",
+        "commandSlug": "wtf-is-lists",
+        "title": "WTF is a Python list?",
+        "wtfQuestion": "How do you store several delivery times together?",
+        "plainEnglish": "A list holds values in order. Index 0 is the first element.",
+        "whyItMatters": "Use the same calculation with new delivery data.",
+        "summary": "A list holds values in order. Index 0 is the first element.",
+        "realWorldSystems": [
+          "Delivery reporting"
+        ],
+        "hasLab": false,
+        "deepDiveParagraphs": [
+          "A list holds values in order. Index 0 is the first element.",
+          "Change the practice input and predict the output before checking your answer."
+        ],
+        "keyTakeaways": [
+          "A list holds values in order. Index 0 is the first element."
+        ],
+        "mathFormulas": [],
+        "codeExamples": [
+          {
+            "title": "Delivery example",
+            "language": "python",
+            "description": "How do you store several delivery times together?",
+            "code": "minutes = [10, 20, 30]\nprint(minutes[0] + 20)"
+          }
+        ],
+        "pitfalls": [
+          "Check which value the prompt asks you to change."
+        ],
+        "libraries": [
+          {
+            "name": "Python tutorial",
+            "url": "https://docs.python.org/3/tutorial/",
+            "purpose": "Review Python data and control flow."
+          }
+        ],
+        "practice": {
+          "inputLabel": "First delivery time",
+          "starter": 10,
+          "multiplier": 1,
+          "offset": 20,
+          "divisor": 1,
+          "solution": "Read the first value, then add 20. Starting with 10 gives 30."
+        }
+      },
+      {
+        "id": "wtf-is-functions",
+        "commandSlug": "wtf-is-functions",
+        "title": "WTF is a Python function?",
+        "wtfQuestion": "How can you reuse the same calculation?",
+        "plainEnglish": "A function takes inputs and can return a result.",
+        "whyItMatters": "Use the same calculation with new delivery data.",
+        "summary": "A function takes inputs and can return a result.",
+        "realWorldSystems": [
+          "Delivery reporting"
+        ],
+        "hasLab": false,
+        "deepDiveParagraphs": [
+          "A function takes inputs and can return a result.",
+          "Change the practice input and predict the output before checking your answer."
+        ],
+        "keyTakeaways": [
+          "A function takes inputs and can return a result."
+        ],
+        "mathFormulas": [],
+        "codeExamples": [
+          {
+            "title": "Delivery example",
+            "language": "python",
+            "description": "How can you reuse the same calculation?",
+            "code": "def total(last):\n    return 10 + 20 + last\n\nprint(total(30))"
+          }
+        ],
+        "pitfalls": [
+          "Check which value the prompt asks you to change."
+        ],
+        "libraries": [
+          {
+            "name": "Python tutorial",
+            "url": "https://docs.python.org/3/tutorial/",
+            "purpose": "Review Python data and control flow."
+          }
+        ],
+        "practice": {
+          "inputLabel": "Last delivery time",
+          "starter": 30,
+          "multiplier": 1,
+          "offset": 30,
+          "divisor": 1,
+          "solution": "Add 10 and 20 to the input. With 30 as the last time, the result is 60."
+        }
+      },
+      {
+        "id": "wtf-is-loops",
+        "commandSlug": "wtf-is-loops",
+        "title": "WTF is a Python loop?",
+        "wtfQuestion": "How do you add every delivery time one at a time?",
+        "plainEnglish": "A for loop visits each value. An accumulator stores the running total.",
+        "whyItMatters": "Use the same calculation with new delivery data.",
+        "summary": "A for loop visits each value. An accumulator stores the running total.",
+        "realWorldSystems": [
+          "Delivery reporting"
+        ],
+        "hasLab": false,
+        "deepDiveParagraphs": [
+          "A for loop visits each value. An accumulator stores the running total.",
+          "Change the practice input and predict the output before checking your answer."
+        ],
+        "keyTakeaways": [
+          "A for loop visits each value. An accumulator stores the running total."
+        ],
+        "mathFormulas": [],
+        "codeExamples": [
+          {
+            "title": "Delivery example",
+            "language": "python",
+            "description": "How do you add every delivery time one at a time?",
+            "code": "total = 0\nfor minutes in [10, 20, 30]:\n    total += minutes\nprint(total)"
+          }
+        ],
+        "pitfalls": [
+          "Check which value the prompt asks you to change."
+        ],
+        "libraries": [
+          {
+            "name": "Python tutorial",
+            "url": "https://docs.python.org/3/tutorial/",
+            "purpose": "Review Python data and control flow."
+          }
+        ],
+        "practice": {
+          "inputLabel": "Last delivery time",
+          "starter": 30,
+          "multiplier": 1,
+          "offset": 30,
+          "divisor": 1,
+          "solution": "Start at zero and add 10, then 20, then the input. A final time of 30 gives 60."
+        }
+      },
+      {
+        "id": "wtf-is-prediction-error",
+        "commandSlug": "wtf-is-prediction-error",
+        "title": "WTF is prediction error?",
+        "wtfQuestion": "How far was a prediction from the observed time?",
+        "plainEnglish": "Signed error here is the prediction minus the observed value. Zero means the prediction matched.",
+        "whyItMatters": "Use the same calculation with new delivery data.",
+        "summary": "Signed error here is the prediction minus the observed value. Zero means the prediction matched.",
+        "realWorldSystems": [
+          "Delivery reporting"
+        ],
+        "hasLab": false,
+        "deepDiveParagraphs": [
+          "Signed error here is the prediction minus the observed value. Zero means the prediction matched.",
+          "Change the practice input and predict the output before checking your answer."
+        ],
+        "keyTakeaways": [
+          "Signed error here is the prediction minus the observed value. Zero means the prediction matched."
+        ],
+        "mathFormulas": [],
+        "codeExamples": [
+          {
+            "title": "Delivery example",
+            "language": "python",
+            "description": "How far was a prediction from the observed time?",
+            "code": "prediction = 25\nobserved = 30\nprint(prediction - observed)"
+          }
+        ],
+        "pitfalls": [
+          "Check which value the prompt asks you to change."
+        ],
+        "libraries": [
+          {
+            "name": "Python tutorial",
+            "url": "https://docs.python.org/3/tutorial/",
+            "purpose": "Review Python data and control flow."
+          }
+        ],
+        "practice": {
+          "inputLabel": "Predicted time",
+          "starter": 25,
+          "multiplier": 1,
+          "offset": -30,
+          "divisor": 1,
+          "solution": "Subtract the observed time of 30. A prediction of 25 gives −5."
+        }
       },
       {
         id: 'wtf-is-vectors-svd',
