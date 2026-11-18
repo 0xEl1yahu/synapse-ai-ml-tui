@@ -21,6 +21,7 @@ export interface CommandPaletteModalProps {
   resources: LearningResource[];
   onSelectSubTopic: (moduleId: string, subTopicId: string) => void;
   onSelectScene: (sceneId: WebGLSceneId) => void;
+  onSelectResource: (query: string) => void;
   onNavigateView: (view: ViewMode) => void;
 }
 
@@ -73,6 +74,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   resources,
   onSelectSubTopic,
   onSelectScene,
+  onSelectResource,
   onNavigateView,
 }) => {
   const [query, setQuery] = useState('');
@@ -149,7 +151,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     );
 
     // 4. Resources
-    resources.slice(0, 18).forEach((res) => {
+    resources.forEach((res) => {
       items.push({
         id: `res-${res.id}`,
         category: 'RESOURCE',
@@ -157,14 +159,14 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         subtitle: res.whyHighSignal,
         badge: res.type,
         action: () => {
-          onNavigateView('resources');
+          onSelectResource(res.title);
           onClose();
         },
       });
     });
 
     return items;
-  }, [modules, resources, onSelectSubTopic, onSelectScene, onNavigateView, onClose]);
+  }, [modules, resources, onSelectSubTopic, onSelectScene, onSelectResource, onNavigateView, onClose]);
 
   const filteredItems = useMemo(() => {
     const clean = query

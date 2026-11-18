@@ -159,6 +159,7 @@ export const LatentGalaxyScene: React.FC<LatentGalaxySceneProps> = ({ config }) 
   }, [geometry]);
 
   useFrame((state, delta) => {
+    if (config.paused) return;
     if (!pointsRef.current) return;
     const posAttr = pointsRef.current.geometry.getAttribute('position') as THREE.BufferAttribute;
     const arr = posAttr.array as Float32Array;
@@ -193,9 +194,7 @@ export const LatentGalaxyScene: React.FC<LatentGalaxySceneProps> = ({ config }) 
 
     posAttr.needsUpdate = true;
 
-    if (!config.paused) {
-      pointsRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.18) * 0.18;
-    }
+    pointsRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.18) * 0.18;
   });
 
   const activeAnchor = SEMANTIC_ANCHORS[activeAnchorIdx];

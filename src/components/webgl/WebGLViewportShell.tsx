@@ -260,7 +260,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
             >
               {isDiverged
                 ? 'STATUS: FAILURE_MODE / INSTABILITY_TRIGGERED'
-                : 'STATUS: STABLE_CONVERGENCE (60FPS)'}
+                : 'STATUS: PARAMETERS_WITHIN_RANGE'}
             </span>
           </div>
           <div className="text-[var(--text-secondary)] text-[10px] mt-0.5">

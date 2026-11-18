@@ -76,6 +76,7 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
   const livePositions = useMemo(() => new Float32Array(sourcePositions), [sourcePositions]);
 
   useFrame((state) => {
+    if (config.paused && scrubTime === null) return;
     if (!pointsRef.current) return;
     const geom = pointsRef.current.geometry;
     const posAttr = geom.getAttribute('position') as THREE.BufferAttribute;

@@ -15,6 +15,8 @@ export interface GitGraphRoadmapProps {
   onTrackChange: (track: TrackId) => void;
   completedNodeIds: string[];
   onToggleNode: (nodeId: string) => void;
+  completedProjectIds?: string[];
+  onToggleProject?: (projectId: string) => void;
   onOpenModule: (moduleId: string) => void;
 }
 
@@ -77,11 +79,12 @@ export const GitGraphRoadmap: React.FC<GitGraphRoadmapProps> = ({
   onTrackChange,
   completedNodeIds,
   onToggleNode,
+  completedProjectIds = [],
+  onToggleProject,
   onOpenModule,
 }) => {
   const [scopeFilter, setScopeFilter] = useState<'TRACK_ONLY' | 'FULL_DAG'>('TRACK_ONLY');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'MASTERED'>('ALL');
-  const [completedProjectIds, setCompletedProjectIds] = useState<string[]>([]);
 
   const moduleMap = useMemo(() => {
     const map = new Map<string, TaxonomyModule>();
@@ -142,14 +145,6 @@ export const GitGraphRoadmap: React.FC<GitGraphRoadmapProps> = ({
       TRACK_DEFINITIONS[0],
     [activeTrack]
   );
-
-  const handleToggleProject = (projectId: string) => {
-    setCompletedProjectIds((prev) =>
-      prev.includes(projectId)
-        ? prev.filter((id) => id !== projectId)
-        : [...prev, projectId]
-    );
-  };
 
   return (
     <div
@@ -899,7 +894,7 @@ export const GitGraphRoadmap: React.FC<GitGraphRoadmapProps> = ({
         projects={projects}
         activeTrack={activeTrack}
         completedProjectIds={completedProjectIds}
-        onToggleProject={handleToggleProject}
+        onToggleProject={onToggleProject}
       />
     </div>
   );

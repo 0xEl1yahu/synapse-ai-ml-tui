@@ -5,6 +5,7 @@ export interface ResourceDirectoryPaneProps {
   resources: LearningResource[];
   modules: TaxonomyModule[];
   initialFilterModuleId?: string;
+  initialSearchQuery?: string;
 }
 
 type ResourceTypeFilter = 'ALL' | LearningResource['type'];
@@ -58,6 +59,7 @@ export const ResourceDirectoryPane: React.FC<ResourceDirectoryPaneProps> = ({
   resources,
   modules,
   initialFilterModuleId,
+  initialSearchQuery,
 }) => {
   const [selectedType, setSelectedType] = useState<ResourceTypeFilter>('ALL');
   const [selectedLevel, setSelectedLevel] =
@@ -69,7 +71,14 @@ export const ResourceDirectoryPane: React.FC<ResourceDirectoryPaneProps> = ({
   const [onlyFree, setOnlyFree] = useState<boolean>(false);
   const [onlyInteractive, setOnlyInteractive] = useState<boolean>(false);
   const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
-  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem('wtfis_ai_bookmarked_resources_v1');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
   const [layoutMode, setLayoutMode] = useState<'GRID' | 'TABLE'>('GRID');
 
   useEffect(() => {
@@ -77,6 +86,18 @@ export const ResourceDirectoryPane: React.FC<ResourceDirectoryPaneProps> = ({
       setSelectedModuleId(initialFilterModuleId);
     }
   }, [initialFilterModuleId]);
+
+  useEffect(() => {
+    if (initialSearchQuery) setSearchQuery(initialSearchQuery);
+  }, [initialSearchQuery]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('wtfis_ai_bookmarked_resources_v1', JSON.stringify(bookmarkedIds));
+    } catch {
+      // Browsing and bookmarking remain usable when storage is unavailable.
+    }
+  }, [bookmarkedIds]);
 
   const moduleMap = useMemo(() => {
     const map = new Map<string, TaxonomyModule>();

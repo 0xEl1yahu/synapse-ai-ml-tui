@@ -46,9 +46,25 @@ export const MilestoneProjectDrawer: React.FC<MilestoneProjectDrawerProps> = ({
   });
 
   const [localCompletedIds, setLocalCompletedIds] = useState<string[]>([]);
-  const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>({});
+  const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = localStorage.getItem('wtfis_ai_project_steps_v1');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copyFailedId, setCopyFailedId] = useState<string | null>(null);
   const [viewAllCards, setViewAllCards] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('wtfis_ai_project_steps_v1', JSON.stringify(checkedSteps));
+    } catch {
+      // Keep the current checklist usable if browser storage is unavailable.
+    }
+  }, [checkedSteps]);
 
   const effectiveCompletedIds =
     completedProjectIds.length > 0 || onToggleProject
@@ -75,14 +91,18 @@ export const MilestoneProjectDrawer: React.FC<MilestoneProjectDrawerProps> = ({
     }));
   };
 
-  const handleCopyCommand = (project: MilestoneProject) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(project.starterCommand).catch(() => {});
+  const handleCopyCommand = async (project: MilestoneProject) => {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(project.starterCommand);
+      setCopyFailedId(null);
+      setCopiedId(project.id);
+      setTimeout(() => setCopiedId((prev) => prev === project.id ? null : prev), 1800);
+    } catch {
+      setCopiedId(null);
+      setCopyFailedId(project.id);
+      setTimeout(() => setCopyFailedId((prev) => prev === project.id ? null : prev), 2500);
     }
-    setCopiedId(project.id);
-    setTimeout(() => {
-      setCopiedId((prev) => (prev === project.id ? null : prev));
-    }, 1800);
   };
 
   const activeProject = useMemo(
@@ -316,7 +336,7 @@ export const MilestoneProjectDrawer: React.FC<MilestoneProjectDrawerProps> = ({
                 >
                   {copiedId === project.id
                     ? '[✓ COPIED_TO_CLIPBOARD]'
-                    : '[COPY_CMD]'}
+                    : copyFailedId === project.id ? '[COPY_UNAVAILABLE]' : '[COPY_CMD]'}
                 </button>
               </div>
               <div

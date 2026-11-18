@@ -26,6 +26,7 @@ const STORAGE_KEYS = {
   ROADMAP: 'wtfis_ai_completed_nodes_v1',
   THEME: 'wtfis_ai_theme_v1',
   TRACK: 'wtfis_ai_track_v1',
+  PROJECTS: 'wtfis_ai_completed_projects_v1',
 };
 
 const FEATURED_WTF_QUESTIONS: {
@@ -144,6 +145,7 @@ export default function App() {
   const [renderAscii, setRenderAscii] = useState<boolean>(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState<boolean>(false);
   const [overviewFilter, setOverviewFilter] = useState<string>('');
+  const [resourceSearchRequest, setResourceSearchRequest] = useState<string>('');
 
   const [activeTheme, setActiveTheme] = useState<ThemeId>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.THEME) as ThemeId | null;
@@ -172,6 +174,14 @@ export default function App() {
       return [];
     }
   });
+  const [completedProjects, setCompletedProjects] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.PROJECTS);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', activeTheme);
@@ -189,6 +199,16 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.ROADMAP, JSON.stringify(completedRoadmapNodes));
   }, [completedRoadmapNodes]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(completedProjects));
+  }, [completedProjects]);
+
+  const handleToggleProjectComplete = (projectId: string) => {
+    setCompletedProjects((prev) =>
+      prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId]
+    );
+  };
 
   // Global keyboard shortcuts (Cmd+K / Ctrl+K or '/' to open "WTF is...?" search)
   useEffect(() => {
@@ -366,7 +386,7 @@ export default function App() {
                         ◆ RAPID_JUMP // POPULAR "WTF IS...?" QUESTIONS:
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono">
-                        {FEATURED_WTF_QUESTIONS.map((item) => (
+                        {FEATURED_WTF_QUESTIONS.slice(0, 4).map((item) => (
                           <button
                             key={item.subTopicId}
                             type="button"
@@ -388,6 +408,25 @@ export default function App() {
                           </button>
                         ))}
                       </div>
+                      <details className="mt-2 text-xs">
+                        <summary className="w-fit cursor-pointer text-[var(--text-secondary)] hover:text-[var(--accent-primary)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[var(--accent-primary)]">
+                          Browse all {FEATURED_WTF_QUESTIONS.length} popular questions
+                        </summary>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono mt-2">
+                          {FEATURED_WTF_QUESTIONS.slice(4).map((item) => (
+                            <button
+                              key={item.subTopicId}
+                              type="button"
+                              onClick={() => handleSelectSubTopic(item.moduleId, item.subTopicId)}
+                              className="p-2 border border-[var(--border-grid)] bg-[var(--bg-canvas)] hover:border-[var(--accent-primary)] text-left group transition-colors cursor-pointer"
+                            >
+                              <div className="text-[10px] text-[var(--accent-param)]">[{item.tag}]</div>
+                              <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] mt-0.5">{item.label}</div>
+                              <div className="text-[10px] text-[var(--text-secondary)] font-sans line-clamp-1 mt-0.5">{item.question}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </details>
                     </div>
                   </div>
 
@@ -439,8 +478,15 @@ export default function App() {
               </div>
 
               {/* INTERACTIVE AGENT HARNESS TRACE & GPU VRAM CALCULATOR ON HOME WORKBENCH */}
-              <AgentHarnessSimulator />
-              <VRAMSystemsCalculator />
+              <details className="border border-[var(--border-grid)] bg-[var(--bg-pane)]">
+                <summary className="cursor-pointer px-4 py-3 font-mono text-sm text-[var(--text-primary)] hover:text-[var(--accent-primary)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[var(--accent-primary)]">
+                  Explore interactive tools <span className="text-xs text-[var(--text-secondary)]">— agent harness and GPU memory calculator</span>
+                </summary>
+                <div className="p-3 space-y-3 border-t border-[var(--border-grid)]">
+                  <AgentHarnessSimulator />
+                  <VRAMSystemsCalculator />
+                </div>
+              </details>
 
               {/* THREE ENTRY TRACKS: WHERE SHOULD YOU START? */}
               <section className="space-y-3">
@@ -514,7 +560,11 @@ export default function App() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredModulesForOverview.map((mod) => (
+                  {filteredModulesForOverview.map((mod) => {
+                    const visibleTopics = overviewFilter.trim()
+                      ? mod.subTopics
+                      : mod.subTopics.slice(0, 2);
+                    return (
                     <div
                       key={mod.id}
                       className="border border-[var(--border-grid)] bg-[var(--bg-pane)] flex flex-col justify-between"
@@ -545,7 +595,7 @@ export default function App() {
 
                         {/* SubTopics List */}
                         <div className="space-y-1.5 pt-2">
-                          {mod.subTopics.map((st, idx) => {
+                          {visibleTopics.map((st, idx) => {
                             const isDone = completedSubTopics.includes(st.id);
                             return (
                               <button
@@ -569,6 +619,35 @@ export default function App() {
                               </button>
                             );
                           })}
+                          {!overviewFilter.trim() && mod.subTopics.length > 2 && (
+                            <details className="pt-1">
+                              <summary className="cursor-pointer px-2 py-1 text-[11px] text-[var(--text-secondary)] hover:text-[var(--accent-primary)] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[var(--accent-primary)]">
+                                Show {mod.subTopics.length - 2} more topics
+                              </summary>
+                              <div className="space-y-1.5 mt-1.5">
+                                {mod.subTopics.slice(2).map((st, offset) => {
+                                  const idx = offset + 2;
+                                  const isDone = completedSubTopics.includes(st.id);
+                                  return (
+                                    <button
+                                      key={st.id}
+                                      type="button"
+                                      onClick={() => handleSelectSubTopic(mod.id, st.id)}
+                                      className="w-full p-2 bg-[var(--bg-canvas)] border border-[var(--border-grid)] hover:border-[var(--accent-primary)] text-left flex items-start justify-between gap-2 group cursor-pointer"
+                                    >
+                                      <div className="min-w-0">
+                                        <div className="font-mono text-xs font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] truncate">
+                                          {isDone ? '[✓] ' : `[${String(idx + 1).padStart(2, '0')}] `}{st.title}
+                                        </div>
+                                        <div className="text-[11px] text-[var(--text-secondary)] line-clamp-1 mt-0.5">{st.wtfQuestion}</div>
+                                      </div>
+                                      <span className="font-mono text-xs text-[var(--accent-primary)] shrink-0">READ ❯</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </details>
+                          )}
                         </div>
                       </div>
 
@@ -585,7 +664,8 @@ export default function App() {
                         <span>EST: {mod.estimatedHours}H</span>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             </div>
@@ -678,6 +758,8 @@ export default function App() {
               onTrackChange={setActiveTrack}
               completedNodeIds={completedRoadmapNodes}
               onToggleNode={handleToggleRoadmapNode}
+              completedProjectIds={completedProjects}
+              onToggleProject={handleToggleProjectComplete}
               onOpenModule={(modId) => {
                 const m = TAXONOMY_MODULES.find((x) => x.id === modId) || TAXONOMY_MODULES[0];
                 handleSelectSubTopic(m.id, m.subTopics[0].id);
@@ -689,12 +771,13 @@ export default function App() {
             <ResourceDirectoryPane
               resources={LEARNING_RESOURCES}
               modules={TAXONOMY_MODULES}
+              initialSearchQuery={resourceSearchRequest}
             />
           )}
         </main>
 
         {/* Right Context Inspector Sidebar (Visible on Module & Overview views) */}
-        {(activeView === 'module' || activeView === 'overview') && (
+        {activeView === 'module' && (
           <InspectorSidebar
             module={activeModule}
             activeSubTopic={activeSubTopic}
@@ -737,6 +820,10 @@ export default function App() {
           setActiveSceneId(sceneId);
           setActiveView('webgl-lab');
           setIsPaletteOpen(false);
+        }}
+        onSelectResource={(query) => {
+          setResourceSearchRequest(query);
+          setActiveView('resources');
         }}
         onNavigateView={(view) => {
           setActiveView(view);

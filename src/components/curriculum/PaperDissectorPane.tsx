@@ -16,14 +16,23 @@ export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
   const [selectedPaperId, setSelectedPaperId] = useState<string>(papers[0]?.id || '');
   const [activeStepIdx, setActiveStepIdx] = useState<number>(0);
   const [copied, setCopied] = useState<boolean>(false);
+  const [copyFailed, setCopyFailed] = useState<boolean>(false);
 
   const activePaper = papers.find((p) => p.id === selectedPaperId) || papers[0];
   const activeStep = activePaper.equationSteps[activeStepIdx] || activePaper.equationSteps[0];
 
-  const handleCopyCode = () => {
-    navigator.clipboard?.writeText(activePaper.minimalCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+  const handleCopyCode = async () => {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(activePaper.minimalCode);
+      setCopyFailed(false);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+      setCopyFailed(true);
+      setTimeout(() => setCopyFailed(false), 2500);
+    }
   };
 
   return (
@@ -217,7 +226,7 @@ export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
                 onClick={handleCopyCode}
                 className="px-2 py-0.5 border border-[var(--border-grid)] text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer"
               >
-                [{copied ? 'COPIED ✓' : 'COPY_PYTORCH'}]
+                [{copied ? 'COPIED ✓' : copyFailed ? 'COPY_UNAVAILABLE' : 'COPY_PYTORCH'}]
               </button>
             </div>
             <pre className="p-3 bg-[var(--bg-canvas)] text-[11px] text-[var(--text-primary)] overflow-x-auto leading-relaxed">

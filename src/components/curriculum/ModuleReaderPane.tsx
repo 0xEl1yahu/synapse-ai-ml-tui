@@ -48,8 +48,9 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
   allModules = [],
 }) => {
   const [showEmbedded3D, setShowEmbedded3D] = useState<boolean>(true);
-  const [stageFilter, setStageFilter] = useState<ReaderSectionFilter>('ALL_STAGES');
+  const [stageFilter, setStageFilter] = useState<ReaderSectionFilter>('01_PLAIN_ENGLISH');
   const [copiedCodeIdx, setCopiedCodeIdx] = useState<number | null>(null);
+  const [copyFailedIdx, setCopyFailedIdx] = useState<number | null>(null);
   const [simulatedCodeIdx, setSimulatedCodeIdx] = useState<number | null>(null);
 
   const isCompleted = completedSubTopics.includes(activeSubTopic.id);
@@ -67,10 +68,18 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
       ? flatTopics[currentFlatIdx + 1]
       : null;
 
-  const handleCopyCode = (code: string, idx: number) => {
-    navigator.clipboard?.writeText(code);
-    setCopiedCodeIdx(idx);
-    setTimeout(() => setCopiedCodeIdx(null), 1800);
+  const handleCopyCode = async (code: string, idx: number) => {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(code);
+      setCopyFailedIdx(null);
+      setCopiedCodeIdx(idx);
+      setTimeout(() => setCopiedCodeIdx((current) => current === idx ? null : current), 1800);
+    } catch {
+      setCopiedCodeIdx(null);
+      setCopyFailedIdx(idx);
+      setTimeout(() => setCopyFailedIdx((current) => current === idx ? null : current), 2500);
+    }
   };
 
   const showSection = (target: ReaderSectionFilter) =>
@@ -150,7 +159,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
 
         {/* Guided 6-Stage Learning Loop Filter Bar */}
         <div className="flex items-center gap-1 pt-2 border-t border-[var(--border-grid)] overflow-x-auto font-mono text-[10px]">
-          <span className="text-[var(--text-muted)] mr-1 shrink-0">STAGE_FOCUS:</span>
+          <span className="text-[var(--text-muted)] mr-1 shrink-0">LESSON_SECTION:</span>
           {STAGE_PILLS.map((pill) => {
             const active = stageFilter === pill.id;
             return (
@@ -336,7 +345,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
                       onClick={() => handleCopyCode(ex.code, idx)}
                       className="px-2 py-0.5 border border-[var(--border-grid)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] cursor-pointer"
                     >
-                      [{copiedCodeIdx === idx ? 'COPIED ✓' : 'COPY_CODE'}]
+                      [{copiedCodeIdx === idx ? 'COPIED ✓' : copyFailedIdx === idx ? 'COPY_UNAVAILABLE' : 'COPY_CODE'}]
                     </button>
                   </div>
                 </div>
