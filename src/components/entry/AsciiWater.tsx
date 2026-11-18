@@ -5,8 +5,31 @@ import { useEffect, useRef } from 'react';
 const tones = [' ', '.', '·', ':', '~', '=', '+', '*', '#', '%', '@'];
 const ink = ['#08090c', '#223e36', '#345948', '#42745c', '#518a70', '#62a286',
   '#79bc99', '#94d2ac', '#afdfbd', '#caedd0', '#e7fae9'];
-const cellWidth = 7;
-const cellHeight = 10;
+export const wordmark = 'WTF IS AI';
+const letters: Record<string, string[]> = {
+  W: ['#...#', '#...#', '#...#', '#.#.#', '#.#.#', '##.##', '.#.#.'],
+  T: ['#####', '#####', '..#..', '..#..', '..#..', '..#..', '..#..'],
+  F: ['####', '####', '#...', '###.', '#...', '#...', '#...'],
+  I: ['###', '.#.', '.#.', '.#.', '.#.', '.#.', '###'],
+  S: ['.####', '##...', '#....', '.###.', '....#', '...##', '####.'],
+  A: ['.###.', '##.##', '#...#', '#...#', '#####', '#...#', '#...#'],
+};
+
+// Lay out the block outlines once in grid units so every size uses the same letterforms.
+const outline = new Path2D();
+let wordmarkWidth = 0;
+for (const letter of wordmark) {
+  if (letter === ' ') {
+    wordmarkWidth += 1.5;
+    continue;
+  }
+  const rows = letters[letter];
+  rows.forEach((row, y) => Array.from(row).forEach((mark, x) => {
+    if (mark === '#') outline.rect(wordmarkWidth + x, y, 1, 1);
+  }));
+  wordmarkWidth += rows[0].length + 1;
+}
+wordmarkWidth -= 1; // No trailing letter space.
 type Ring = { x: number; y: number; birth: number; strength: number; speed: number };
 
 export function AsciiWater() {
@@ -22,6 +45,8 @@ export function AsciiWater() {
     if (!brush) return;
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     let width = 0, height = 0, scale = 1;
+    let cellWidth = 7, cellHeight = 10;
+    let titleMask = new Path2D();
     let rings: Ring[] = [];
     let frame = 0, lastFrame = 0;
     let hold: { id: number; start: number } | null = null;
@@ -30,6 +55,11 @@ export function AsciiWater() {
     function draw(now: number) {
       if (!ctx || !width || !height) return;
       ctx.clearRect(0, 0, width, height);
+      ctx.save();
+      ctx.clip(titleMask);
+      // Keep the strokes readable between crests and on low-density screens.
+      ctx.fillStyle = '#1d4036';
+      ctx.fillRect(0, 0, width, height);
       const t = motion.matches ? 0 : now / 2600;
       rings = rings.filter(r => now - r.birth < 2700);
       for (let y = cellHeight / 2; y < height; y += cellHeight) {
@@ -40,7 +70,7 @@ export function AsciiWater() {
           const px = (x / width - 0.5) * 9 / depth;
           const swell = Math.sin(px * 1.35 + py * 1.85 - t + 0.7 * Math.sin(px * 0.9 - t * 0.3));
           const chop = Math.sin(px * 2.4 - py * 1.45 - t * 0.8 + 0.55 * Math.cos(py * 1.2));
-          let light = 0.12 + Math.pow((1 + swell) / 2, 3) * (0.32 + (1 + chop) * 0.18);
+          let light = 0.38 + Math.pow((1 + swell) / 2, 2) * (0.34 + (1 + chop) * 0.14);
           for (const ring of rings) {
             const age = (now - ring.birth) / 1000;
             const distance = Math.hypot(x - ring.x, (y - ring.y) / 0.55);
@@ -54,6 +84,7 @@ export function AsciiWater() {
             cellHeight * scale, x - cellWidth / 2, y - cellHeight / 2, cellWidth, cellHeight);
         }
       }
+      ctx.restore();
     }
 
     function tick(now: number) {
@@ -75,22 +106,32 @@ export function AsciiWater() {
 
     function resize() {
       if (!canvas || !ctx || !brush) return;
+      const nextScale = Math.min(2, Math.ceil(window.devicePixelRatio || 1));
+      if (width === canvas.clientWidth && height === canvas.clientHeight && scale === nextScale) return;
       width = canvas.clientWidth;
       height = canvas.clientHeight;
-      scale = Math.min(2, Math.ceil(window.devicePixelRatio || 1));
+      cellWidth = Math.min(7, Math.max(3, Math.round(width / 145)));
+      cellHeight = Math.round(cellWidth * 1.45);
+      scale = nextScale;
       canvas.width = width * scale;
       canvas.height = height * scale;
       ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      const block = Math.min(width / wordmarkWidth, height / 7);
+      titleMask = new Path2D();
+      titleMask.addPath(outline, new DOMMatrix()
+        .translate((width - block * wordmarkWidth) / 2, (height - block * 7) / 2)
+        .scale(block));
       atlas.width = tones.length * cellWidth * scale;
       atlas.height = cellHeight * scale;
       brush.setTransform(scale, 0, 0, scale, 0, 0);
-      brush.font = '10px ui-monospace, monospace';
+      brush.font = `600 ${cellHeight}px ui-monospace, monospace`;
       brush.textBaseline = 'middle';
       tones.forEach((glyph, i) => {
         brush.fillStyle = ink[i];
         brush.fillText(glyph, i * cellWidth, cellHeight / 2);
       });
       refresh();
+      if (width && height) canvas.dataset.ready = 'true';
     }
 
     function point(event: PointerEvent) {

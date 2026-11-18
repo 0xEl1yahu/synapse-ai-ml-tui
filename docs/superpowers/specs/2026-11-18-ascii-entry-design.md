@@ -2,7 +2,7 @@
 
 ## Approved revision
 
-The wordmark stays still. A shallow pool of pale-green ASCII water sits between the title and the entry button. Tapping sends a ring across the surface, dragging leaves a wake, and holding then releasing sends a stronger ring. Reduced-motion mode shows a still water surface. The renderer adapts the wave field from [ASCII Liquid Login on 21st.dev](https://21st.dev/@prayaniwork/components/ascii-liquid-login). The session and keyboard behavior below still apply.
+The block letters spelling **WTF IS AI** form the water surface. Pale-green ASCII waves fill the letters. Tapping sends a ring through the title, dragging leaves a wake, and holding then releasing sends a stronger ring. Reduced-motion mode shows a still water texture. A bright raised **Enter curriculum** button sits below the lettering and includes a return-key symbol. The renderer adapts the wave field from [ASCII Liquid Login on 21st.dev](https://21st.dev/@prayaniwork/components/ascii-liquid-login). The session and keyboard behavior below still apply.
 
 ## Original wordmark design
 
