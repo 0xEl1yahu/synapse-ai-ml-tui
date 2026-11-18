@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(2.5rem, 6vh, 4rem);
+  gap: clamp(.75rem, 2.5vh, 1.5rem);
   padding: 1rem;
   background-color: #08090c;
   background-image: radial-gradient(ellipse at 50% 45%, #12201c 0%, #0a0e10 39%, transparent 70%);
@@ -18,7 +18,6 @@
   gap: .48em;
   font: 400 clamp(12px, 4.55vw, 48px)/1 ui-monospace, Menlo, monospace;
   user-select: none;
-  touch-action: manipulation;
   filter: drop-shadow(.06em .085em 0 #527663);
 }
 .entry-letter {
@@ -47,9 +46,11 @@
 .entry-button:focus-visible { outline: 2px solid #e6f8e8; outline-offset: 5px; }
 .entry-button:disabled { cursor: progress; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .entry-cell.rippling { animation: entry-ripple 360ms ease-out; }
-  @keyframes entry-ripple {
-    30% { transform: translate(var(--shift-x), var(--shift-y)); color: #53e9a5; }
-  }
+.entry-water {
+  display: block;
+  width: min(100%, 66rem);
+  height: clamp(6rem, min(21vw, 25dvh), 14rem);
+  touch-action: none;
+  user-select: none;
+  mask-image: radial-gradient(ellipse 58% 65% at 50% 50%, black 50%, transparent 100%);
 }

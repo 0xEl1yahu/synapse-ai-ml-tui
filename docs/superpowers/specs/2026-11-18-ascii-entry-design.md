@@ -1,5 +1,11 @@
 # WTFis.AI entry screen
 
+## Approved revision
+
+The wordmark stays still. A shallow pool of pale-green ASCII water sits between the title and the entry button. Tapping sends a ring across the surface, dragging leaves a wake, and holding then releasing sends a stronger ring. Reduced-motion mode shows a still water surface. The renderer adapts the wave field from [ASCII Liquid Login on 21st.dev](https://21st.dev/@prayaniwork/components/ascii-liquid-login). The session and keyboard behavior below still apply.
+
+## Original wordmark design
+
 The entrance introduces the curriculum with two elements: the name and a button. A first-time visitor should recognize the name and see how to enter before moving the pointer.
 
 ## Approaches
