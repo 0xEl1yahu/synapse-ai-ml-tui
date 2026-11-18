@@ -79,3 +79,35 @@ test('breaking one lab preserves the baseline of other scenes', async ({ page })
   await page.getByRole('button', { name: '[RESET]', exact: true }).click();
   await expect(page.getByText(/simulated exploding gradients/i)).toHaveCount(0);
 });
+
+test('memory estimates disclose assumptions and distinguish modeled outcomes', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Enter curriculum' }).click();
+  await page.getByText('Explore interactive tools', { exact: false }).click();
+  await expect(page.getByText(/Within estimated budget: 18.1 GB/)).toBeVisible();
+  await page.getByRole('button', { name: /70B Dense/ }).click();
+  await page.getByRole('button', { name: '24G', exact: true }).click();
+  await expect(page.getByText(/Above estimated budget: 145.4 GB/)).toBeVisible();
+  await page.getByRole('button', { name: 'INT4_AWQ' }).click();
+  await page.getByRole('button', { name: '4x', exact: true }).click();
+  await expect(page.getByText(/Within estimated budget: 11.0 GB/)).toBeVisible();
+  await page.getByRole('button', { name: 'FULL_ADAMW' }).click();
+  await expect(page.getByText(/Above estimated budget: 285.4 GB/)).toBeVisible();
+  await expect(page.getByText(/KV cache replicated per GPU/)).toBeVisible();
+});
+
+test('lab selectors expose names and update the probe by keyboard', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Enter curriculum' }).click();
+  await page.getByRole('button', { name: /04: (3D_LAB|AI_SYSTEMS_LAB)/ }).click();
+  const rate = page.getByRole('slider', { name: 'Learning rate' });
+  await expect(rate).toHaveValue('0.036');
+  await rate.press('ArrowRight');
+  await expect(rate).toHaveValue('0.038');
+  const neuron = page.getByRole('combobox', { name: 'Inspect neuron' });
+  await neuron.selectOption('L1-N2');
+  await expect(page.getByText('NODE::L1-N2', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /04:TRANSFORMER_ATTN/ }).click();
+  await page.getByRole('combobox', { name: 'Query token' }).selectOption('2');
+  await expect(page.getByRole('status').filter({ hasText: 'Query test' })).toBeVisible();
+});

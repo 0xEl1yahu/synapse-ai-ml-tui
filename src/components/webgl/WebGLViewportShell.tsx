@@ -133,6 +133,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
               return (
                 <button
                   key={tab.id}
+                  aria-pressed={isSelected}
                   type="button"
                   onClick={() => onSceneChange?.(tab.id)}
                   className={`px-2 py-0.5 text-[11px] border transition-colors cursor-pointer ${
@@ -214,7 +215,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           {activeScene === 'neural-lattice' && <NeuralLatticeScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
           {activeScene === 'loss-landscape' && <LossLandscapeScene key={resetCount} config={config} />}
           {activeScene === 'latent-galaxy' && <LatentGalaxyScene key={resetCount} config={config} />}
-          {activeScene === 'attention-rope' && <AttentionRoPEScene key={resetCount} config={config} />}
+          {activeScene === 'attention-rope' && <AttentionRoPEScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
           {activeScene === 'flow-matching' && <FlowMatchingScene key={resetCount} config={config} />}
           {activeScene === 'superposition-sae' && <SuperpositionSAEScene key={resetCount} config={config} />}
 
@@ -282,6 +283,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           </div>
           <input
             type="range"
+            aria-label="Learning rate"
             min={0.002}
             max={0.15}
             step={0.002}
@@ -315,6 +317,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           </div>
           <input
             type="range"
+            aria-label={isLoss ? "Surface roughness" : "Temperature"}
             min={0.1}
             max={2.0}
             step={0.05}
@@ -335,6 +338,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           </div>
           <input
             type="range"
+            aria-label="Network depth"
             min={2}
             max={10}
             step={1}
@@ -364,6 +368,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           </div>
           <input
             type="range"
+            aria-label="Sparsity penalty"
             min={0.0}
             max={1.0}
             step={0.02}

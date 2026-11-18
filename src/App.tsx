@@ -49,7 +49,7 @@ const FEATURED_WTF_QUESTIONS: {
   },
   {
     label: 'WTF is Backpropagation?',
-    question: 'How does reverse-mode autodiff know which weight in Layer 1 caused the error in Layer 32?',
+    question: 'How does reverse-mode autodiff compute loss sensitivities for early layers?',
     moduleId: '02_deep_learning',
     subTopicId: 'wtf-is-backprop',
     sceneId: 'neural-lattice',

@@ -204,7 +204,7 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
                 : 'border-[#1E2430] text-[#94A3B8]'
             }`}
           >
-            [FLOW_MATCHING_ODE: STRAIGHT OT PATHS (4-8 STEPS)]
+            [DEMO: STRAIGHT FLOW PATH]
           </button>
           <button
             type="button"
@@ -215,7 +215,7 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
                 : 'border-[#1E2430] text-[#94A3B8]'
             }`}
           >
-            [DDPM_SDE: CURVED STOCHASTIC SCORE (50-1000 STEPS)]
+            [DEMO: NOISY DIFFUSION PATH]
           </button>
           <div className="flex items-center gap-1.5 text-[10px] text-[#06B6D4]">
             <span>SCRUB_t:</span>
@@ -240,7 +240,7 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
           </div>
           {isHighVarianceNoise && (
             <span className="text-[#EF4444] font-semibold">
-              [!WARN: SDE SCORE VARIANCE HIGH (T={config.temperature.toFixed(2)})]
+              [DEMO: INCREASED NOISE AMPLITUDE (T={config.temperature.toFixed(2)})]
             </span>
           )}
         </div>

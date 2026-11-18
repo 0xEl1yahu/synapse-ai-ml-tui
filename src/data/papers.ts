@@ -13,10 +13,10 @@ export const CANONICAL_PAPERS: CanonicalPaper[] = [
     subTopicId: 'wtf-is-attention',
     coupledSceneId: 'attention-rope',
     wtfInvention:
-      'Replaced sequential RNNs entirely with parallelizable Scaled Dot-Product Multi-Head Self-Attention, enabling any token to attend to any other token in O(1) sequential operations.',
+      'Self-attention computes token interactions in parallel. Full attention connects each token pair in one layer and computes a quadratic number of scores. Causal attention masks future tokens.',
     whatBrokeBefore:
       'LSTMs and GRUs had to process token t strictly after token t-1, starving thousands of GPU tensor cores of parallel work and crushing long-range context through a fixed hidden state.',
-    coreEquation: 'Attention(Q, K, V) = softmax( (Q K^T + M) / sqrt(d_k) ) V',
+    coreEquation: 'Attention(Q, K, V) = softmax( Q K^T / sqrt(d_k) + M ) V',
     tensorFlowAscii: [
       '┌─────────────────────────────────────────────────────────────────────────┐',
       '│  Input X: [B, T, d_model=512]                                           │',
@@ -42,7 +42,7 @@ export const CANONICAL_PAPERS: CanonicalPaper[] = [
         expression: 'S = (Q K^T) / sqrt(d_k)',
         tensorShapes: '[B, 8, T, 64] @ [B, 8, 64, T] -> S: [B, 8, T, T]',
         plainMeaning:
-          'If q and k have unit variance, their dot product has variance d_k = 64 (std = 8). Dividing by sqrt(64) = 8 restores unit variance so softmax does not saturate into a 1-hot step function with zero gradients!',
+          'Assuming independent, zero-mean, unit-variance components of q and k, their dot product has variance d_k = 64. Dividing by sqrt(64) = 8 gives unit variance under these assumptions and reduces the risk of softmax saturation.',
       },
       {
         stepTitle: '03 // Causal Masking & Value Aggregation',

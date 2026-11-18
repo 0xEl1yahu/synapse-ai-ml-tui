@@ -300,6 +300,13 @@ export const NeuralLatticeScene: React.FC<NeuralLatticeSceneProps> = ({ config, 
           distanceFactor={12}
         >
           <div className="w-full max-w-sm border border-[#10B981] bg-[#08090C]/95 p-2 font-mono text-[10px] text-[#ECFDF5] shadow-none select-none">
+            <label className="mb-2 flex flex-wrap items-center gap-2">
+              Inspect neuron
+              <select value={selectedNeuron.id} onChange={event => setSelectedNeuronId(event.target.value)}
+                className="border border-[#1E2430] bg-[#08090C] p-1 text-[#ECFDF5]">
+                {neurons.map(neuron => <option key={neuron.id}>{neuron.id}</option>)}
+              </select>
+            </label>
             <div className="flex items-center justify-between border-b border-[#1E2430] pb-1">
               <span className="font-bold text-[#10B981]">NODE::{selectedNeuron.id}</span>
               <span className={isExploding ? 'text-[#EF4444] font-bold' : 'text-[#06B6D4]'}>

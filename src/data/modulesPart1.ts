@@ -15,7 +15,7 @@ export const MODULES_PART_1: TaxonomyModule[] = [
     prerequisites: ['No prior coding for Python', 'High-school algebra for the math lessons'],
     coreTools: ['NumPy', 'PyTorch Tensors', 'einops', 'SciPy'],
     mentalModelSummary:
-      'Every neural network is just a sequence of geometric space-warpings (matrices) interleaved with non-linear folds, steered by local slope measurements (gradients) to minimize average statistical surprise (cross-entropy).',
+      'Many neural networks compose linear maps and nonlinear operations. Gradients describe how the objective changes locally. Cross-entropy is common for classification, while mean squared error is one option for regression.',
     asciiArchitectureDiagram: [
       '┌────────────────────────────────────────────────────────────────────────────┐',
       '│                 GEOMETRY -> CALCULUS -> INFORMATION LOOP                   │',
@@ -745,7 +745,7 @@ print("Top-3 PCA variance captured:", np.round(var_ratio, 4))`,
         }],
         title: 'WTF is a Neural Network & Backpropagation?',
         commandSlug: 'wtf-is-backprop',
-        wtfQuestion: 'When a network with 10 billion weights makes a mistake, how does it know which exact weight in layer 3 caused the error?',
+        wtfQuestion: 'How does backpropagation measure the sensitivity of the loss to each weight?',
         plainEnglish:
           'A neural network without non-linear activation functions is a total fraud—if you stack 100 matrices in a row without a non-linear bend in between, they collapse into a single matrix and can only draw flat lines. By inserting simple folds (like ReLU or SwiGLU) between matrices, the network can fold and sculpt space into any shape imaginable (Universal Approximation). Backpropagation is simply the Chain Rule from calculus combined with dynamic programming: during the forward pass, every operation writes down a tiny local receipt of its inputs. During the backward pass, the error signal starts at the end and walks backward through the receipts, multiplying local sensitivities (Vector-Jacobian Products) so every single weight learns its exact blame in just ONE backward sweep.',
         whyItMatters:
