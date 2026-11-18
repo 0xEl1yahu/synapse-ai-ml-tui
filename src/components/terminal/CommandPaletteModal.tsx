@@ -1,3 +1,4 @@
+import { GUIDE_LESSONS } from '../../data/fieldGuide';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Search,
@@ -17,6 +18,7 @@ import {
 export interface CommandPaletteModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenGuide: (id: string) => void;
   modules: TaxonomyModule[];
   resources: LearningResource[];
   onSelectSubTopic: (moduleId: string, subTopicId: string) => void;
@@ -70,6 +72,7 @@ const LAB_ITEMS: { id: WebGLSceneId; title: string; subtitle: string }[] = [
 export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   isOpen,
   onClose,
+  onOpenGuide,
   modules,
   resources,
   onSelectSubTopic,
@@ -91,6 +94,12 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
 
   const allItems = useMemo<PaletteItem[]>(() => {
     const items: PaletteItem[] = [];
+
+    GUIDE_LESSONS.forEach(lesson => items.push({
+      id: 'guide-' + lesson.id, title: lesson.title, subtitle: lesson.introduction,
+      category: 'NAVIGATION', badge: 'Field guide',
+      action: () => { onOpenGuide(lesson.id); onClose(); },
+    }));
 
     // 1. All SubTopics ("WTF is...?")
     modules.forEach((mod) => {
@@ -166,7 +175,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     });
 
     return items;
-  }, [modules, resources, onSelectSubTopic, onSelectScene, onSelectResource, onNavigateView, onClose]);
+  }, [onOpenGuide, modules, resources, onSelectSubTopic, onSelectScene, onSelectResource, onNavigateView, onClose]);
 
   const filteredItems = useMemo(() => {
     const clean = query

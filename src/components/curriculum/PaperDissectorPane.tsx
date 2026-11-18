@@ -47,7 +47,7 @@ export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
             LANDMARK AI/ML PAPERS DECODED EQUATION-BY-EQUATION
           </h1>
           <p className="text-xs font-sans text-[var(--text-secondary)] mt-1">
-            No academic gatekeeping: inspect what broke before each paper existed, step through the annotated tensor shapes, and run the 25-line PyTorch reproduction.
+            Choose a paper to see the problem its authors tackled, explore the equation, and copy a short code example.
           </p>
         </div>
 

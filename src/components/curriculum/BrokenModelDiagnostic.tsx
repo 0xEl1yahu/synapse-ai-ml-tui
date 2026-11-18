@@ -20,12 +20,13 @@ const CHALLENGES: DiagnosticChallenge[] = [
       'class BrokenLoRALinear(nn.Module):',
       '    def __init__(self, d_in=4096, d_out=4096, r=16):',
       '        super().__init__()',
-      '        self.lora_A = nn.Parameter(torch.zeros(r, d_in))  # <-- CLICK BUGGY LINE',
+      '        self.base = nn.Linear(d_in, d_out)',
+      '        self.lora_A = nn.Parameter(torch.zeros(r, d_in))',
       '        self.lora_B = nn.Parameter(torch.zeros(d_out, r))',
       '    def forward(self, x):',
       '        return self.base(x) + (x @ self.lora_A.T @ self.lora_B.T)',
     ],
-    bugLineIndex: 3,
+    bugLineIndex: 4,
     explanation:
       'By the chain rule, dL/dA = B^T (dL/dy) x^T and dL/dB = (dL/dy) (Ax)^T. If BOTH A and B are initialized to 0, then Ax = 0 and B^T = 0 at step 0, locking both gradients at exact 0 forever! A must be initialized with Gaussian/Kaiming noise while B = 0.',
     fixedLine: '        self.lora_A = nn.Parameter(torch.randn(r, d_in) / math.sqrt(d_in))',
@@ -38,7 +39,7 @@ const CHALLENGES: DiagnosticChallenge[] = [
     buggyCode: [
       'def causal_self_attention(Q, K, V, mask):',
       '    # Q, K, V shape: [B, n_heads, T, d_k=128]',
-      '    scores = (Q @ K.transpose(-2, -1))  # <-- CLICK BUGGY LINE',
+      '    scores = (Q @ K.transpose(-2, -1))',
       '    scores = scores.masked_fill(mask == 0, float("-inf"))',
       '    weights = torch.softmax(scores, dim=-1)',
       '    return weights @ V',
@@ -50,19 +51,19 @@ const CHALLENGES: DiagnosticChallenge[] = [
   },
   {
     id: 'data-leakage-scaler',
-    title: 'INCIDENT_03 // 99.4% Validation Accuracy, 52% Production Crash (Data Leakage)',
+    title: 'INCIDENT_03 // Preprocessing Uses Held-Out Data',
     symptomLog:
-      '[EVAL] Val ROC-AUC = 0.994 | Production Live ROC-AUC = 0.518 (Massive Distribution Shift!)',
+      'The scaler reports seeing every row, including the rows reserved for validation.',
     buggyCode: [
       'def prepare_pipeline(X_raw, y):',
       '    scaler = StandardScaler()',
-      '    X_scaled = scaler.fit_transform(X_raw)  # <-- CLICK BUGGY LINE',
+      '    X_scaled = scaler.fit_transform(X_raw)',
       '    X_train, X_val, y_train, y_val = train_test_split(X_scaled, y, test_size=0.2)',
       '    return XGBClassifier().fit(X_train, y_train)',
     ],
     bugLineIndex: 2,
     explanation:
-      'Calling fit_transform(X_raw) BEFORE train_test_split leaks the validation set mean, variance, and target statistics into training! Always split first, then call scaler.fit_transform(X_train) and scaler.transform(X_val).',
+      'Calling fit_transform(X_raw) BEFORE train_test_split lets held-out feature values influence the training mean and variance. Always split first, then call scaler.fit_transform(X_train) and scaler.transform(X_val).',
     fixedLine: '    # Split first! Then fit scaler strictly on X_train only.',
   },
 ];

@@ -532,11 +532,11 @@ def grpo_step_loss(logp_new, logp_old, logp_ref, group_rewards, clip_eps=0.2, be
         id: 'wtf-is-agent-harness',
         title: 'WTF is an Agent Harness & How Does a Model Turn a Request Into an Action?',
         commandSlug: 'wtf-is-agent-harness',
-        wtfQuestion: 'A neural network only outputs token probabilities—so how does it actually run terminal commands, edit files, and manage multi-step state?',
+        wtfQuestion: 'When I ask an assistant to find a date in my notes, who actually reads the note?',
         plainEnglish:
-          'A language model has no hands, no memory between calls, and no ability to run code on its own—it literally just takes an array of token IDs and outputs probabilities for the next token. The "Agent Harness" is the deterministic systems runtime (like Claude Code, Antigravity, or a custom ReAct loop) wrapped around the model. When you type "Fix the bug in auth.py", the Harness assembles a context payload containing a System Prompt plus strict JSON schemas of available tools (read_file, edit_file, run_command). As the LLM streams tokens, it emits reasoning tokens followed by a special stop sequence (<|tool_call|>) and a structured JSON call. The Harness intercepts that stream, pauses the GPU, validates permissions, executes the real shell/filesystem operation in a sandbox, formats the stdout/stderr as a <tool_result> message, appends it directly onto the existing KV-cache prefix, and resumes generation in a closed feedback loop!',
+          'The model can ask to search your notebook. The harness is the program that checks whether the notebook is in scope, runs the search, and gives the result back to the model. The assistant can then answer with the date and the note it came from.',
         whyItMatters:
-          'In production AI engineering, 80% of reliability comes from the Agent Harness—tool ergonomics, context compaction, deterministic verification gates, KV-cache prefix reuse, and sandbox boundaries—not just swapping model checkpoints.',
+          'The harness decides what the assistant may read or change. A calendar lookup and a calendar invitation need different permissions, even when the same model proposes both.',
         realWorldSystems: [
           'Antigravity / Claude Code / Cursor Agent Harnesses',
           'Model Context Protocol (MCP) Tool Servers',
@@ -545,13 +545,13 @@ def grpo_step_loss(logp_new, logp_old, logp_ref, group_rewards, clip_eps=0.2, be
         summary:
           'An Agent Harness orchestrates the stateful ReAct loop: Context Assembly -> Constrained Tool-Call Generation -> Sandboxed Execution -> Observation Injection -> Context Compaction.',
         deepDiveParagraphs: [
-          'Step 1 (Context & Schema Injection): Before the first forward pass, the harness serializes every available tool into a TypeScript-like or JSON Schema signature inside the system prompt. Because KV-cache prefix caching hashes the token prefix, a well-designed harness keeps system instructions and tool definitions strictly static at the very beginning of the context so 95%+ of the prompt prefill is cached across turns.',
-          'Step 2 (Constrained Decoding & Stop Interception): During autoregressive decoding, the model generates internal reasoning (<thought>) followed by a tool invocation token. Production harnesses often apply Finite-State-Machine (FSM) constrained decoding (e.g., Outlines / XGrammar) over the vocabulary logits so the model is mathematically guaranteed to emit valid JSON matching the tool schema.',
-          'Step 3 (Sandbox Execution & Observation Loop): The harness parses the JSON arguments, checks security/permission policies, runs the command or file diff, truncates runaway stdout (preventing a 50MB log dump from blowing up the context window), and appends the observation back into the message array. The loop repeats until the model emits a final user-facing stop token or hits max_steps.',
+          'First the harness supplies the task, relevant history and descriptions of the tools available for this user. A tool description says which inputs a tool accepts.',
+          'A model can respond with a proposed tool name and arguments. Different providers encode this differently. Valid formatting alone says nothing about whether this user may perform the operation.',
+          'The harness checks the request against the signed-in user’s permissions, executes an allowed action, and returns the observation. It stops at a final answer or a step limit and reports tool failures explicitly.',
         ],
         keyTakeaways: [
           'The LLM never executes tools directly; it emits structured text tokens that the deterministic Agent Harness intercepts and executes.',
-          'Keeping system prompts and tool schemas immutable at index 0 maximizes KV-cache prefix hit rates, cutting latency and cost by 5x–10x.',
+          'Some providers can reuse a shared prompt prefix. Measure cache usage with your provider before relying on savings.',
           'Context engineering (truncating large tool outputs, compacting stale turns, providing line-numbered file views) prevents mid-context attention degradation.',
         ],
         mathFormulas: [
@@ -577,32 +577,17 @@ def grpo_step_loss(logp_new, logp_old, logp_ref, group_rewards, clip_eps=0.2, be
         ],
         codeExamples: [
           {
-            title: 'Production-Style Agent Harness Execution Loop in Python',
+            title: 'A read-only tool dispatcher',
             language: 'python',
-            description: 'Complete stateful agent loop showing schema dispatch, output truncation, and multi-turn feedback.',
-            code: `import json, subprocess
+            description: 'Run with standard Python. The two requests stand in for model output. Only the selected sample note can be read.',
+            code: `notes = {"design review": "Thursday at 10"}
+def dispatch(tool, note):
+    if tool != "read_note" or note not in notes:
+        return "Request denied"
+    return notes[note]
 
-TOOLS = {
-    "run_cmd": lambda cmd: subprocess.run(
-        cmd, shell=True, capture_output=True, text=True, timeout=10
-    ).stdout[:4000]
-}
-
-def run_agent_harness(llm_client, user_request: str, max_steps: int = 8):
-    messages = [
-        {"role": "system", "content": "You are a systems agent. Emit tool_call JSON when needed."},
-        {"role": "user", "content": user_request},
-    ]
-    for step in range(max_steps):
-        response = llm_client.generate(messages)  # Reuses KV prefix cache
-        messages.append({"role": "assistant", "content": response.text, "tool_calls": response.tool_calls})
-        if not response.tool_calls:
-            return response.text  # Task complete!
-        for call in response.tool_calls:
-            fn = TOOLS.get(call["name"])
-            obs = fn(**json.loads(call["arguments"])) if fn else "ERROR: Unknown tool"
-            messages.append({"role": "tool", "tool_call_id": call["id"], "content": obs})
-    raise RuntimeError("Max agent steps exceeded")`,
+print(dispatch("read_note", "design review"))  # Thursday at 10
+print(dispatch("send_note", "design review"))  # Request denied`,
           },
         ],
         pitfalls: [
@@ -948,7 +933,7 @@ def corrected_true_success_rate(observed_pass_rate: float, tpr: float, tnr: floa
           'Activation steering intervenes directly on residual stream vectors x_l <- x_l + alpha * d_concept during inference, while system-level privilege separation defends against indirect prompt injection.',
         deepDiveParagraphs: [
           'Because the Transformer residual stream x_l = x_0 + sum_{i=1}^l (Attn_i + MLP_i) acts as a shared linear communication bus across layers, high-level behavioral concepts (refusal, sycophancy, code security, persona) are often encoded as linear directions (the Linear Representation Hypothesis). Adding or projecting out a unit direction v_steer at middle layers (typically 40%–65% of model depth) reliably shifts generation without fine-tuning.',
-          'Indirect Prompt Injection occurs because self-attention computes QK^T across all tokens in the context window without hardware-level separation between "code" (system instructions) and "data" (retrieved web pages or emails)—the exact equivalent of a classic von Neumann buffer overflow.',
+          'An assistant can interpret text in a retrieved page as new instructions. Treat retrieved material as untrusted and enforce tool permissions outside the model.',
         ],
         keyTakeaways: [
           'The Linear Representation Hypothesis shows high-level behaviors often correspond to single linear directions in middle-layer residual streams.',

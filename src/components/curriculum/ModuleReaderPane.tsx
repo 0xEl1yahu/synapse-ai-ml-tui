@@ -51,7 +51,6 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
   const [stageFilter, setStageFilter] = useState<ReaderSectionFilter>('01_PLAIN_ENGLISH');
   const [copiedCodeIdx, setCopiedCodeIdx] = useState<number | null>(null);
   const [copyFailedIdx, setCopyFailedIdx] = useState<number | null>(null);
-  const [simulatedCodeIdx, setSimulatedCodeIdx] = useState<number | null>(null);
 
   const isCompleted = completedSubTopics.includes(activeSubTopic.id);
 
@@ -333,15 +332,6 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() =>
-                        setSimulatedCodeIdx(simulatedCodeIdx === idx ? null : idx)
-                      }
-                      className="px-2 py-0.5 border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/15 text-[11px] cursor-pointer"
-                    >
-                      [{simulatedCodeIdx === idx ? 'HIDE_TRACE' : 'RUN_VERIFICATION_TRACE ❯'}]
-                    </button>
-                    <button
-                      type="button"
                       onClick={() => handleCopyCode(ex.code, idx)}
                       className="px-2 py-0.5 border border-[var(--border-grid)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] cursor-pointer"
                     >
@@ -355,19 +345,6 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
                 <pre className="p-3 bg-[var(--bg-canvas)] text-xs text-[var(--text-primary)] overflow-x-auto leading-relaxed">
                   {ex.code}
                 </pre>
-                {simulatedCodeIdx === idx && (
-                  <div className="p-3 bg-[var(--bg-elevated)] border-t border-[var(--accent-primary)] text-[11px] text-[var(--accent-primary)]">
-                    <div>
-                      $ python3 -c &quot;verify_{activeSubTopic.commandSlug.replace(/-/g, '_')}()&quot;
-                    </div>
-                    <div className="text-[var(--text-secondary)] mt-1">
-                      [STDOUT] Initializing tensor shapes &amp; analytical gradient check...
-                    </div>
-                    <div className="text-[var(--accent-primary)] font-bold mt-0.5">
-                      [PASS ✓] Forward/Backward numerical invariant verified (max_rel_err = 1.42e-7, exit_code = 0)
-                    </div>
-                  </div>
-                )}
               </div>
             ))}
           </section>

@@ -16,6 +16,8 @@ const RESOURCE_TYPES: ResourceTypeFilter[] = [
   'COURSE',
   'BOOK',
   'VIDEO',
+  'CHANNEL',
+  'READING',
   'PAPER',
   'INTERACTIVE',
   'REPO',

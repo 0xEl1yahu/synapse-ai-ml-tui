@@ -214,15 +214,13 @@ export const GitGraphRoadmap: React.FC<GitGraphRoadmapProps> = ({
               className="text-lg md:text-xl font-bold tracking-tight"
               style={{ color: 'var(--text-primary)' }}
             >
-              No Passive Watching. Every Node Demands a Working Artifact &amp;
-              Self-Verification Gate.
+              What to learn first
             </h1>
             <p
               className="text-xs md:text-sm leading-relaxed"
               style={{ color: 'var(--text-secondary)' }}
             >
-              Select your execution track below. Traverse the dependency DAG from
-              root commits to frontier architectures. Each node pairs direct theory
+              Choose a track and follow its prerequisites. Each step pairs a lesson
               with a concrete <span style={{ color: 'var(--accent-primary)' }}>Build Deliverable</span> and a
               falsifiable <span style={{ color: 'var(--accent-warn)' }}>Verification Check</span>.
             </p>

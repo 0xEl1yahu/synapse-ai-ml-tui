@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { FieldGuide } from './components/curriculum/FieldGuide';
+import { GUIDE_LESSONS } from './data/fieldGuide';
 import { ThemeId, TrackId, ViewMode, WebGLSceneId } from './types';
 import { TAXONOMY_MODULES, CLI_MAN_PAGES } from './data/taxonomy';
 import { ROADMAP_NODES, MILESTONE_PROJECTS, TRACK_DEFINITIONS } from './data/tracks';
@@ -137,6 +139,11 @@ const FEATURED_WTF_QUESTIONS: {
 
 export default function App() {
   const [activeView, setActiveView] = useState<ViewMode>('overview');
+  const [guideId, setGuideId] = useState('python');
+  const guide = GUIDE_LESSONS.find(item => item.id === guideId) || GUIDE_LESSONS[0];
+  const mainRef = React.useRef<HTMLElement>(null);
+  const openGuide = (id: string) => { setGuideId(id); setActiveView('guide'); };
+  useEffect(() => { if (activeView === 'guide') mainRef.current?.scrollTo(0, 0); }, [activeView, guideId]);
   const [activeModuleId, setActiveModuleId] = useState<string>(TAXONOMY_MODULES[0].id);
   const [activeSubTopicId, setActiveSubTopicId] = useState<string>(
     TAXONOMY_MODULES[0].subTopics[0].id
@@ -248,13 +255,14 @@ export default function App() {
   );
 
   const activePath = useMemo(() => {
+    if (activeView === 'guide') return '~/wtfis-ai/guide/' + guideId;
     if (activeView === 'overview') return '~/wtfis-ai/README.wtf';
     if (activeView === 'papers') return '~/wtfis-ai/papers-decoded/attention_is_all_you_need.tex';
     if (activeView === 'roadmap') return `~/wtfis-ai/roadmap.dag (${activeTrack})`;
     if (activeView === 'resources') return '~/wtfis-ai/resources.db';
     if (activeView === 'webgl-lab') return `~/wtfis-ai/systems-lab/${activeSceneId}.glsl`;
     return `~/wtfis-ai/${activeModule.number}_${activeModule.slug}/${activeSubTopic.commandSlug}.md`;
-  }, [activeView, activeTrack, activeSceneId, activeModule, activeSubTopic]);
+  }, [activeView, activeTrack, activeSceneId, activeModule, activeSubTopic, guideId]);
 
   const handleSelectSubTopic = (moduleId: string, subTopicId: string) => {
     const targetMod = TAXONOMY_MODULES.find((m) => m.id === moduleId) || TAXONOMY_MODULES[0];
@@ -333,7 +341,8 @@ export default function App() {
         />
 
         {/* Center Active Viewport Buffer */}
-        <main className="flex-1 min-w-0 h-full overflow-y-auto bg-[var(--bg-canvas)]">
+        <main ref={mainRef} className="flex-1 min-w-0 h-full overflow-y-auto bg-[var(--bg-canvas)]">
+          {activeView === 'guide' && <FieldGuide key={guide.id} lesson={guide} onChoose={openGuide} onOpenHarness={() => handleSelectSubTopic('06_ai_systems_ops', 'wtf-is-agent-harness')} />}
           {activeView === 'overview' && (
             <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
               {/* HERO SPLIT WORKBENCH: WTFIS.AI MANIFESTO + LIVE 3D WEBGL SANDBOX */}
@@ -351,11 +360,18 @@ export default function App() {
                     </h1>
 
                     <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                      AI education is broken—split between watered-down hype threads, $10,000 bootcamps, and dense academic gatekeeping.{' '}
-                      <strong className="text-[var(--text-primary)]">WTFIS.AI</strong> bridges the gap: every concept starts in plain English, connects to an interactive 3D WebGL &amp; systems lab where you can break hyperparameters live, decodes the exact mathematics, and gives you runnable from-scratch code.
+                      Learn how an assistant finds a note, how a model recognizes a digit, or how to write your first line of Python. Each topic starts with a question you can explore at your own pace.
                     </p>
 
                     <EcosystemLogoStrip isLightMode={activeTheme === 'paper-lab'} />
+
+                    <button
+                      type="button"
+                      onClick={() => openGuide('python')}
+                      className="px-3 py-1.5 bg-[var(--accent-primary)] text-black font-bold hover:opacity-90 cursor-pointer"
+                    >
+                      New to coding? Start with Python →
+                    </button>
 
                     {/* Instant Search Trigger Input */}
                     <div className="pt-1">
@@ -432,15 +448,7 @@ export default function App() {
 
                   {/* Primary Action Bar */}
                   <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[var(--border-grid)] font-mono text-xs">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleSelectSubTopic('00_foundations', 'wtf-is-vectors-svd')
-                      }
-                      className="px-3 py-1.5 bg-[var(--accent-primary)] text-black font-bold hover:opacity-90 cursor-pointer"
-                    >
-                      [START_AT_00: FOUNDATIONS ❯]
-                    </button>
+
                     <button
                       type="button"
                       onClick={() => setActiveView('webgl-lab')}
@@ -793,6 +801,7 @@ export default function App() {
 
       {/* Bottom Interactive CLI Prompt Bar */}
       <CommandLineBar
+        onOpenGuide={openGuide}
         modules={TAXONOMY_MODULES}
         manPages={CLI_MAN_PAGES}
         onNavigateView={setActiveView}
@@ -808,6 +817,7 @@ export default function App() {
 
       {/* Global ⌘K / '/' "WTF is...?" Search & Command Modal */}
       <CommandPaletteModal
+        onOpenGuide={openGuide}
         isOpen={isPaletteOpen}
         onClose={() => setIsPaletteOpen(false)}
         modules={TAXONOMY_MODULES}

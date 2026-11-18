@@ -9,6 +9,7 @@ export type WebGLSceneId =
   | 'superposition-sae';
 
 export type ViewMode =
+  | 'guide'
   | 'overview'      // WTFIS.AI Landing Hero + Neural Lattice 3D + "WTF is...?" Search & Quick Start
   | 'module'        // "WTF is...?" Deep-dive reader + Plain-English -> Math -> Code -> Failure Modes + coupled 3D Lab
   | 'papers'        // Interactive Paper Dissector ("WTF is this Paper?": Attention Is All You Need, ResNet, LoRA, FlashAttention, DeepSeek-R1, etc.)
@@ -124,7 +125,7 @@ export interface LearningResource {
   title: string;
   authorOrOrg: string;
   url: string;
-  type: 'COURSE' | 'BOOK' | 'VIDEO' | 'PAPER' | 'INTERACTIVE' | 'REPO';
+  type: 'COURSE' | 'BOOK' | 'VIDEO' | 'PAPER' | 'INTERACTIVE' | 'REPO' | 'READING' | 'CHANNEL';
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'FRONTIER';
   moduleIds: string[];
   isFree: boolean;

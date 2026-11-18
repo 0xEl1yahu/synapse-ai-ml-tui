@@ -9,8 +9,6 @@ export const InteractiveFormulaBlock: React.FC<InteractiveFormulaBlockProps> = (
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(
     formula.variables[0]?.symbol || null
   );
-  const [probeA, setProbeA] = useState<number>(64);
-  const [probeB, setProbeB] = useState<number>(0.1);
 
   const activeVar = formula.variables.find((v) => v.symbol === selectedSymbol) || formula.variables[0];
 
@@ -71,42 +69,11 @@ export const InteractiveFormulaBlock: React.FC<InteractiveFormulaBlockProps> = (
           <div className="md:col-span-7 p-2.5 bg-[var(--bg-canvas)] border border-[var(--border-grid)] text-xs">
             <div className="flex items-center justify-between text-[var(--accent-primary)] font-bold mb-1">
               <span>SYMBOL: {activeVar.symbol} — {activeVar.name}</span>
-              <span className="text-[10px] text-[var(--accent-param)]">[ACTIVE_PROBE]</span>
             </div>
             <p className="text-[var(--text-secondary)] font-sans leading-relaxed">
               {activeVar.role}
             </p>
-            <div className="mt-2 pt-2 border-t border-[var(--border-grid)] flex flex-wrap items-center gap-4 text-[11px]">
-              <label className="flex items-center gap-1.5 text-[var(--text-secondary)]">
-                <span>DIM/SCALE (d):</span>
-                <input
-                  type="range"
-                  min={8}
-                  max={512}
-                  step={8}
-                  value={probeA}
-                  onChange={(e) => setProbeA(parseInt(e.target.value, 10))}
-                  className="w-20 accent-[var(--accent-primary)]"
-                />
-                <span className="text-[var(--text-primary)]">{probeA}</span>
-              </label>
-              <label className="flex items-center gap-1.5 text-[var(--text-secondary)]">
-                <span>COEFF (α/η):</span>
-                <input
-                  type="range"
-                  min={0.01}
-                  max={2.0}
-                  step={0.01}
-                  value={probeB}
-                  onChange={(e) => setProbeB(parseFloat(e.target.value))}
-                  className="w-20 accent-[var(--accent-param)]"
-                />
-                <span className="text-[var(--text-primary)]">{probeB.toFixed(2)}</span>
-              </label>
-              <span className="text-[var(--accent-primary)]">
-                1/√d = {(1 / Math.sqrt(probeA)).toFixed(4)} | α/√d = {(probeB / Math.sqrt(probeA)).toFixed(4)}
-              </span>
-            </div>
+
           </div>
         )}
       </div>
