@@ -200,3 +200,60 @@ for (const width of [320, 375, 390, 768, 1280]) {
     }
   });
 }
+
+const unavailable = 'Interactive 3D is unavailable in this browser.';
+
+for (const condition of ['blocked', 'throws', 'renderer fails'] as const) {
+  test(`curriculum remains usable when WebGL ${condition}`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(mode => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, ...args: Parameters<typeof original>) {
+        if (args[0] === 'webgl2' && (mode !== 'renderer fails' || this.isConnected)) {
+          if (this.isConnected) document.body.dataset.rendererAttempted = 'yes';
+          if (mode === 'throws') throw new Error('WebGL unavailable');
+          return null;
+        }
+        return original.apply(this, args);
+      } as typeof original;
+    }, condition);
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Enter curriculum' }).click();
+    await expect(page.getByText(unavailable)).toBeVisible();
+    if (condition === 'renderer fails') {
+      await expect(page.locator('body')).toHaveAttribute('data-renderer-attempted', 'yes');
+    }
+    await page.getByRole('button', { name: 'Start with Python' }).click();
+    await expect(page.getByRole('heading', { name: 'WTF is Python?' })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'WTF is Python?' })).toBeVisible();
+    await page.getByRole('button', { name: /04: (3D_LAB|AI_SYSTEMS_LAB)/ }).click();
+    await page.getByRole('button', { name: /02:LOSS_&_OPTIMIZERS/ }).click();
+    await expect(page.getByText('w_{t+1} = w_t - eta * m_hat / (sqrt(v_hat) + eps)', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: /WIREFRAME/ })).toHaveCount(0);
+    await page.getByRole('button', { name: /READ_COUPLED_THEORY/ }).click();
+    await page.getByRole('button', { name: 'Try it', exact: true }).click();
+    await expect(page.getByText(unavailable)).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+}
+
+test('supported browser draws the lab and responds to scene and render controls', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Enter curriculum' }).click();
+  await page.getByRole('button', { name: /04: (3D_LAB|AI_SYSTEMS_LAB)/ }).click();
+  await page.getByRole('button', { name: /02:LOSS_&_OPTIMIZERS/ }).click();
+  await expect.poll(() => page.locator('canvas[data-engine]').evaluate((canvas: HTMLCanvasElement) => {
+    const gl = canvas.getContext('webgl2');
+    if (!gl) return false;
+    const pixel = new Uint8Array(4);
+    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    return pixel.some(value => value > 0);
+  })).toBe(true);
+  await page.getByRole('button', { name: /--render=shader/ }).click();
+  await expect(page.locator('[data-ascii-overlay="true"]')).toBeVisible();
+  await page.getByRole('button', { name: /PAUSE/ }).click();
+  await expect(page.getByRole('button', { name: /RESUME/ })).toBeVisible();
+});

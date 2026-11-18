@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { SceneControlConfig, WebGLSceneId } from '../../types';
@@ -69,9 +69,85 @@ const DEFAULT_CONFIG: SceneControlConfig = {
   activePreset: 'default',
 };
 
-export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
+function supportsWebGL2() {
+  try {
+    const context = document.createElement('canvas').getContext('webgl2');
+    if (!context) return false;
+    context.getExtension('WEBGL_lose_context')?.loseContext();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+class LabBoundary extends React.Component<React.PropsWithChildren<{ fallback: React.ReactNode }>> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+export function WebGLViewportShell(props: WebGLViewportShellProps) {
+  const { activeScene, compact, onSceneChange } = props;
+  const [supported, setSupported] = useState<boolean | null>(null);
+  useEffect(() => { setSupported(supportsWebGL2()); }, []);
+  const activeMeta = SCENE_TABS.find(scene => scene.id === activeScene) || SCENE_TABS[0];
+  const fallback = (
+    <section className="space-y-2 p-4 text-sm">
+      <h3 className="font-bold">{activeMeta.label}</h3>
+      <code className="break-words">{activeMeta.equation}</code>
+      <p>Interactive 3D is unavailable in this browser.</p>
+    </section>
+  );
+  return (
+    <div className="flex flex-col w-full h-full bg-[var(--bg-canvas)] border border-[var(--border-grid)] font-mono select-none">
+      <div className="flex flex-wrap items-center gap-1 px-3 py-1.5">
+        <span className="text-[var(--accent-primary)] font-bold mr-1">
+          [WEBGL2_LAB]
+        </span>
+        {compact ? (
+          <span className="px-2 py-0.5 text-[11px] border border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] font-semibold">
+            {activeMeta.code}
+          </span>
+        ) : (
+          SCENE_TABS.map((tab) => {
+            const isSelected = tab.id === activeScene;
+            return (
+              <button
+                key={tab.id}
+                aria-pressed={isSelected}
+                type="button"
+                onClick={() => onSceneChange?.(tab.id)}
+                className={`px-2 py-0.5 text-[11px] border transition-colors cursor-pointer ${
+                  isSelected
+                    ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-semibold'
+                    : 'border-[var(--border-grid)] bg-[var(--bg-canvas)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                [{tab.code}]
+              </button>
+            );
+          })
+        )}
+      </div>
+
+      {supported === false && fallback}
+      {supported && (
+        <LabBoundary fallback={fallback}>
+          <InteractiveLab {...props} />
+        </LabBoundary>
+      )}
+    </div>
+  );
+}
+
+const InteractiveLab: React.FC<WebGLViewportShellProps> = ({
   activeScene,
-  onSceneChange,
   compact = false,
   initialAscii = false,
   onAsciiChange,
@@ -123,39 +199,9 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-[var(--bg-canvas)] border border-[var(--border-grid)] font-mono select-none">
+    <>
       {/* Top Viewport Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 bg-[var(--bg-pane)] border-b border-[var(--border-grid)] text-xs">
-        <div className="flex flex-wrap items-center gap-1">
-          <span className="text-[var(--accent-primary)] font-bold mr-1">
-            [WEBGL2_LAB]
-          </span>
-          {compact ? (
-            <span className="px-2 py-0.5 text-[11px] border border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] font-semibold">
-              {activeMeta.code}
-            </span>
-          ) : (
-            SCENE_TABS.map((tab) => {
-              const isSelected = tab.id === activeScene;
-              return (
-                <button
-                  key={tab.id}
-                  aria-pressed={isSelected}
-                  type="button"
-                  onClick={() => onSceneChange?.(tab.id)}
-                  className={`px-2 py-0.5 text-[11px] border transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-semibold'
-                      : 'border-[var(--border-grid)] bg-[var(--bg-canvas)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  [{tab.code}]
-                </button>
-              );
-            })
-          )}
-        </div>
-
         <div className="flex min-w-0 flex-wrap items-center gap-1.5 max-sm:[&_button]:min-h-10">
           {canBreak && <button
             type="button"
@@ -390,7 +436,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
         </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
 
