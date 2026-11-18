@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, ThreeEvent } from '@react-three/fiber';
+import { useSceneState } from '../sceneState';
 import { SceneLabel } from '../SceneLabel';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
@@ -87,7 +88,7 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
   const momMeshRef = useRef<THREE.Mesh>(null);
   const adamMeshRef = useRef<THREE.Mesh>(null);
 
-  const [spawnPoint, setSpawnPoint] = useState<[number, number]>([-2.6, 2.2]);
+  const [spawnPoint, setSpawnPoint] = useSceneState<[number, number]>('spawn', [-2.6, 2.2]);
   const [trails, setTrails] = useState<{
     sgd: [number, number, number][];
     mom: [number, number, number][];

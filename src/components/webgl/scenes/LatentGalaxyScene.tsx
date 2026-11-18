@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useSceneState } from '../sceneState';
 import { SceneLabel } from '../SceneLabel';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,6 +8,7 @@ import { SceneControlConfig } from '../../../types';
 
 export interface LatentGalaxySceneProps {
   config: SceneControlConfig;
+  inspectorHost: HTMLElement | null;
 }
 
 interface SemanticAnchor {
@@ -66,9 +68,9 @@ const SEMANTIC_ANCHORS: SemanticAnchor[] = [
 
 const POINT_COUNT = 3000;
 
-export const LatentGalaxyScene: React.FC<LatentGalaxySceneProps> = ({ config }) => {
+export const LatentGalaxyScene: React.FC<LatentGalaxySceneProps> = ({ config, inspectorHost }) => {
   const pointsRef = useRef<THREE.Points>(null);
-  const [activeAnchorIdx, setActiveAnchorIdx] = useState<number>(0);
+  const [activeAnchorIdx, setActiveAnchorIdx] = useSceneState('anchor', 0);
 
   const isCollapsed = config.temperature > 1.55 || config.learningRate > 0.11;
   const projectionMode =
@@ -251,26 +253,23 @@ export const LatentGalaxyScene: React.FC<LatentGalaxySceneProps> = ({ config }) 
               />
             </mesh>
 
-            <SceneLabel position={[0, 0.52, 0]} distanceFactor={13}>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveAnchorIdx(idx);
-                }}
-                className={`cursor-pointer border px-1.5 py-0.5 font-mono text-[9px] whitespace-nowrap ${
-                  isSelected
-                    ? 'border-[#10B981] bg-[#08090C]/95 text-[#ECFDF5] font-bold'
-                    : 'border-[#1E2430] bg-[#08090C]/80 text-[#94A3B8] hover:border-[#06B6D4]'
-                }`}
-              >
-                {isSelected ? '>> ' : ''}
-                {anchor.token}
-              </button>
-            </SceneLabel>
+
           </group>
         );
       })}
+
+      {inspectorHost && (
+        <SceneLabel panelHost={inspectorHost} position={[0, 0, 0]}>
+          <div className="flex flex-wrap gap-2 p-2">
+            {SEMANTIC_ANCHORS.map((anchor, index) => (
+              <button key={anchor.token} type="button" aria-pressed={activeAnchorIdx === index}
+                onClick={() => setActiveAnchorIdx(index)} className="border border-[var(--border-grid)] px-2 py-1 text-xs">
+                {anchor.token}
+              </button>
+            ))}
+          </div>
+        </SceneLabel>
+      )}
 
       {/* Live k-NN Cosine Similarity Raycaster Lines & Similarity Badges */}
       {activeAnchor.neighbors.map((nb, idx) => {

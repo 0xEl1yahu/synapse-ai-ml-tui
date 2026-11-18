@@ -7,20 +7,22 @@ interface SceneLabelProps {
   position: ThreeElements['group']['position'];
   distanceFactor?: number;
   children: ReactNode;
+  panelHost?: HTMLElement | null;
 }
 
-export function SceneLabel({ position, distanceFactor, children }: SceneLabelProps) {
+export function SceneLabel({ position, distanceFactor, children, panelHost }: SceneLabelProps) {
   const anchor = useRef<Group>(null);
   const element = useRef<HTMLDivElement | null>(null);
   const root = useRef<Root | null>(null);
   const [point] = useState(() => new Vector3());
-  const host = useThree(state => state.gl.domElement.parentElement);
+  const canvasHost = useThree(state => state.gl.domElement.parentElement);
+  const host = panelHost ?? canvasHost;
 
   useLayoutEffect(() => {
     if (!host) return;
     // Each mount owns a fresh container, including during React's effect replay.
     const label = document.createElement('div');
-    label.style.cssText = 'position:absolute;top:0;left:0;width:max-content;z-index:4;transform-origin:0 0';
+    if (!panelHost) label.style.cssText = 'position:absolute;top:0;left:0;width:max-content;z-index:4;transform-origin:0 0';
     host.appendChild(label);
     const labelRoot = createRoot(label);
     root.current = labelRoot;
@@ -32,14 +34,14 @@ export function SceneLabel({ position, distanceFactor, children }: SceneLabelPro
       // Finish the Three renderer's commit before unmounting the DOM root.
       queueMicrotask(() => labelRoot.unmount());
     };
-  }, [host]);
+  }, [host, panelHost]);
 
   useLayoutEffect(() => {
     root.current?.render(children);
   }, [host, children]);
 
   useFrame(({ camera, size }) => {
-    if (!element.current || !anchor.current) return;
+    if (panelHost || !element.current || !anchor.current) return;
     anchor.current.getWorldPosition(point);
     const distance = point.distanceTo(camera.position);
     point.project(camera);

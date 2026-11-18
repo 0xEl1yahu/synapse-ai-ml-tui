@@ -70,7 +70,9 @@ export const VRAMSystemsCalculator: React.FC = () => {
 
     const kvCacheGB = (kvBytesPerTokenPerLayer * model.layers * seqLen) / 1e9;
     const totalClusterGB = weightsGB + gradsGB + optimizerGB + kvCacheGB;
-    const perGpuGB = totalClusterGB / numGpus;
+    const replicatedCache = mode !== 'INFERENCE' || attnType === 'MLA' || numGpus > (attnType === 'GQA' ? model.kvHeadsGQA : model.qHeads);
+    const perGpuGB = (weightsGB + gradsGB + optimizerGB) / numGpus +
+      (replicatedCache ? kvCacheGB : kvCacheGB / numGpus);
     const fitsInVram = perGpuGB <= gpuVramGB;
 
     return {
@@ -79,6 +81,7 @@ export const VRAMSystemsCalculator: React.FC = () => {
       optimizerGB,
       kvCacheGB,
       totalClusterGB,
+      replicatedCache,
       perGpuGB,
       fitsInVram,
     };
@@ -98,8 +101,8 @@ export const VRAMSystemsCalculator: React.FC = () => {
           }`}
         >
           {stats.fitsInVram
-            ? `[✓ FITS IN VRAM: ${stats.perGpuGB.toFixed(1)} GB / ${gpuVramGB} GB PER GPU]`
-            : `[!CUDA_OOM: NEEDS ${stats.perGpuGB.toFixed(1)} GB > ${gpuVramGB} GB PER GPU]`}
+            ? `[Within estimated budget: ${stats.perGpuGB.toFixed(1)} GB / ${gpuVramGB} GB PER GPU]`
+            : `[Above estimated budget: ${stats.perGpuGB.toFixed(1)} GB > ${gpuVramGB} GB PER GPU]`}
         </span>
       </div>
 
@@ -242,6 +245,15 @@ export const VRAMSystemsCalculator: React.FC = () => {
       </div>
 
       {/* Memory Breakdown Readout */}
+      <p className="break-words text-[var(--text-secondary)]">
+        {mode === 'INFERENCE'
+          ? `Inference with ${precision} weights and ideal tensor-parallel weight sharding.`
+          : 'Training with ideal parameter, gradient, and optimizer sharding. The selected inference weight precision does not apply.'}
+        {' '}Batch size 1 · {seqLen.toLocaleString()} tokens · 16-bit {attnType} KV cache
+        {stats.replicatedCache ? ' replicated per GPU' : ' evenly sharded'}.
+        Breakdown shows cluster allocations before replication, followed by the per-GPU estimate.
+        The estimate excludes activations, temporary buffers, allocator overhead, and implementation-specific quantization metadata.
+      </p>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-[var(--border-grid)] text-[11px]">
         <div className="p-2 bg-[var(--bg-canvas)] border border-[var(--border-grid)]">
           <div className="text-[10px] text-[var(--text-secondary)]">WEIGHTS_VRAM</div>

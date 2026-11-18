@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { SceneControlConfig, WebGLSceneId } from '../../types';
+import { SceneStateContext } from './sceneState';
 import { AsciiOverlayRenderer } from './AsciiOverlayRenderer';
 import { NeuralLatticeScene } from './scenes/NeuralLatticeScene';
 import { LossLandscapeScene } from './scenes/LossLandscapeScene';
@@ -58,7 +59,7 @@ const SCENE_TABS: { id: WebGLSceneId; code: string; label: string; equation: str
 ];
 
 const DEFAULT_CONFIG: SceneControlConfig = {
-  learningRate: 0.035,
+  learningRate: 0.036,
   temperature: 0.65,
   layerDepth: 5,
   sparsityPenalty: 0.72,
@@ -75,59 +76,50 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
   initialAscii = false,
   onAsciiChange,
 }) => {
+  const [inspectorHost, setInspectorHost] = useState<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [config, setConfig] = useState<SceneControlConfig>({
-    ...DEFAULT_CONFIG,
-    renderAscii: initialAscii,
-  });
-
-  useEffect(() => {
-    setConfig((prev) => ({ ...prev, renderAscii: initialAscii }));
-  }, [initialAscii]);
-
-  const activeMeta = SCENE_TABS.find((s) => s.id === activeScene) || SCENE_TABS[0];
-
-  const isDiverged =
-    config.learningRate > 0.095 ||
-    config.temperature > 1.65 ||
-    config.sparsityPenalty < 0.18;
-
-  const triggerBreakItPreset = () => {
-    if (activeScene === 'loss-landscape' || activeScene === 'neural-lattice') {
-      setConfig((prev) => ({
-        ...prev,
-        learningRate: 0.135,
-        temperature: 1.4,
-        activePreset: 'break-diverged',
-      }));
-    } else if (activeScene === 'attention-rope' || activeScene === 'flow-matching') {
-      setConfig((prev) => ({
-        ...prev,
-        temperature: 1.9,
-        learningRate: 0.11,
-        activePreset: 'ddpm',
-      }));
-    } else {
-      setConfig((prev) => ({
-        ...prev,
-        sparsityPenalty: 0.05,
-        temperature: 1.75,
-        activePreset: 'break-collapse',
-      }));
-    }
-  };
-
-  const resetConfig = () => {
-    setConfig((prev) => ({
-      ...DEFAULT_CONFIG,
-      renderAscii: prev.renderAscii,
+  const [sceneConfigs, setSceneConfigs] = useState<Partial<Record<WebGLSceneId, SceneControlConfig>>>({});
+  const [sceneControls] = useState(() =>
+    new Map(SCENE_TABS.map(({ id }) => [id, new Map<string, unknown>()]))
+  );
+  const currentControls = sceneControls.get(activeScene)!;
+  const [resetCount, setResetCount] = useState(0);
+  const config = { ...(sceneConfigs[activeScene] ?? DEFAULT_CONFIG), renderAscii: initialAscii };
+  const setConfig = (update: (previous: SceneControlConfig) => SceneControlConfig) => {
+    setSceneConfigs(previous => ({
+      ...previous,
+      [activeScene]: update(previous[activeScene] ?? DEFAULT_CONFIG),
     }));
   };
+  const activeMeta = SCENE_TABS.find(scene => scene.id === activeScene) ?? SCENE_TABS[0];
+  const isNeural = activeScene === 'neural-lattice';
+  const isLoss = activeScene === 'loss-landscape';
+  const isAttention = activeScene === 'attention-rope';
+  const isEmbedding = activeScene === 'latent-galaxy';
+  const isSae = activeScene === 'superposition-sae';
+  const canBreak = isNeural || isLoss;
+  const warning = isNeural && config.learningRate > 0.10
+    ? 'Simulated exploding gradients at a high learning rate'
+    : isNeural && config.layerDepth >= 9 && config.learningRate < 0.015
+      ? 'Simulated vanishing gradients in a deep network at a low learning rate'
+      : isLoss && config.learningRate > 0.09
+        ? 'Optimizer demo: high learning rate can overshoot the minimum'
+        : isEmbedding && config.temperature > 1.55
+          ? 'Illustrated embedding collapse at high temperature'
+          : isSae && config.sparsityPenalty < 0.2
+            ? 'Illustrated feature interference at low sparsity penalty'
+            : null;
 
-  const toggleAscii = () => {
-    const next = !config.renderAscii;
-    setConfig((prev) => ({ ...prev, renderAscii: next }));
-    onAsciiChange?.(next);
+  const triggerBreakItPreset = () => setConfig(previous => ({
+    ...previous,
+    learningRate: 0.136,
+    activePreset: 'break-diverged',
+  }));
+
+  const resetConfig = () => {
+    setConfig(() => DEFAULT_CONFIG);
+    currentControls.clear();
+    setResetCount(count => count + 1);
   };
 
   return (
@@ -148,6 +140,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
               return (
                 <button
                   key={tab.id}
+                  aria-pressed={isSelected}
                   type="button"
                   onClick={() => onSceneChange?.(tab.id)}
                   className={`px-2 py-0.5 text-[11px] border transition-colors cursor-pointer ${
@@ -163,18 +156,18 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <button
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5 max-sm:[&_button]:min-h-10">
+          {canBreak && <button
             type="button"
             onClick={triggerBreakItPreset}
             className="px-2 py-0.5 text-[11px] border border-[#EF4444] bg-[#EF4444]/15 text-[#EF4444] hover:bg-[#EF4444]/30 font-semibold cursor-pointer"
-            title="Intentionally inject extreme hyperparameters to observe failure modes live"
+            title="Raise the learning rate to 0.136 and observe the demo"
           >
             [BREAK_IT_PRESET !]
-          </button>
+          </button>}
           <button
             type="button"
-            onClick={toggleAscii}
+            onClick={() => onAsciiChange?.(!config.renderAscii)}
             className={`px-2 py-0.5 text-[11px] border cursor-pointer ${
               config.renderAscii
                 ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)] text-black font-bold'
@@ -226,12 +219,14 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           <directionalLight position={[8, 12, 8]} intensity={1.1} />
           <gridHelper args={[24, 24, '#1E2430', '#12161F']} position={[0, -3.5, 0]} />
 
-          {activeScene === 'neural-lattice' && <NeuralLatticeScene config={config} />}
-          {activeScene === 'loss-landscape' && <LossLandscapeScene config={config} />}
-          {activeScene === 'latent-galaxy' && <LatentGalaxyScene config={config} />}
-          {activeScene === 'attention-rope' && <AttentionRoPEScene config={config} />}
-          {activeScene === 'flow-matching' && <FlowMatchingScene config={config} />}
-          {activeScene === 'superposition-sae' && <SuperpositionSAEScene config={config} />}
+          <SceneStateContext.Provider value={currentControls}>
+            {activeScene === 'neural-lattice' && <NeuralLatticeScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+            {activeScene === 'loss-landscape' && <LossLandscapeScene key={resetCount} config={config} />}
+            {activeScene === 'latent-galaxy' && <LatentGalaxyScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+            {activeScene === 'attention-rope' && <AttentionRoPEScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+            {activeScene === 'flow-matching' && <FlowMatchingScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+            {activeScene === 'superposition-sae' && <SuperpositionSAEScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+          </SceneStateContext.Provider>
 
           <OrbitControls
             makeDefault
@@ -245,22 +240,26 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
         {/* Optional Real-Time ASCII Glyph Matrix Post-Processor */}
         <AsciiOverlayRenderer containerRef={containerRef} enabled={config.renderAscii} />
 
+        {/* Top-Right Camera Hint */}
+        <div className="pointer-events-none absolute bottom-2.5 right-3 hidden sm:block bg-[#08090C]/85 border border-[var(--border-grid)] px-2 py-1 text-[10px] text-[var(--text-secondary)]">
+          [DRAG: ORBIT_3D] [SCROLL: ZOOM] [CLICK_NODES: PROBE]
+        </div>
+      </div>
+
         {/* Top-Left Telemetry Overlay */}
-        <div className="pointer-events-none absolute top-2.5 left-3 bg-[#08090C]/90 border border-[var(--border-grid)] px-2.5 py-1.5 text-[11px] leading-relaxed">
-          <div className="flex items-center gap-2">
+        <div className="break-words bg-[#08090C]/90 border border-[var(--border-grid)] px-2.5 py-1.5 text-[11px] leading-relaxed">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-[var(--accent-primary)] font-bold">
               ◆ {activeMeta.label}
             </span>
             <span
               className={`px-1.5 py-0.2 text-[10px] border ${
-                isDiverged
+                warning
                   ? 'border-[#EF4444] bg-[#EF4444]/20 text-[#EF4444]'
                   : 'border-[#10B981]/50 text-[#10B981]'
               }`}
             >
-              {isDiverged
-                ? 'STATUS: FAILURE_MODE / INSTABILITY_TRIGGERED'
-                : 'STATUS: PARAMETERS_WITHIN_RANGE'}
+              {warning ?? 'Ready to explore'}
             </span>
           </div>
           <div className="text-[var(--text-secondary)] text-[10px] mt-0.5">
@@ -268,30 +267,32 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           </div>
         </div>
 
-        {/* Top-Right Camera Hint */}
-        <div className="pointer-events-none absolute top-2.5 right-3 bg-[#08090C]/85 border border-[var(--border-grid)] px-2 py-1 text-[10px] text-[var(--text-secondary)]">
-          [DRAG: ORBIT_3D] [SCROLL: ZOOM] [CLICK_NODES: PROBE]
-        </div>
-      </div>
+      <div ref={setInspectorHost} />
+
+      {canBreak && <p className="px-3 py-1 text-[11px] text-[var(--text-secondary)]">
+        Break It raises the learning rate to 0.136. {isNeural ? 'Watch the simulated gradient in the neuron inspector.' : 'Compare the optimizer paths on the loss surface.'}
+      </p>}
 
       {/* Bottom Interactive Hyperparameter & Telemetry Deck */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 px-3 py-2 bg-[var(--bg-pane)] border-t border-[var(--border-grid)] text-[11px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-3 py-2 bg-[var(--bg-pane)] border-t border-[var(--border-grid)] text-[11px]">
+        {canBreak && (
         <div className="flex flex-col gap-1 border-r border-[var(--border-grid)] pr-2">
           <div className="flex justify-between">
             <span className="text-[var(--text-secondary)]">--learning-rate (η):</span>
             <span
               className={
-                config.learningRate > 0.095
+                Boolean(warning)
                   ? 'text-[#EF4444] font-bold'
                   : 'text-[var(--accent-primary)]'
               }
             >
               {config.learningRate.toFixed(3)}
-              {config.learningRate > 0.095 ? ' [EXPLODING!]' : ''}
+
             </span>
           </div>
           <input
             type="range"
+            aria-label="Learning rate"
             min={0.002}
             max={0.15}
             step={0.002}
@@ -302,10 +303,12 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
             className="w-full accent-[var(--accent-primary)] cursor-pointer"
           />
         </div>
+        )}
 
+        {!isNeural && !isSae && (
         <div className="flex flex-col gap-1 border-r border-[var(--border-grid)] pr-2">
           <div className="flex justify-between">
-            <span className="text-[var(--text-secondary)]">--temperature (τ):</span>
+            <span className="text-[var(--text-secondary)]">{isLoss ? "Surface roughness" : "Temperature (τ)"}</span>
             <span
               className={
                 config.temperature > 1.55
@@ -314,15 +317,16 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
               }
             >
               {config.temperature.toFixed(2)}
-              {config.temperature < 0.22
+              {isAttention && config.temperature < 0.22
                 ? ' [ARGMAX]'
-                : config.temperature > 1.55
+                : isAttention && config.temperature > 1.55
                 ? ' [HIGH_ENTROPY]'
                 : ''}
             </span>
           </div>
           <input
             type="range"
+            aria-label={isLoss ? "Surface roughness" : "Temperature"}
             min={0.1}
             max={2.0}
             step={0.05}
@@ -333,7 +337,9 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
             className="w-full accent-[var(--accent-param)] cursor-pointer"
           />
         </div>
+        )}
 
+        {isNeural && (
         <div className="flex flex-col gap-1 border-r border-[var(--border-grid)] pr-2">
           <div className="flex justify-between">
             <span className="text-[var(--text-secondary)]">--network-depth (L):</span>
@@ -341,6 +347,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           </div>
           <input
             type="range"
+            aria-label="Network depth"
             min={2}
             max={10}
             step={1}
@@ -351,7 +358,9 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
             className="w-full accent-[var(--accent-primary)] cursor-pointer"
           />
         </div>
+        )}
 
+        {(isNeural || isSae) && (
         <div className="flex flex-col gap-1">
           <div className="flex justify-between">
             <span className="text-[var(--text-secondary)]">--l1-sparsity (λ):</span>
@@ -368,6 +377,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           </div>
           <input
             type="range"
+            aria-label="Sparsity penalty"
             min={0.0}
             max={1.0}
             step={0.02}
@@ -378,6 +388,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
             className="w-full accent-[#F59E0B] cursor-pointer"
           />
         </div>
+        )}
       </div>
     </div>
   );

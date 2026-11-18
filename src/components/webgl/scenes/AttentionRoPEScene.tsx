@@ -1,5 +1,6 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useSceneState } from '../sceneState';
 import { SceneLabel } from '../SceneLabel';
 import { Line, QuadraticBezierLine } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,6 +8,7 @@ import { SceneControlConfig } from '../../../types';
 
 export interface AttentionRoPESceneProps {
   config: SceneControlConfig;
+  inspectorHost: HTMLElement | null;
 }
 
 const TOKENS = ['USER:', 'run', 'test', '->', '<tool:bash>', 'pytest', 'PASS'];
@@ -22,9 +24,9 @@ const RAW_LOGITS: number[][] = [
   [1.2, 1.6, 2.8, 1.1, 2.9, 3.6, 2.3],
 ];
 
-export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config }) => {
+export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config, inspectorHost }) => {
   const ropeGroupRef = useRef<THREE.Group>(null);
-  const [activeQueryIdx, setActiveQueryIdx] = useState<number>(5); // Default to 'pytest'
+  const [activeQueryIdx, setActiveQueryIdx] = useSceneState('query', 5); // Default to 'pytest'
 
   const isUniformEntropy = config.temperature > 1.55;
   const isArgmaxSpike = config.temperature < 0.22;
@@ -109,6 +111,7 @@ export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config }
             <SceneLabel position={[0, -0.55, 0.55]} distanceFactor={13}>
               <button
                 type="button"
+                aria-pressed={isQuery}
                 onClick={(e) => {
                   e.stopPropagation();
                   setActiveQueryIdx(idx);
@@ -132,6 +135,24 @@ export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config }
           </group>
         );
       })}
+
+      {inspectorHost && (
+        <SceneLabel position={[0, 0, 0]} panelHost={inspectorHost}>
+          <div className="p-2 text-xs text-[var(--text-primary)]">
+            <label className="flex flex-wrap items-center gap-2">
+              Query token
+              <select value={activeQueryIdx} onChange={event => setActiveQueryIdx(Number(event.target.value))}
+                className="border border-[var(--border-grid)] bg-[var(--bg-pane)] p-1">
+                {TOKENS.map((token, index) => <option key={index} value={index}>{index} · {token}</option>)}
+              </select>
+            </label>
+            <p role="status" className="mt-1">
+              Query {TOKENS[activeQueryIdx]} uses the displayed row. Selecting the same query keeps its weights.
+              Later tokens are masked.
+            </p>
+          </div>
+        </SceneLabel>
+      )}
 
       {/* 3D Multi-Head Attention Bezier Arcs from Active Query to Causal Keys */}
       {activeWeights.map((weight, kIdx) => {

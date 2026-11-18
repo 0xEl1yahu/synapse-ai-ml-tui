@@ -1,5 +1,6 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useSceneState } from '../sceneState';
 import { SceneLabel } from '../SceneLabel';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,6 +8,7 @@ import { SceneControlConfig } from '../../../types';
 
 export interface NeuralLatticeSceneProps {
   config: SceneControlConfig;
+  inspectorHost: HTMLElement | null;
 }
 
 interface NeuronNode {
@@ -27,13 +29,13 @@ interface SynapseEdge {
   weight: number;
 }
 
-export const NeuralLatticeScene: React.FC<NeuralLatticeSceneProps> = ({ config }) => {
+export const NeuralLatticeScene: React.FC<NeuralLatticeSceneProps> = ({ config, inspectorHost }) => {
   const groupRef = useRef<THREE.Group>(null);
   const pulseGroupRef = useRef<THREE.Group>(null);
-  const [selectedNeuronId, setSelectedNeuronId] = useState<string>('L1-N1');
-  const [perturbations, setPerturbations] = useState<Record<string, { biasDelta: number; dropped: boolean }>>({});
+  const [selectedNeuronId, setSelectedNeuronId] = useSceneState('neuron', 'L1-N1');
+  const [perturbations, setPerturbations] = useSceneState<Record<string, { biasDelta: number; dropped: boolean }>>('perturbations', {});
 
-  const effectiveLayers = Math.max(3, Math.min(8, Math.round(config.layerDepth)));
+  const effectiveLayers = Math.max(2, Math.min(10, Math.round(config.layerDepth)));
   const isExploding = config.learningRate > 0.10;
   const isVanishing = config.layerDepth >= 9 && config.learningRate < 0.015;
 
@@ -295,9 +297,17 @@ export const NeuralLatticeScene: React.FC<NeuralLatticeSceneProps> = ({ config }
             selectedNeuron.position[1] + 0.85,
             selectedNeuron.position[2],
           ]}
+          panelHost={inspectorHost}
           distanceFactor={12}
         >
-          <div className="w-60 border border-[#10B981] bg-[#08090C]/95 p-2 font-mono text-[10px] text-[#ECFDF5] shadow-none select-none">
+          <div className="w-full max-w-sm border border-[#10B981] bg-[#08090C]/95 p-2 font-mono text-[10px] text-[#ECFDF5] shadow-none select-none">
+            <label className="mb-2 flex flex-wrap items-center gap-2">
+              Inspect neuron
+              <select value={selectedNeuron.id} onChange={event => setSelectedNeuronId(event.target.value)}
+                className="border border-[#1E2430] bg-[#08090C] p-1 text-[#ECFDF5]">
+                {neurons.map(neuron => <option key={neuron.id}>{neuron.id}</option>)}
+              </select>
+            </label>
             <div className="flex items-center justify-between border-b border-[#1E2430] pb-1">
               <span className="font-bold text-[#10B981]">NODE::{selectedNeuron.id}</span>
               <span className={isExploding ? 'text-[#EF4444] font-bold' : 'text-[#06B6D4]'}>
@@ -338,7 +348,7 @@ export const NeuralLatticeScene: React.FC<NeuralLatticeSceneProps> = ({ config }
               </div>
             </div>
 
-            <div className="mt-2 flex items-center gap-1 border-t border-[#1E2430] pt-1.5">
+            <div className="mt-2 flex flex-wrap items-center gap-1 max-sm:[&_button]:min-h-10 border-t border-[#1E2430] pt-1.5">
               <button
                 type="button"
                 onClick={(e) => {

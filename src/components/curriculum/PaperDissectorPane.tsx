@@ -4,16 +4,19 @@ import { CANONICAL_PAPERS } from '../../data/papers';
 
 export interface PaperDissectorPaneProps {
   papers?: CanonicalPaper[];
+  selectedPaperId: string;
+  onSelectPaper: (paperId: string) => void;
   onOpenModule: (moduleId: string, subTopicId: string) => void;
   onLaunch3DScene: (sceneId: WebGLSceneId) => void;
 }
 
 export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
   papers = CANONICAL_PAPERS,
+  selectedPaperId,
+  onSelectPaper,
   onOpenModule,
   onLaunch3DScene,
 }) => {
-  const [selectedPaperId, setSelectedPaperId] = useState<string>(papers[0]?.id || '');
   const [activeStepIdx, setActiveStepIdx] = useState<number>(0);
   const [copied, setCopied] = useState<boolean>(false);
   const [copyFailed, setCopyFailed] = useState<boolean>(false);
@@ -51,19 +54,19 @@ export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 break-words">
           <a
             href={activePaper.url}
             target="_blank"
             rel="noreferrer"
-            className="px-3 py-1.5 border border-[var(--accent-param)] text-[var(--accent-param)] hover:bg-[var(--accent-param)]/15 font-semibold"
+            className="max-w-full [overflow-wrap:anywhere] px-3 py-1.5 border border-[var(--accent-param)] text-[var(--accent-param)] hover:bg-[var(--accent-param)]/15 font-semibold"
           >
             [OPEN_ORIGINAL_ARXIV_PDF ↗]
           </a>
           <button
             type="button"
             onClick={() => onLaunch3DScene(activePaper.coupledSceneId)}
-            className="px-3 py-1.5 border border-[var(--accent-primary)] bg-[var(--accent-primary)] text-black font-bold cursor-pointer"
+            className="max-w-full [overflow-wrap:anywhere] px-3 py-1.5 border border-[var(--accent-primary)] bg-[var(--accent-primary)] text-black font-bold cursor-pointer"
           >
             [LAUNCH_COUPLED_3D_LAB: {activePaper.coupledSceneId.toUpperCase()} ❯]
           </button>
@@ -79,7 +82,7 @@ export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
               key={paper.id}
               type="button"
               onClick={() => {
-                setSelectedPaperId(paper.id);
+                onSelectPaper(paper.id);
                 setActiveStepIdx(0);
               }}
               className={`p-3 border text-left transition-colors cursor-pointer ${
@@ -162,7 +165,7 @@ export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
             <div className="text-[11px] text-[var(--accent-param)] font-bold mb-2">
               02 // ANNOTATED_TENSOR_SHAPE_PIPELINE:
             </div>
-            <pre className="p-2.5 bg-[var(--bg-canvas)] border border-[var(--border-grid)] text-[10px] text-[var(--accent-primary)] overflow-x-auto leading-snug">
+            <pre className="p-2.5 bg-[var(--bg-canvas)] border border-[var(--border-grid)] text-[10px] text-[var(--accent-primary)] max-w-full overflow-x-auto leading-snug">
               {activePaper.tensorFlowAscii}
             </pre>
           </div>
@@ -229,7 +232,7 @@ export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
                 [{copied ? 'COPIED ✓' : copyFailed ? 'COPY_UNAVAILABLE' : 'COPY_PYTORCH'}]
               </button>
             </div>
-            <pre className="p-3 bg-[var(--bg-canvas)] text-[11px] text-[var(--text-primary)] overflow-x-auto leading-relaxed">
+            <pre className="p-3 bg-[var(--bg-canvas)] text-[11px] text-[var(--text-primary)] max-w-full overflow-x-auto leading-relaxed">
               {activePaper.minimalCode}
             </pre>
           </div>

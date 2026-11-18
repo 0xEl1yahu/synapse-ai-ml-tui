@@ -68,6 +68,7 @@ export interface SubTopic {
   id: string;
   title: string;              // e.g. "WTF is Backpropagation?" or "WTF is an Agent Harness?"
   commandSlug: string;        // e.g. "wtf-is-backprop", "wtf-is-attention", "wtf-is-agent-harness", "wtf-is-grpo"
+  practice?: { inputLabel: string; starter: number; multiplier: number; offset: number; divisor: number; solution: string };
   wtfQuestion: string;        // e.g. "How does a network actually know which weight caused the error?"
   plainEnglish: string;       // Direct, zero-jargon explanation before any math
   whyItMatters: string;       // Why engineers care in real systems
