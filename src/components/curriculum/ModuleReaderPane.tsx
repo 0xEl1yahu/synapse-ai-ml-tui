@@ -29,13 +29,13 @@ type ReaderSectionFilter =
   | '06_BREAK_IT';
 
 const STAGE_PILLS: { id: ReaderSectionFilter; label: string }[] = [
-  { id: 'ALL_STAGES', label: '[ALL: FULL_LOOP]' },
-  { id: '01_PLAIN_ENGLISH', label: '[01: WTF_PLAIN_ENGLISH]' },
-  { id: '02_3D_LAB', label: '[02: 3D_LAB_&_SIM]' },
-  { id: '03_ARCHITECTURE', label: '[03: ARCHITECTURE]' },
-  { id: '04_MATH', label: '[04: MATH_DECODED]' },
-  { id: '05_CODE', label: '[05: RUNNABLE_CODE]' },
-  { id: '06_BREAK_IT', label: '[06: BREAK_IT!]' },
+  { id: '01_PLAIN_ENGLISH', label: 'Overview' },
+  { id: '03_ARCHITECTURE', label: 'How it works' },
+  { id: '02_3D_LAB', label: 'Try it' },
+  { id: '04_MATH', label: 'Math' },
+  { id: '05_CODE', label: 'Code' },
+  { id: '06_BREAK_IT', label: 'What can go wrong' },
+  { id: 'ALL_STAGES', label: 'Full lesson' },
 ];
 
 export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
@@ -170,16 +170,16 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
         </div>
 
         {/* Guided 6-Stage Learning Loop Filter Bar */}
-        <div className="flex items-center gap-1 pt-2 border-t border-[var(--border-grid)] overflow-x-auto font-mono text-[10px]">
-          <span className="text-[var(--text-muted)] mr-1 shrink-0">LESSON_SECTION:</span>
+        <div role="group" aria-label="Lesson sections" className="flex flex-wrap items-center gap-1 pt-2 border-t border-[var(--border-grid)] font-mono text-xs">
           {availableStages.map((pill) => {
             const active = stageFilter === pill.id;
             return (
               <button
                 key={pill.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => setStageFilter(pill.id)}
-                className={`px-1.5 py-0.5 border shrink-0 transition-colors cursor-pointer ${
+                className={`px-2 py-1 border shrink-0 transition-colors cursor-pointer ${
                   active
                     ? 'border-[var(--accent-param)] bg-[var(--accent-param)]/15 text-[var(--accent-param)] font-bold'
                     : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'

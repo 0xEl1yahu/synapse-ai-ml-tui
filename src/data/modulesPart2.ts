@@ -694,31 +694,28 @@ print(dispatch("send_note", "design review"))  # Request denied`,
         libraries: [{
           name: "Qdrant client",
           url: "https://python-client.qdrant.tech/",
-          purpose: "Store example vectors and retrieve nearby records by similarity.",
+          purpose: "Store sample policy passages and search for the one that answers the shopper’s question.",
         }],
-        title: 'WTF is RAG, Vector Search (HNSW) & Hybrid Reranking?',
+        title: 'WTF is RAG?',
         commandSlug: 'wtf-is-rag-vectordb',
-        wtfQuestion: 'How do you search 100 million documents in 5 milliseconds without checking every vector, and why does naive vector search fail on exact error codes?',
+        wtfQuestion: '“Can I return shoes I bought on sale?” How does a shop assistant find the right answer?',
         plainEnglish:
-          'Naive Retrieval-Augmented Generation (RAG) chops PDFs into arbitrary 500-word chunks, embeds them into vectors, and runs cosine similarity. That fails in production for two reasons: (1) comparing a query vector against 100M vectors via brute-force takes seconds, and (2) dense embeddings are blurry semantic summaries that completely miss exact identifiers like "ERR_409_CONFLICT" or "SKU-9981". Production RAG solves speed with HNSW (Hierarchical Navigable Small World graphs—a multi-layer express-highway skip-list over vectors that finds nearest neighbors in logarithmic steps) and solves precision with Hybrid Search (combining exact BM25 keyword scores with dense vector scores via Reciprocal Rank Fusion, then scoring the top 25 candidates with a Cross-Encoder Reranker).',
+          'Imagine a shop whose policy says “Unworn sale shoes can be returned within 14 days.” The assistant searches the shop’s current policy, finds that sentence, and gives it to the model along with your question. The model can now answer “Yes, if they’re unworn and you return them within 14 days” and link you to the rule. Looking up information and using it to write an answer is called retrieval-augmented generation, or RAG.',
         whyItMatters:
-          'Every enterprise knowledge assistant, code search indexer, and long-term agent memory relies on hybrid HNSW + BM25 + Cross-Encoder pipelines.',
-        realWorldSystems: [
-          'Qdrant / Milvus / pgvector HNSW Indexes',
-          'Cohere / BGE Cross-Encoder Rerankers',
-          'Contextual Retrieval & AST-Aware Code Chunkers',
-        ],
+          'If the shop changes its return window, it can update the policy the assistant searches. If the assistant only finds a rule for full-price shoes, it should tell the shopper it could not confirm the sale policy.',
+        realWorldSystems: ['Shop assistants answering policy questions', 'Help desks searching product manuals', 'Staff looking up company procedures'],
         summary:
-          'Production retrieval combines HNSW sub-linear graph search, BM25 lexical matching via Reciprocal Rank Fusion (RRF), and Cross-Encoder full-attention reranking.',
+          'RAG retrieves passages to support an answer. Hybrid search can combine vector search (HNSW), keyword search (BM25), reciprocal rank fusion and cross-encoder reranking.',
+        architectureDiagram: 'Shopper’s question → search the policy → select the passage → answer with a source',
         deepDiveParagraphs: [
-          'HNSW constructs a multi-layer proximity graph where Layer 0 contains all N vectors with short-range edges, and upper layers contain exponentially fewer nodes with long-range "express highway" edges (analogous to a 1D skip list generalized to high-dimensional graphs). Searching starts at the top sparse layer and greedily hops toward the query before zooming into denser lower layers in O(log N) hops.',
-          'Bi-encoder embeddings compress an entire passage into a single d-dimensional vector independent of the user query, creating an information bottleneck. By pairing dense HNSW retrieval with sparse BM25 keyword scoring via Reciprocal Rank Fusion—RRF(d) = sum_m 1 / (k + rank_m(d))—you get both semantic recall and exact lexical precision without calibrating incompatible score scales.',
-          'Finally, a Cross-Encoder Reranker concatenates [CLS] Query [SEP] Document [SEP] and runs full bidirectional self-attention across every query token and document token simultaneously over the top 20–50 candidates.',
+          'First, split the policy into passages and keep each heading and source link with its text. The heading “Sale footwear” gives the 14-day rule its scope. Store a numerical representation of each passage, called an embedding, so a search for “shoes” can also find “footwear”.',
+          'At search time, the question gets an embedding too. An HNSW index connects nearby vectors in a layered graph, letting the search visit promising passages without comparing every vector. A keyword search such as BM25 can also look for a particular product code. Each search produces a ranked list.',
+          'Reciprocal rank fusion combines those lists using each passage’s position. An optional cross-encoder reranker reads the question alongside each shortlisted passage to score how well they match. The model receives the selected passage and its source. Check whether the answer preserves both conditions in the policy: the shoes must be unworn and the return must be within 14 days.',
         ],
         keyTakeaways: [
-          'HNSW achieves millisecond ANN search in O(log N) via hierarchical skip-graph navigation.',
-          'Reciprocal Rank Fusion (RRF) merges lexical BM25 and dense vector rankings using only rank positions (k=60), requiring zero score normalization.',
-          'Bi-encoders are fast for 10M-scale candidate retrieval; Cross-Encoders provide full token-to-token attention for top-K precision.',
+          'Keep headings with passages so exceptions remain attached to the right products.',
+          'Keyword and vector searches can surface different passages. Rank fusion combines their results.',
+          'Test retrieval and answering separately. Did the search find the sale policy? Did the answer preserve its conditions?',
         ],
         mathFormulas: [
           {

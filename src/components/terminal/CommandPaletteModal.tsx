@@ -101,7 +101,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
           id: `sub-${mod.id}-${sub.id}`,
           category: 'WTF_IS_MODULE',
           title: sub.title,
-          keywords: sub.libraries.map(library => library.name).join(' '),
+          keywords: [sub.summary, ...sub.libraries.map(library => library.name)].join(' '),
           subtitle: `${sub.wtfQuestion} — ${sub.plainEnglish}`,
           badge: `MOD_${mod.number}`,
           action: () => {

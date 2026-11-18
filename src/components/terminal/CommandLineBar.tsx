@@ -17,6 +17,10 @@ export interface CommandLineBarProps {
 }
 
 const TOPIC_ALIASES: Record<string, string> = {
+  hnsw: 'rag',
+  'vector search': 'rag',
+  'hybrid reranking': 'rag',
+  reranking: 'rag',
   skills: 'agent-skills',
   'agent skills': 'agent-skills',
   mcps: 'mcp',

@@ -284,7 +284,7 @@ export default function App() {
     if (!q) return TAXONOMY_MODULES;
     return TAXONOMY_MODULES.flatMap(module => {
       const topics = module.subTopics.filter(topic =>
-        [topic.title, topic.wtfQuestion, topic.plainEnglish, ...topic.libraries.map(lib => lib.name)]
+        [topic.title, topic.wtfQuestion, topic.plainEnglish, topic.summary, ...topic.libraries.map(lib => lib.name)]
           .some(value => value.toLowerCase().includes(q))
       );
       if (topics.length) return [{ ...module, subTopics: topics }];
@@ -349,6 +349,14 @@ export default function App() {
                     <p className="max-w-prose text-sm text-[var(--text-secondary)] leading-relaxed">
                       Learn how an assistant finds a note, how a model recognizes a digit, or how to write your first line of Python. Each topic starts with a question you can explore at your own pace.
                     </p>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectSubTopic('00_foundations', 'wtf-is-python')}
+                      className="block px-3 py-2 bg-[var(--accent-primary)] text-black font-mono text-sm font-bold hover:opacity-90 cursor-pointer"
+                    >
+                      Start with Python <span aria-hidden="true">❯</span>
+                    </button>
 
                     <EcosystemLogoStrip isLightMode={activeTheme === 'paper-lab'} />
 
@@ -440,15 +448,6 @@ export default function App() {
 
                   {/* Primary Action Bar */}
                   <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[var(--border-grid)] font-mono text-xs">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleSelectSubTopic('00_foundations', 'wtf-is-python')
-                      }
-                      className="px-3 py-1.5 bg-[var(--accent-primary)] text-black font-bold hover:opacity-90 cursor-pointer"
-                    >
-                      [START_AT_00: PYTHON ❯]
-                    </button>
                     <button
                       type="button"
                       onClick={() => setActiveView('webgl-lab')}

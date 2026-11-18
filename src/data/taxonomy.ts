@@ -180,8 +180,8 @@ export const CLI_MAN_PAGES: Record<
     subTopicId: 'wtf-is-agent-harness',
   },
   rag: {
-    title: 'WTF is RAG, Vector Search (HNSW) & Hybrid Reranking?',
-    summary: 'Hierarchical Navigable Small World graphs, BM25 + Dense Reciprocal Rank Fusion, and Cross-Encoder reranking.',
+    title: 'WTF is RAG?',
+    summary: 'Follow a shopper’s return question from a policy lookup to an answer with a source.',
     command: 'wtf rag',
     moduleId: '06_ai_systems_ops',
     subTopicId: 'wtf-is-rag-vectordb',
