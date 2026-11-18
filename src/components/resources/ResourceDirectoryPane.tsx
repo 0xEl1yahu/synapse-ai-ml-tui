@@ -473,7 +473,7 @@ export const ResourceDirectoryPane: React.FC<ResourceDirectoryPaneProps> = ({
 
         <div className="flex flex-wrap items-center gap-3 px-3 py-2 text-xs">
           <span role="status">{filteredResources.length} results</span>
-          <span className="min-w-0 break-words">{activeCliCommand}</span>
+          <span className="min-w-0 [overflow-wrap:anywhere]">{activeCliCommand}</span>
           <button type="button" className="underline" onClick={resetAllFilters}>Clear filters</button>
           <button type="button" className="underline md:hidden" aria-expanded={showSecondaryFilters}
             aria-controls="resource-secondary-filters" onClick={() => setShowSecondaryFilters(value => !value)}>

@@ -166,3 +166,37 @@ test('phone paper actions and resource filters remain reachable', async ({ page 
   await expect(page.getByRole('button', { name: 'Clear filters' })).toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: /results/ })).toBeVisible();
 });
+
+test('scene-local changes survive tab switches and Reset affects only the active scene', async ({ page }) => {
+  await page.goto('/#lab/neural-lattice');
+  await expect(page.getByRole('slider', { name: 'Sparsity penalty' })).toBeVisible();
+  await page.getByRole('button', { name: 'KILL_NODE' }).click();
+  await page.getByRole('button', { name: /05:FLOW_VS_DIFFUSION/ }).click();
+  await page.getByRole('button', { name: /NOISY DIFFUSION PATH/ }).click();
+  await page.getByRole('button', { name: /01:NEURAL_NET_LAB/ }).click();
+  await expect(page.getByRole('button', { name: 'RESTORE' })).toBeVisible();
+  await page.getByRole('button', { name: '[RESET]', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'KILL_NODE' })).toBeVisible();
+  await page.getByRole('button', { name: /05:FLOW_VS_DIFFUSION/ }).click();
+  await expect(page.getByRole('button', { name: /NOISY DIFFUSION PATH/ })).toHaveAttribute('aria-pressed', 'true');
+});
+
+for (const width of [320, 375, 390, 768, 1280]) {
+  test(`lab actions and inspector fit at ${width} CSS px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/#lab/neural-lattice');
+    for (const embedded of [false, true]) {
+      if (embedded) await page.getByRole('button', { name: /01:.*WTF_INDEX/ }).click();
+      const pause = page.getByRole('button', { name: /\[PAUSE/ });
+      await pause.click();
+      await page.getByRole('button', { name: /\[RESUME/ }).click();
+      const inspector = page.getByRole('combobox', { name: 'Inspect neuron' });
+      await inspector.selectOption('L1-N2');
+      await expect(page.getByText('NODE::L1-N2', { exact: true })).toBeVisible();
+      const reset = page.getByRole('button', { name: '[RESET]', exact: true });
+      expect(await reset.evaluate(el => el.getBoundingClientRect().right)).toBeLessThanOrEqual(width);
+      await reset.click();
+      await expect(page.getByText('NODE::L1-N1', { exact: true })).toBeVisible();
+    }
+  });
+}

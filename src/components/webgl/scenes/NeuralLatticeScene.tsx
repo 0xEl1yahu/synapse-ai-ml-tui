@@ -1,5 +1,6 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useSceneState } from '../sceneState';
 import { SceneLabel } from '../SceneLabel';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
@@ -31,10 +32,10 @@ interface SynapseEdge {
 export const NeuralLatticeScene: React.FC<NeuralLatticeSceneProps> = ({ config, inspectorHost }) => {
   const groupRef = useRef<THREE.Group>(null);
   const pulseGroupRef = useRef<THREE.Group>(null);
-  const [selectedNeuronId, setSelectedNeuronId] = useState<string>('L1-N1');
-  const [perturbations, setPerturbations] = useState<Record<string, { biasDelta: number; dropped: boolean }>>({});
+  const [selectedNeuronId, setSelectedNeuronId] = useSceneState('neuron', 'L1-N1');
+  const [perturbations, setPerturbations] = useSceneState<Record<string, { biasDelta: number; dropped: boolean }>>('perturbations', {});
 
-  const effectiveLayers = Math.max(3, Math.min(8, Math.round(config.layerDepth)));
+  const effectiveLayers = Math.max(2, Math.min(10, Math.round(config.layerDepth)));
   const isExploding = config.learningRate > 0.10;
   const isVanishing = config.layerDepth >= 9 && config.learningRate < 0.015;
 

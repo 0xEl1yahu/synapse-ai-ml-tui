@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { SceneControlConfig, WebGLSceneId } from '../../types';
+import { SceneStateContext } from './sceneState';
 import { AsciiOverlayRenderer } from './AsciiOverlayRenderer';
 import { NeuralLatticeScene } from './scenes/NeuralLatticeScene';
 import { LossLandscapeScene } from './scenes/LossLandscapeScene';
@@ -78,6 +79,10 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
   const [inspectorHost, setInspectorHost] = useState<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [sceneConfigs, setSceneConfigs] = useState<Partial<Record<WebGLSceneId, SceneControlConfig>>>({});
+  const [sceneControls] = useState(() =>
+    new Map(SCENE_TABS.map(({ id }) => [id, new Map<string, unknown>()]))
+  );
+  const currentControls = sceneControls.get(activeScene)!;
   const [resetCount, setResetCount] = useState(0);
   const config = { ...(sceneConfigs[activeScene] ?? DEFAULT_CONFIG), renderAscii: initialAscii };
   const setConfig = (update: (previous: SceneControlConfig) => SceneControlConfig) => {
@@ -89,6 +94,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
   const activeMeta = SCENE_TABS.find(scene => scene.id === activeScene) ?? SCENE_TABS[0];
   const isNeural = activeScene === 'neural-lattice';
   const isLoss = activeScene === 'loss-landscape';
+  const isAttention = activeScene === 'attention-rope';
   const isEmbedding = activeScene === 'latent-galaxy';
   const isSae = activeScene === 'superposition-sae';
   const canBreak = isNeural || isLoss;
@@ -112,6 +118,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
 
   const resetConfig = () => {
     setConfig(() => DEFAULT_CONFIG);
+    currentControls.clear();
     setResetCount(count => count + 1);
   };
 
@@ -212,12 +219,14 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
           <directionalLight position={[8, 12, 8]} intensity={1.1} />
           <gridHelper args={[24, 24, '#1E2430', '#12161F']} position={[0, -3.5, 0]} />
 
-          {activeScene === 'neural-lattice' && <NeuralLatticeScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
-          {activeScene === 'loss-landscape' && <LossLandscapeScene key={resetCount} config={config} />}
-          {activeScene === 'latent-galaxy' && <LatentGalaxyScene key={resetCount} config={config} />}
-          {activeScene === 'attention-rope' && <AttentionRoPEScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
-          {activeScene === 'flow-matching' && <FlowMatchingScene key={resetCount} config={config} />}
-          {activeScene === 'superposition-sae' && <SuperpositionSAEScene key={resetCount} config={config} />}
+          <SceneStateContext.Provider value={currentControls}>
+            {activeScene === 'neural-lattice' && <NeuralLatticeScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+            {activeScene === 'loss-landscape' && <LossLandscapeScene key={resetCount} config={config} />}
+            {activeScene === 'latent-galaxy' && <LatentGalaxyScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+            {activeScene === 'attention-rope' && <AttentionRoPEScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+            {activeScene === 'flow-matching' && <FlowMatchingScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+            {activeScene === 'superposition-sae' && <SuperpositionSAEScene key={resetCount} config={config} inspectorHost={inspectorHost} />}
+          </SceneStateContext.Provider>
 
           <OrbitControls
             makeDefault
@@ -299,7 +308,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
         {!isNeural && !isSae && (
         <div className="flex flex-col gap-1 border-r border-[var(--border-grid)] pr-2">
           <div className="flex justify-between">
-            <span className="text-[var(--text-secondary)]">--temperature (τ):</span>
+            <span className="text-[var(--text-secondary)]">{isLoss ? "Surface roughness" : "Temperature (τ)"}</span>
             <span
               className={
                 config.temperature > 1.55
@@ -308,9 +317,9 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
               }
             >
               {config.temperature.toFixed(2)}
-              {config.temperature < 0.22
+              {isAttention && config.temperature < 0.22
                 ? ' [ARGMAX]'
-                : config.temperature > 1.55
+                : isAttention && config.temperature > 1.55
                 ? ' [HIGH_ENTROPY]'
                 : ''}
             </span>
@@ -351,7 +360,7 @@ export const WebGLViewportShell: React.FC<WebGLViewportShellProps> = ({
         </div>
         )}
 
-        {isNeural || isSae && (
+        {(isNeural || isSae) && (
         <div className="flex flex-col gap-1">
           <div className="flex justify-between">
             <span className="text-[var(--text-secondary)]">--l1-sparsity (λ):</span>

@@ -295,7 +295,7 @@ export const MILESTONE_PROJECTS: MilestoneProject[] = [
     ],
     evaluationMetrics: [
       'On 10 saved multi-turn traces, replay requests with cache enabled and measure reused prefix tokens / eligible repeated prefix tokens across all turns. Compare against a cache-disabled replay. Example: 920 / 1,000 = 92% and passes the >90% gate.',
-      'Freeze 50 labeled queries and a corpus snapshot with stable chunk IDs. Baseline: exact dense cosine top 5. Candidate: same embeddings and corpus, BM25 plus dense top 20 each, RRF k=60, then cross-encoder rerank to 5. Average the fraction of labeled relevant chunks retrieved per query. Example: (0.62 − 0.50) / 0.50 = 24% relative lift and passes the >18% gate.',
+      'Build a benchmark from your own repository: record the corpus commit, chunker, embedding and reranker versions in a manifest, and save 50 queries with their relevant stable chunk IDs. Freeze that fixture before comparing. Baseline: exact dense cosine top 5. Candidate: same embeddings and corpus, BM25 plus dense top 20 each, RRF k=60, then cross-encoder rerank to 5. Average the fraction of labeled relevant chunks retrieved per query. Example: (0.62 − 0.50) / 0.50 = 24% relative lift and passes the >18% gate.',
       'Run a fixed 200-case validation fixture against an isolated test workspace with mock tool calls. Record rejected out-of-scope requests and malformed payloads. Pass when every rejection is handled and no out-of-scope request succeeds. Example: 200 cases, zero unauthorized successes, zero unhandled errors.',
     ],
     starterCommand: 'mkdir -p wtfis-labs/03-agent-harness-rag && cd wtfis-labs/03-agent-harness-rag',

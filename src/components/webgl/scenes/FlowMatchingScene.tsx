@@ -1,5 +1,6 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useSceneState } from '../sceneState';
 import { SceneLabel } from '../SceneLabel';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,14 +8,15 @@ import { SceneControlConfig } from '../../../types';
 
 export interface FlowMatchingSceneProps {
   config: SceneControlConfig;
+  inspectorHost: HTMLElement | null;
 }
 
 const PARTICLE_COUNT = 2400;
 
-export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) => {
+export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config, inspectorHost }) => {
   const pointsRef = useRef<THREE.Points>(null);
-  const [solverMode, setSolverMode] = useState<'flow-matching' | 'ddpm-sde'>('flow-matching');
-  const [scrubTime, setScrubTime] = useState<number | null>(null);
+  const [solverMode, setSolverMode] = useSceneState<'flow-matching' | 'ddpm-sde'>('solver', 'flow-matching');
+  const [scrubTime, setScrubTime] = useSceneState<number | null>('scrubTime', null);
 
   const isHighVarianceNoise = config.temperature > 1.45;
   const activeMode = config.activePreset === 'ddpm' ? 'ddpm-sde' : solverMode;
@@ -193,10 +195,11 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
         </div>
       </SceneLabel>
 
-      <SceneLabel position={[0, -3.3, 0]}>
-        <div className="bg-[#0D0F14]/95 border border-[var(--border-grid)] px-3 py-2 font-mono text-[11px] text-[var(--text-primary)] flex items-center gap-3 whitespace-nowrap">
+      <SceneLabel position={[0, -3.3, 0]} panelHost={inspectorHost}>
+        <div className="bg-[#0D0F14]/95 border border-[var(--border-grid)] px-3 py-2 font-mono text-[11px] text-[var(--text-primary)] flex flex-wrap items-center gap-3">
           <button
             type="button"
+            aria-pressed={activeMode === 'flow-matching'}
             onClick={() => setSolverMode('flow-matching')}
             className={`px-2 py-0.5 border cursor-pointer ${
               activeMode === 'flow-matching'
@@ -208,6 +211,7 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
           </button>
           <button
             type="button"
+            aria-pressed={activeMode === 'ddpm-sde'}
             onClick={() => setSolverMode('ddpm-sde')}
             className={`px-2 py-0.5 border cursor-pointer ${
               activeMode === 'ddpm-sde'
@@ -221,6 +225,7 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
             <span>SCRUB_t:</span>
             <input
               type="range"
+              aria-label="Simulation time"
               min={0}
               max={1}
               step={0.01}
@@ -238,7 +243,10 @@ export const FlowMatchingScene: React.FC<FlowMatchingSceneProps> = ({ config }) 
               </button>
             )}
           </div>
-          {isHighVarianceNoise && (
+          <p className="basis-full text-[var(--text-secondary)]">
+            These animations illustrate straight and noisy paths. Other flow paths and faster diffusion samplers are possible.
+          </p>
+          {activeMode === 'ddpm-sde' && isHighVarianceNoise && (
             <span className="text-[#EF4444] font-semibold">
               [DEMO: INCREASED NOISE AMPLITUDE (T={config.temperature.toFixed(2)})]
             </span>

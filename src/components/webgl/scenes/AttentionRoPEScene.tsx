@@ -1,5 +1,6 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useSceneState } from '../sceneState';
 import { SceneLabel } from '../SceneLabel';
 import { Line, QuadraticBezierLine } from '@react-three/drei';
 import * as THREE from 'three';
@@ -25,7 +26,7 @@ const RAW_LOGITS: number[][] = [
 
 export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config, inspectorHost }) => {
   const ropeGroupRef = useRef<THREE.Group>(null);
-  const [activeQueryIdx, setActiveQueryIdx] = useState<number>(5); // Default to 'pytest'
+  const [activeQueryIdx, setActiveQueryIdx] = useSceneState('query', 5); // Default to 'pytest'
 
   const isUniformEntropy = config.temperature > 1.55;
   const isArgmaxSpike = config.temperature < 0.22;

@@ -1,5 +1,6 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useSceneState } from '../sceneState';
 import { SceneLabel } from '../SceneLabel';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,6 +8,7 @@ import { SceneControlConfig } from '../../../types';
 
 export interface SuperpositionSAESceneProps {
   config: SceneControlConfig;
+  inspectorHost: HTMLElement | null;
 }
 
 const FEATURE_LABELS = [
@@ -61,10 +63,10 @@ function computePolytopeVectors(featureCount: number, collapseFactor: number): [
   });
 }
 
-export const SuperpositionSAEScene: React.FC<SuperpositionSAESceneProps> = ({ config }) => {
+export const SuperpositionSAEScene: React.FC<SuperpositionSAESceneProps> = ({ config, inspectorHost }) => {
   const polytopeGroupRef = useRef<THREE.Group>(null);
-  const [featureCount, setFeatureCount] = useState<number>(6);
-  const [probedFeature, setProbedFeature] = useState<number>(1);
+  const [featureCount, setFeatureCount] = useSceneState('features', 6);
+  const [probedFeature, setProbedFeature] = useSceneState('probe', 1);
 
   // Low sparsity causes polysemantic interference collapse
   const collapseFactor = Math.max(0, 0.35 - config.sparsityPenalty) * 2.4;
@@ -190,8 +192,8 @@ export const SuperpositionSAEScene: React.FC<SuperpositionSAESceneProps> = ({ co
       </group>
 
       {/* Bottom Interactive Polytope Mode Selector */}
-      <SceneLabel position={[0, -3.35, 0]}>
-        <div className="bg-[#0D0F14]/95 border border-[var(--border-grid)] px-3 py-2 font-mono text-[11px] text-[var(--text-primary)] flex items-center gap-3 whitespace-nowrap">
+      <SceneLabel position={[0, -3.35, 0]} panelHost={inspectorHost}>
+        <div className="bg-[#0D0F14]/95 border border-[var(--border-grid)] px-3 py-2 font-mono text-[11px] text-[var(--text-primary)] flex flex-wrap items-center gap-3">
           <span className="text-[#94A3B8]">PACK M FEATURES IN R^3:</span>
           {[
             { m: 3, name: 'M=3 (ORTHOGONAL)' },
@@ -201,6 +203,7 @@ export const SuperpositionSAEScene: React.FC<SuperpositionSAESceneProps> = ({ co
           ].map((item) => (
             <button
               key={item.m}
+              aria-pressed={featureCount === item.m}
               type="button"
               onClick={() => {
                 setFeatureCount(item.m);
