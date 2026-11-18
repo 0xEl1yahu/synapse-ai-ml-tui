@@ -1,6 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FieldGuide } from './components/curriculum/FieldGuide';
-import { GUIDE_LESSONS } from './data/fieldGuide';
 import { ThemeId, TrackId, ViewMode, WebGLSceneId } from './types';
 import { TAXONOMY_MODULES, CLI_MAN_PAGES } from './data/taxonomy';
 import { ROADMAP_NODES, MILESTONE_PROJECTS, TRACK_DEFINITIONS } from './data/tracks';
@@ -139,11 +137,6 @@ const FEATURED_WTF_QUESTIONS: {
 
 export default function App() {
   const [activeView, setActiveView] = useState<ViewMode>('overview');
-  const [guideId, setGuideId] = useState('python');
-  const guide = GUIDE_LESSONS.find(item => item.id === guideId) || GUIDE_LESSONS[0];
-  const mainRef = React.useRef<HTMLElement>(null);
-  const openGuide = (id: string) => { setGuideId(id); setActiveView('guide'); };
-  useEffect(() => { if (activeView === 'guide') mainRef.current?.scrollTo(0, 0); }, [activeView, guideId]);
   const [activeModuleId, setActiveModuleId] = useState<string>(TAXONOMY_MODULES[0].id);
   const [activeSubTopicId, setActiveSubTopicId] = useState<string>(
     TAXONOMY_MODULES[0].subTopics[0].id
@@ -255,14 +248,13 @@ export default function App() {
   );
 
   const activePath = useMemo(() => {
-    if (activeView === 'guide') return '~/wtfis-ai/guide/' + guideId;
     if (activeView === 'overview') return '~/wtfis-ai/README.wtf';
     if (activeView === 'papers') return '~/wtfis-ai/papers-decoded/attention_is_all_you_need.tex';
     if (activeView === 'roadmap') return `~/wtfis-ai/roadmap.dag (${activeTrack})`;
     if (activeView === 'resources') return '~/wtfis-ai/resources.db';
     if (activeView === 'webgl-lab') return `~/wtfis-ai/systems-lab/${activeSceneId}.glsl`;
     return `~/wtfis-ai/${activeModule.number}_${activeModule.slug}/${activeSubTopic.commandSlug}.md`;
-  }, [activeView, activeTrack, activeSceneId, activeModule, activeSubTopic, guideId]);
+  }, [activeView, activeTrack, activeSceneId, activeModule, activeSubTopic]);
 
   const handleSelectSubTopic = (moduleId: string, subTopicId: string) => {
     const targetMod = TAXONOMY_MODULES.find((m) => m.id === moduleId) || TAXONOMY_MODULES[0];
@@ -341,8 +333,7 @@ export default function App() {
         />
 
         {/* Center Active Viewport Buffer */}
-        <main ref={mainRef} className="flex-1 min-w-0 h-full overflow-y-auto bg-[var(--bg-canvas)]">
-          {activeView === 'guide' && <FieldGuide key={guide.id} lesson={guide} onChoose={openGuide} onOpenHarness={() => handleSelectSubTopic('06_ai_systems_ops', 'wtf-is-agent-harness')} />}
+        <main className="flex-1 min-w-0 h-full overflow-y-auto bg-[var(--bg-canvas)]">
           {activeView === 'overview' && (
             <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
               {/* HERO SPLIT WORKBENCH: WTFIS.AI MANIFESTO + LIVE 3D WEBGL SANDBOX */}
@@ -364,14 +355,6 @@ export default function App() {
                     </p>
 
                     <EcosystemLogoStrip isLightMode={activeTheme === 'paper-lab'} />
-
-                    <button
-                      type="button"
-                      onClick={() => openGuide('python')}
-                      className="px-3 py-1.5 bg-[var(--accent-primary)] text-black font-bold hover:opacity-90 cursor-pointer"
-                    >
-                      New to coding? Start with Python →
-                    </button>
 
                     {/* Instant Search Trigger Input */}
                     <div className="pt-1">
@@ -448,7 +431,15 @@ export default function App() {
 
                   {/* Primary Action Bar */}
                   <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[var(--border-grid)] font-mono text-xs">
-
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleSelectSubTopic('00_foundations', 'wtf-is-python')
+                      }
+                      className="px-3 py-1.5 bg-[var(--accent-primary)] text-black font-bold hover:opacity-90 cursor-pointer"
+                    >
+                      [START_AT_00: PYTHON ❯]
+                    </button>
                     <button
                       type="button"
                       onClick={() => setActiveView('webgl-lab')}
@@ -681,6 +672,7 @@ export default function App() {
 
           {activeView === 'module' && (
             <ModuleReaderPane
+              key={activeSubTopic.id}
               module={activeModule}
               activeSubTopic={activeSubTopic}
               onSelectSubTopic={(subId) => setActiveSubTopicId(subId)}
@@ -723,7 +715,8 @@ export default function App() {
                       const coupledMod =
                         TAXONOMY_MODULES.find((m) => m.defaultSceneId === activeSceneId) ||
                         TAXONOMY_MODULES[0];
-                      handleSelectSubTopic(coupledMod.id, coupledMod.subTopics[0].id);
+                      const theory = coupledMod.subTopics.find(topic => topic.hasLab !== false);
+                      if (theory) handleSelectSubTopic(coupledMod.id, theory.id);
                     }}
                     className="px-2.5 py-1 border border-[var(--accent-primary)] bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] font-bold hover:bg-[var(--accent-primary)]/25 cursor-pointer"
                   >
@@ -748,7 +741,8 @@ export default function App() {
             <PaperDissectorPane
               onOpenModule={(modId) => {
                 const m = TAXONOMY_MODULES.find((x) => x.id === modId) || TAXONOMY_MODULES[0];
-                handleSelectSubTopic(m.id, m.subTopics[0].id);
+                const theory = m.subTopics.find(topic => topic.hasLab !== false) || m.subTopics[0];
+                handleSelectSubTopic(m.id, theory.id);
               }}
               onLaunch3DScene={(sceneId) => {
                 setActiveSceneId(sceneId);
@@ -768,9 +762,10 @@ export default function App() {
               onToggleNode={handleToggleRoadmapNode}
               completedProjectIds={completedProjects}
               onToggleProject={handleToggleProjectComplete}
-              onOpenModule={(modId) => {
-                const m = TAXONOMY_MODULES.find((x) => x.id === modId) || TAXONOMY_MODULES[0];
-                handleSelectSubTopic(m.id, m.subTopics[0].id);
+              onOpenModule={(modId, command) => {
+                const lesson = CLI_MAN_PAGES[command.replace(/^wtf /, '')];
+                const m = TAXONOMY_MODULES.find(module => module.id === modId);
+                if (m) handleSelectSubTopic(m.id, lesson?.subTopicId || m.subTopics[0].id);
               }}
             />
           )}
@@ -801,7 +796,6 @@ export default function App() {
 
       {/* Bottom Interactive CLI Prompt Bar */}
       <CommandLineBar
-        onOpenGuide={openGuide}
         modules={TAXONOMY_MODULES}
         manPages={CLI_MAN_PAGES}
         onNavigateView={setActiveView}
@@ -817,7 +811,6 @@ export default function App() {
 
       {/* Global ⌘K / '/' "WTF is...?" Search & Command Modal */}
       <CommandPaletteModal
-        onOpenGuide={openGuide}
         isOpen={isPaletteOpen}
         onClose={() => setIsPaletteOpen(false)}
         modules={TAXONOMY_MODULES}

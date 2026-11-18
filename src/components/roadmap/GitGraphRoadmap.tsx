@@ -17,7 +17,7 @@ export interface GitGraphRoadmapProps {
   onToggleNode: (nodeId: string) => void;
   completedProjectIds?: string[];
   onToggleProject?: (projectId: string) => void;
-  onOpenModule: (moduleId: string) => void;
+  onOpenModule: (moduleId: string, command: string) => void;
 }
 
 interface TrackMetadata {
@@ -779,7 +779,7 @@ export const GitGraphRoadmap: React.FC<GitGraphRoadmapProps> = ({
 
                         <button
                           type="button"
-                          onClick={() => onOpenModule(node.moduleId)}
+                          onClick={() => onOpenModule(node.moduleId, node.command)}
                           className="px-3 py-1.5 font-bold tracking-wide transition-colors cursor-pointer"
                           style={{
                             backgroundColor: 'var(--bg-elevated)',

@@ -17,7 +17,9 @@ export const InspectorSidebar: React.FC<InspectorSidebarProps> = ({
   onSelectScene,
   onNavigateRoadmap,
 }) => {
-  const matchedResources = resources.filter((r) => r.moduleIds.includes(module.id));
+  const matchedResources = resources.filter((r) => activeSubTopic.readingIds
+    ? activeSubTopic.readingIds.includes(r.id)
+    : r.moduleIds.includes(module.id));
 
   return (
     <aside className="w-72 shrink-0 h-full overflow-y-auto bg-[var(--bg-pane)] border-l border-[var(--border-grid)] font-mono text-xs p-3 space-y-4 hidden xl:block">
@@ -34,16 +36,18 @@ export const InspectorSidebar: React.FC<InspectorSidebarProps> = ({
             <span className="text-[var(--text-secondary)]">EST_MASTERY:</span>
             <span className="text-[var(--accent-warn)]">{module.estimatedHours} HOURS</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-[var(--text-secondary)]">COUPLED_3D_LAB:</span>
-            <button
-              type="button"
-              onClick={() => onSelectScene(module.defaultSceneId)}
-              className="text-[var(--accent-param)] underline cursor-pointer"
-            >
-              {module.defaultSceneId} ↗
-            </button>
-          </div>
+          {activeSubTopic.hasLab !== false && (
+            <div className="flex justify-between">
+              <span className="text-[var(--text-secondary)]">COUPLED_3D_LAB:</span>
+              <button
+                type="button"
+                onClick={() => onSelectScene(module.defaultSceneId)}
+                className="text-[var(--accent-param)] underline cursor-pointer"
+              >
+                {module.defaultSceneId} ↗
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

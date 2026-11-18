@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SubTopic, TaxonomyModule, WebGLSceneId } from '../../types';
+import { LEARNING_RESOURCES } from '../../data/resources';
 import { InteractiveFormulaBlock } from './InteractiveFormulaBlock';
 import { AgentHarnessSimulator } from './AgentHarnessSimulator';
 import { VRAMSystemsCalculator } from './VRAMSystemsCalculator';
@@ -81,8 +82,17 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
     }
   };
 
+  const availableStages = STAGE_PILLS.filter(({ id }) => {
+    if (id === '02_3D_LAB') return activeSubTopic.hasLab !== false;
+    if (id === '04_MATH') return activeSubTopic.mathFormulas.length > 0;
+    if (id === '05_CODE') return activeSubTopic.codeExamples.length > 0;
+    return true;
+  });
   const showSection = (target: ReaderSectionFilter) =>
-    stageFilter === 'ALL_STAGES' || stageFilter === target;
+    availableStages.some(stage => stage.id === target) &&
+    (stageFilter === 'ALL_STAGES' || stageFilter === target);
+  const readings = LEARNING_RESOURCES.filter(resource => activeSubTopic.readingIds?.includes(resource.id));
+  const check = activeSubTopic.knowledgeCheck;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto bg-[var(--bg-canvas)] text-[var(--text-primary)]">
@@ -99,24 +109,26 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowEmbedded3D((v) => !v)}
-              className={`px-2 py-0.5 border text-[11px] cursor-pointer ${
-                showEmbedded3D
-                  ? 'border-[var(--accent-param)] text-[var(--accent-param)] bg-[var(--accent-param)]/10'
-                  : 'border-[var(--border-grid)] text-[var(--text-secondary)]'
-              }`}
-            >
-              [{showEmbedded3D ? 'HIDE_3D_SANDBOX' : 'SHOW_3D_SANDBOX'}]
-            </button>
-            <button
-              type="button"
-              onClick={() => onOpenFullLab(module.defaultSceneId)}
-              className="px-2 py-0.5 border border-[var(--border-grid)] text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-[11px] cursor-pointer"
-            >
-              [FULLSCREEN_LAB ↗]
-            </button>
+            {activeSubTopic.hasLab !== false && <>
+              <button
+                type="button"
+                onClick={() => setShowEmbedded3D((v) => !v)}
+                className={`px-2 py-0.5 border text-[11px] cursor-pointer ${
+                  showEmbedded3D
+                    ? 'border-[var(--accent-param)] text-[var(--accent-param)] bg-[var(--accent-param)]/10'
+                    : 'border-[var(--border-grid)] text-[var(--text-secondary)]'
+                }`}
+              >
+                [{showEmbedded3D ? 'HIDE_3D_SANDBOX' : 'SHOW_3D_SANDBOX'}]
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenFullLab(module.defaultSceneId)}
+                className="px-2 py-0.5 border border-[var(--border-grid)] text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-[11px] cursor-pointer"
+              >
+                [FULLSCREEN_LAB ↗]
+              </button>
+            </>}
             <button
               type="button"
               onClick={() => onToggleComplete(activeSubTopic.id)}
@@ -159,7 +171,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
         {/* Guided 6-Stage Learning Loop Filter Bar */}
         <div className="flex items-center gap-1 pt-2 border-t border-[var(--border-grid)] overflow-x-auto font-mono text-[10px]">
           <span className="text-[var(--text-muted)] mr-1 shrink-0">LESSON_SECTION:</span>
-          {STAGE_PILLS.map((pill) => {
+          {availableStages.map((pill) => {
             const active = stageFilter === pill.id;
             return (
               <button
@@ -228,6 +240,18 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
                 </ul>
               </div>
             </div>
+            {readings.length > 0 && (
+              <div className="mt-4 border-t border-[var(--border-grid)] pt-3">
+                <div className="font-mono text-xs text-[var(--accent-param)]">READ_OR_WATCH_NEXT:</div>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {readings.map(resource => <li key={resource.id}>
+                    <a className="underline" href={resource.url} target="_blank" rel="noreferrer">
+                      {resource.title} · {resource.authorOrOrg}
+                    </a>
+                  </li>)}
+                </ul>
+              </div>
+            )}
           </section>
         )}
 
@@ -267,7 +291,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
             </div>
 
             <pre className="p-3 bg-[var(--bg-canvas)] border border-[var(--border-grid)] font-mono text-[11px] text-[var(--accent-primary)] overflow-x-auto leading-snug">
-              {module.asciiArchitectureDiagram}
+              {activeSubTopic.architectureDiagram ?? module.asciiArchitectureDiagram}
             </pre>
 
             <div className="space-y-3 text-sm leading-relaxed text-[var(--text-primary)]">
@@ -370,7 +394,13 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
               </ul>
             </div>
 
-            <BrokenModelDiagnostic />
+            {check && (
+              <details className="border border-[var(--border-grid)] bg-[var(--bg-pane)] p-4">
+                <summary className="cursor-pointer text-sm font-semibold">{check.question}</summary>
+                <p className="mt-2 text-sm leading-relaxed">{check.answer}</p>
+              </details>
+            )}
+            {activeSubTopic.hasLab !== false && <BrokenModelDiagnostic />}
           </section>
         )}
 

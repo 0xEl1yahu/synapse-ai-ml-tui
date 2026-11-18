@@ -9,7 +9,6 @@ export type WebGLSceneId =
   | 'superposition-sae';
 
 export type ViewMode =
-  | 'guide'
   | 'overview'      // WTFIS.AI Landing Hero + Neural Lattice 3D + "WTF is...?" Search & Quick Start
   | 'module'        // "WTF is...?" Deep-dive reader + Plain-English -> Math -> Code -> Failure Modes + coupled 3D Lab
   | 'papers'        // Interactive Paper Dissector ("WTF is this Paper?": Attention Is All You Need, ResNet, LoRA, FlashAttention, DeepSeek-R1, etc.)
@@ -60,6 +59,10 @@ export interface CodeImplementation {
 }
 
 export interface SubTopic {
+  hasLab?: boolean;
+  architectureDiagram?: string;
+  readingIds?: string[];
+  knowledgeCheck?: { question: string; answer: string };
   id: string;
   title: string;              // e.g. "WTF is Backpropagation?" or "WTF is an Agent Harness?"
   commandSlug: string;        // e.g. "wtf-is-backprop", "wtf-is-attention", "wtf-is-agent-harness", "wtf-is-grpo"

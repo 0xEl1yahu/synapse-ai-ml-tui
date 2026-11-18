@@ -1,9 +1,7 @@
-import { GUIDE_LESSONS } from '../../data/fieldGuide';
 import React, { useState } from 'react';
 import { TaxonomyModule, ThemeId, TrackId, ViewMode, WebGLSceneId } from '../../types';
 
 export interface CommandLineBarProps {
-  onOpenGuide: (id: string) => void;
   modules: TaxonomyModule[];
   manPages?: Record<
     string,
@@ -18,6 +16,14 @@ export interface CommandLineBarProps {
   onOpenSearch: () => void;
 }
 
+const TOPIC_ALIASES: Record<string, string> = {
+  graphs: 'graph-engineering',
+  harness: 'agent-harness',
+  injection: 'prompt-injection',
+  'prompt injection': 'prompt-injection',
+  privacy: 'model-and-data-security',
+};
+
 const QUICK_CHIPS = [
   { label: 'wtf attention', cmd: 'wtf attention' },
   { label: 'wtf backprop', cmd: 'wtf backprop' },
@@ -30,7 +36,6 @@ const QUICK_CHIPS = [
 ];
 
 export const CommandLineBar: React.FC<CommandLineBarProps> = ({
-  onOpenGuide,
   modules,
   manPages = {},
   onNavigateView,
@@ -57,21 +62,11 @@ export const CommandLineBar: React.FC<CommandLineBarProps> = ({
     const verb = parts[0];
     const arg = parts.slice(1).join(' ');
 
-    if (verb === 'guide' || verb === 'wtf' || verb === 'man') {
-      const term = arg.replace(/^is /, '').replace(/\?$/, '').trim();
-      const lesson = GUIDE_LESSONS.find(item => item.id === term || item.title.toLowerCase() === 'wtf is ' + term + '?');
-      if (lesson || (verb === 'guide' && !term)) {
-        onOpenGuide(lesson?.id || 'python');
-        setConsoleLog(null);
-        return;
-      }
-    }
-
     if (verb === 'help' || verb === '?') {
       setConsoleLog({
         cmd: trimmed,
         output:
-          'COMMANDS: guide [python|harness|openclaw|hermes|langchain|langgraph|graphs|injection|jailbreaking|privacy] | wtf <topic> (e.g. wtf attention, wtf backprop, wtf agent-harness, wtf grpo, wtf svd, wtf sae) | lab <neural-lattice|loss-landscape|latent-galaxy|attention-rope|flow-matching|superposition-sae> | cd <home|library|lab|roadmap|resources> | ascii <on|off> | track <builder|ml-engineer|researcher> | theme <phosphor|amber-crt|cyber-cyan|paper-lab> | clear',
+          'COMMANDS: wtf <topic> (e.g. wtf attention, wtf backprop, wtf agent-harness, wtf grpo, wtf svd, wtf sae) | lab <neural-lattice|loss-landscape|latent-galaxy|attention-rope|flow-matching|superposition-sae> | cd <home|library|lab|roadmap|resources> | ascii <on|off> | track <builder|ml-engineer|researcher> | theme <phosphor|amber-crt|cyber-cyan|paper-lab> | clear',
       });
       return;
     }
@@ -160,8 +155,6 @@ export const CommandLineBar: React.FC<CommandLineBarProps> = ({
       return;
     }
 
-    if (verb === 'cd' && arg === 'guide') { onOpenGuide('python'); return; }
-
     if (verb === 'cd') {
       if (arg === '~' || arg === 'home' || arg === 'overview') {
         onNavigateView('overview');
@@ -211,7 +204,8 @@ export const CommandLineBar: React.FC<CommandLineBarProps> = ({
     }
 
     if (verb === 'wtf' || verb === 'man') {
-      const cleanQuery = arg.replace(/^is\s+/, '').trim();
+      const term = arg.replace(/^is\s+/, '').replace(/\?$/, '').trim();
+      const cleanQuery = TOPIC_ALIASES[term] || term;
       const manHit = manPages[cleanQuery];
       if (manHit) {
         const mod = modules.find((m) => m.id === manHit.moduleId);
