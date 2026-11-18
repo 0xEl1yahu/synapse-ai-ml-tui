@@ -1,3 +1,4 @@
+import { CurriculumSymbol } from './CurriculumSymbol';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Search,
@@ -26,6 +27,7 @@ export interface CommandPaletteModalProps {
 }
 
 interface PaletteItem {
+  keywords?: string;
   id: string;
   category: 'WTF_IS_MODULE' | '3D_SYSTEMS_LAB' | 'RESOURCE' | 'NAVIGATION';
   title: string;
@@ -99,6 +101,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
           id: `sub-${mod.id}-${sub.id}`,
           category: 'WTF_IS_MODULE',
           title: sub.title,
+          keywords: sub.libraries.map(library => library.name).join(' '),
           subtitle: `${sub.wtfQuestion} — ${sub.plainEnglish}`,
           badge: `MOD_${mod.number}`,
           action: () => {
@@ -179,7 +182,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
 
     return allItems
       .filter((item) => {
-        const hay = `${item.title} ${item.subtitle} ${item.badge}`.toLowerCase();
+        const hay = `${item.title} ${item.subtitle} ${item.badge} ${item.keywords ?? ''}`.toLowerCase();
         return clean.split(/\s+/).every((token) => hay.includes(token));
       })
       .slice(0, 14);
@@ -376,7 +379,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                               : 'var(--text-primary)',
                           }}
                         >
-                          {item.title}
+                          <CurriculumSymbol name={item.title} />{item.title}
                         </span>
                       </div>
                       <p

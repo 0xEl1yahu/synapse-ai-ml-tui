@@ -25,6 +25,7 @@ export interface CanonicalPaper {
   venueOrArxiv: string;
   url: string;
   moduleId: string;
+  subTopicId: string;
   coupledSceneId: WebGLSceneId;
   wtfInvention: string;       // 1-sentence plain-English breakthrough
   whatBrokeBefore: string;    // Exact failure mode before this paper existed
@@ -59,6 +60,7 @@ export interface CodeImplementation {
 }
 
 export interface SubTopic {
+  libraries: { name: string; url: string; purpose: string }[];
   hasLab?: boolean;
   architectureDiagram?: string;
   readingIds?: string[];

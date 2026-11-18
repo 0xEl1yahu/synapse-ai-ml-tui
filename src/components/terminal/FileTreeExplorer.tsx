@@ -1,3 +1,4 @@
+import { CurriculumSymbol } from './CurriculumSymbol';
 import React, { useEffect, useState } from 'react';
 import {
   Folder,
@@ -273,7 +274,7 @@ export const FileTreeExplorer: React.FC<FileTreeExplorerProps> = ({
                             <span style={{ color: 'var(--text-muted)' }}>
                               {isLast ? '└' : '├'}
                             </span>
-                            <span className="truncate">{shortName}</span>
+                            <span className="truncate"><CurriculumSymbol name={sub.title} />{shortName}</span>
                           </div>
                           <span
                             className="text-[10px] shrink-0 font-bold"

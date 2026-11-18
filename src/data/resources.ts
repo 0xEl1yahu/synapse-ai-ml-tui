@@ -2,6 +2,27 @@ import { LearningResource } from '../types';
 
 export const LEARNING_RESOURCES: LearningResource[] = [
   {
+    id: 'res-agent-skills-spec', title: 'Agent Skills file format', authorOrOrg: 'Agent Skills',
+    url: 'https://agentskills.io/specification',
+    type: 'READING', level: 'BEGINNER', moduleIds: ['06_ai_systems_ops'],
+    isFree: true, isInteractive: false, timeCommitment: 'Self-paced',
+    whyHighSignal: 'See where to put the instructions, examples and optional scripts for a reporting skill.',
+  },
+  {
+    id: 'res-mcp-architecture', title: 'How an MCP connection works', authorOrOrg: 'Model Context Protocol',
+    url: 'https://modelcontextprotocol.io/docs/learn/architecture',
+    type: 'READING', level: 'BEGINNER', moduleIds: ['06_ai_systems_ops'],
+    isFree: true, isInteractive: false, timeCommitment: 'Self-paced',
+    whyHighSignal: 'Trace a request from the assistant app through a client to a server.',
+  },
+  {
+    id: 'res-deepeval', title: 'Getting started with DeepEval', authorOrOrg: 'Confident AI',
+    url: 'https://deepeval.com/docs/getting-started',
+    type: 'READING', level: 'BEGINNER', moduleIds: ['07_interp_evals'],
+    isFree: true, isInteractive: false, timeCommitment: 'Self-paced',
+    whyHighSignal: 'Learn how test cases, expected outputs and scoring criteria fit together.',
+  },
+  {
     id: "res-cs50p",
     title: "Introduction to Programming with Python",
     authorOrOrg: "Harvard CS50",

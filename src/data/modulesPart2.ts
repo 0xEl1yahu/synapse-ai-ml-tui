@@ -31,6 +31,11 @@ export const MODULES_PART_2: TaxonomyModule[] = [
     subTopics: [
       {
         id: 'wtf-is-llm-tokenization',
+        libraries: [{
+          name: "Hugging Face Tokenizers",
+          url: "https://huggingface.co/docs/tokenizers/quicktour",
+          purpose: "Train a tokenizer on sample text and inspect the resulting token IDs.",
+        }],
         title: 'WTF is Tokenization (BPE), Pre-Training & Scaling Laws?',
         commandSlug: 'wtf-is-llm-tokenization',
         wtfQuestion: 'How does an LLM read raw text, why does it struggle to count letters in "strawberry", and how do we know how big to make a model vs its dataset?',
@@ -114,6 +119,11 @@ def train_bpe(text: str, num_merges: int = 10):
       },
       {
         id: 'wtf-is-diffusion',
+        libraries: [{
+          name: "Diffusers schedulers",
+          url: "https://huggingface.co/docs/diffusers/using-diffusers/schedulers",
+          purpose: "Compare the update rules used to remove noise over several sampling steps.",
+        }],
         title: 'WTF is a Diffusion Model & Score Matching?',
         commandSlug: 'wtf-is-diffusion',
         wtfQuestion: 'How can a neural network generate photorealistic images just by learning how to subtract static Gaussian noise?',
@@ -184,6 +194,11 @@ def ddpm_training_loss(model, x0: torch.Tensor, alpha_bar: torch.Tensor):
       },
       {
         id: 'wtf-is-flow-matching',
+        libraries: [{
+          name: "Flow Matching",
+          url: "https://github.com/facebookresearch/flow_matching",
+          purpose: "Explore probability paths and solvers in the PyTorch examples.",
+        }],
         title: 'WTF is Flow Matching & Optimal Transport?',
         commandSlug: 'wtf-is-flow-matching',
         wtfQuestion: 'Why did frontier image, audio, and robotics models ditch curved diffusion paths for straight-line Flow Matching?',
@@ -287,6 +302,11 @@ def euler_flow_sample(v_net, shape, steps: int = 8, device="cuda"):
     subTopics: [
       {
         id: 'wtf-is-reinforcement-learning',
+        libraries: [{
+          name: "Gymnasium",
+          url: "https://gymnasium.farama.org/introduction/basic_usage/",
+          purpose: "Step through an environment and inspect observations, rewards and episode termination.",
+        }],
         title: 'WTF is Reinforcement Learning (MDPs, Q-Learning & PPO)?',
         commandSlug: 'wtf-is-reinforcement-learning',
         wtfQuestion: 'How do you train a neural network when there is no "correct label", only a delayed reward signal at the end of a game or reasoning chain?',
@@ -354,6 +374,11 @@ def ppo_loss(logprobs_new, logprobs_old, advantages, clip_eps=0.2):
       },
       {
         id: 'wtf-is-rlhf-dpo',
+        libraries: [{
+          name: "TRL DPOTrainer",
+          url: "https://huggingface.co/docs/trl/dpo_trainer",
+          purpose: "Inspect the chosen and rejected responses used to train on preferences.",
+        }],
         title: 'WTF is Alignment (SFT, RLHF & Direct Preference Optimization)?',
         commandSlug: 'wtf-is-rlhf-dpo',
         wtfQuestion: 'How do we align a raw base model with human preferences without running four giant neural networks in memory at once?',
@@ -419,6 +444,11 @@ def dpo_loss(pi_win_logp, pi_lose_logp, ref_win_logp, ref_lose_logp, beta: float
       },
       {
         id: 'wtf-is-reasoning-grpo',
+        libraries: [{
+          name: "TRL GRPOTrainer",
+          url: "https://huggingface.co/docs/trl/grpo_trainer",
+          purpose: "Follow how a reward function scores a group of candidate completions.",
+        }],
         title: 'WTF is a Reasoning Model, Test-Time Compute & GRPO?',
         commandSlug: 'wtf-is-reasoning-grpo',
         wtfQuestion: 'How did models like DeepSeek-R1 and o1 learn to "think", backtrack, and solve Olympiad math without human step-by-step labels?',
@@ -530,6 +560,11 @@ def grpo_step_loss(logp_new, logp_old, logp_ref, group_rewards, clip_eps=0.2, be
     subTopics: [
       {
         id: 'wtf-is-agent-harness',
+        libraries: [{
+          name: "OpenAI Agents SDK",
+          url: "https://openai.github.io/openai-agents-python/",
+          purpose: "Trace a tool request from model output through the runner to a tool result.",
+        }],
         title: 'WTF is an Agent Harness & How Does a Model Turn a Request Into an Action?',
         commandSlug: 'wtf-is-agent-harness',
         wtfQuestion: 'When I ask an assistant to find a date in my notes, who actually reads the note?',
@@ -601,7 +636,66 @@ print(dispatch("send_note", "design review"))  # Request denied`,
         ],
       },
       {
+        id: 'wtf-is-agent-skills',
+        libraries: [{
+          name: "Agent Skills reference tools",
+          url: "https://github.com/agentskills/agentskills/tree/main/skills-ref",
+          purpose: "Validate a skill directory and its metadata before sharing it.",
+        }],
+        title: 'WTF is an Agent Skill?',
+        commandSlug: 'wtf-is-agent-skills',
+        wtfQuestion: 'How can an assistant prepare the same stock report every Friday?',
+        plainEnglish: 'Write down how you prepare the report once. A skill gives an assistant those reusable instructions. Your stock-report skill might say to group items by shop, flag anything below five units, and show when the stock count was taken.',
+        whyItMatters: 'If the team changes its low-stock threshold, you can update the procedure in one place and check the next report against a small sample.',
+        realWorldSystems: ['Inventory reports', 'Preparing release notes', 'Checking a document against a house style'],
+        summary: 'A skill packages a repeatable procedure in a directory that an agent can discover and read.',
+        architectureDiagram: 'Report requested → select stock-report skill → read SKILL.md → apply steps to stock counts',
+        deepDiveParagraphs: [
+          'In the Agent Skills format, a folder called stock-report contains a SKILL.md file. Its opening metadata gives the name (stock-report) and a description of when to use it. The rest of the file gives the steps. You can keep an example report under assets/ or longer guidance under references/.',
+          'A host can show the assistant only skill names and descriptions at first, then load the full instructions when a task matches. If the numbers are available in a spreadsheet, the assistant can use the spreadsheet you supplied. If it needs live stock, it needs an authorized connection to the stock system.',
+        ],
+        keyTakeaways: ['Use the description to tell the assistant when to choose the skill.', 'Test the instructions with sample stock counts whose report you can check by hand.'],
+        hasLab: false,
+        mathFormulas: [],
+        codeExamples: [],
+        pitfalls: ['A skill can include executable scripts. Inspect their behavior and required access before enabling them.', 'If the stock count is missing, the procedure should say how to report that gap.'],
+        knowledgeCheck: { question: 'The threshold changes from five units to eight. Where do you make the change?', answer: 'Update the reporting skill and test it with an item that has six units. It should now appear on the low-stock list.' },
+        readingIds: ['res-agent-skills-spec'],
+      },
+      {
+        id: 'wtf-is-mcp',
+        libraries: [{
+          name: "MCP Python SDK",
+          url: "https://py.sdk.modelcontextprotocol.io/servers/",
+          purpose: "Compare the tools, resources and prompts an MCP server can offer a client.",
+        }],
+        title: 'WTF is the Model Context Protocol (MCP)?',
+        commandSlug: 'wtf-is-mcp',
+        wtfQuestion: 'How does the assistant get today’s stock count for that Friday report?',
+        plainEnglish: 'MCP is a shared way for an assistant app to connect to another program. A shop can provide a stock lookup through an MCP server. When you ask for the Friday report, the app can use that lookup to get a current count, then follow the reporting skill to format it.',
+        whyItMatters: 'A shop can offer the same lookup to several compatible apps. The shop still controls which shops and records each signed-in user can access.',
+        realWorldSystems: ['Claude Desktop with an MCP server', 'A read-only inventory lookup', 'A searchable document collection'],
+        summary: 'MCP defines how a host discovers capabilities and requests data or actions from a server.',
+        architectureDiagram: 'Assistant app (host) → MCP client → inventory server → authorized stock records',
+        deepDiveParagraphs: [
+          'The host is the app you use. Inside it, an MCP client communicates with the inventory server. The server can advertise tools (operations such as looking up stock), resources (data you can read), and prompts (reusable message templates). A server can offer just one of these.',
+          'For the Friday report, the app requests the count for your shop. The server checks your access and returns six units with a timestamp. The skill determines which section of the report gets that row. Changing a stock count is a separate operation with different authorization.',
+        ],
+        keyTakeaways: ['Use a skill to describe how to prepare the report. Use an MCP connection when the app needs current stock data.', 'A listed tool may still deny a request. The service must check access for each operation.'],
+        hasLab: false,
+        mathFormulas: [],
+        codeExamples: [],
+        pitfalls: ['A disconnected server leaves you without a fresh count. Show the failure or label cached figures with their timestamp.', 'Keep a reporting connection read-only when the task only needs a lookup.'],
+        knowledgeCheck: { question: 'The stock server is offline. Which part of the Friday report can the assistant still prepare?', answer: 'It can use the skill to prepare the headings and explain that current counts are unavailable. It needs another authorized source to fill in the figures.' },
+        readingIds: ['res-mcp-architecture'],
+      },
+      {
         id: 'wtf-is-rag-vectordb',
+        libraries: [{
+          name: "Qdrant client",
+          url: "https://python-client.qdrant.tech/",
+          purpose: "Store example vectors and retrieve nearby records by similarity.",
+        }],
         title: 'WTF is RAG, Vector Search (HNSW) & Hybrid Reranking?',
         commandSlug: 'wtf-is-rag-vectordb',
         wtfQuestion: 'How do you search 100 million documents in 5 milliseconds without checking every vector, and why does naive vector search fail on exact error codes?',
@@ -665,6 +759,11 @@ print(dispatch("send_note", "design review"))  # Request denied`,
       },
       {
         id: 'wtf-is-flashattention-vllm',
+        libraries: [{
+          name: "vLLM",
+          url: "https://docs.vllm.ai/en/latest/",
+          purpose: "Explore how an inference engine schedules requests and manages attention memory.",
+        }],
         title: 'WTF is GPU Inference, FlashAttention, PagedAttention & Quantization?',
         commandSlug: 'wtf-is-flashattention-vllm',
         wtfQuestion: 'If an H100 GPU can do 1,000 Trillion math ops per second, why does LLM generation spend 90% of its time waiting on memory wires?',
@@ -776,6 +875,11 @@ def flash_attention_tiled(Q, K, V, block_size=4):
     subTopics: [
       {
         id: 'wtf-is-superposition-sae',
+        libraries: [{
+          name: "SAELens",
+          url: "https://github.com/jbloomAus/SAELens",
+          purpose: "Inspect features learned by a sparse autoencoder on model activations.",
+        }],
         title: 'WTF is Mechanistic Interpretability, Superposition & Sparse Autoencoders?',
         commandSlug: 'wtf-is-superposition-sae',
         wtfQuestion: 'Why does a single neuron fire on completely unrelated things (like cats, car bumpers, and Korean verbs), and how do we untangle it?',
@@ -852,14 +956,20 @@ class SparseAutoencoder(nn.Module):
       },
       {
         id: 'wtf-is-ai-evals',
+        libraries: [{
+          name: "DeepEval",
+          url: "https://deepeval.com/docs/metrics-exact-match",
+          purpose: "Score an exact classification label against its expected value without calling a judge model.",
+        }],
         title: 'WTF are AI Evals & How Do You Measure Generalisation vs Failure Modes?',
         commandSlug: 'wtf-is-ai-evals',
-        wtfQuestion: 'How do you scientifically test a non-deterministic AI system when "vibe-checking" 5 prompts lies to you every time?',
-        plainEnglish:
-          'When engineers build traditional software, a unit test is binary: 2 + 2 == 4. When engineers build AI systems, changing two words in a prompt or swapping a chunking strategy can fix 3 examples you looked at while silently breaking 40% of edge cases you didn\'t check. "AI Evals" replace vibe-checking with an automated engineering harness: (1) Deterministic Code Graders (AST syntax checks, JSON schema validation, SQL execution diffs, regex assertions), (2) Retrieval Metrics (Recall@K, MRR, NDCG), and (3) Calibrated LLM-as-a-Judge rubrics (which must be bias-corrected against human gold labels using TPR/TNR calibration).',
-        whyItMatters:
-          'You cannot improve what you cannot measure. High-velocity AI teams spend more time building domain-specific eval datasets and failure-mode taxonomies than tweaking prompts.',
+        wtfQuestion: 'If we update a delivery assistant, how can we tell whether its answers improve?',
+        plainEnglish: 'Keep examples with answers you can check. Give the assistant the same examples after a change and compare the results. For a parcel that missed its delivery date, the expected status might be “delayed”. DeepEval is a Python library that can check whether the assistant returned that exact label.',
+        whyItMatters: 'A change that fixes one parcel may break another. Include routine deliveries, missing tracking records and late parcels so you can see who benefits and where the assistant still fails.',
+        readingIds: ['res-deepeval'],
+        knowledgeCheck: { question: 'Would exact matching fairly grade a friendly explanation of a late parcel?', answer: 'Several explanations could be equally accurate. Check the exact status label separately, then assess the explanation against criteria such as accuracy and clarity.' },
         realWorldSystems: [
+          'DeepEval classification tests',
           'UK AISI Inspect AI & Promptfoo Eval Harnesses',
           'SWE-bench Verified (Containerized Unit-Test Grading)',
           'Ragas / Braintrust Production Eval Pipelines',
@@ -867,13 +977,13 @@ class SparseAutoencoder(nn.Module):
         summary:
           'Rigorous AI evaluation combines deterministic functional graders, pass@k sampling estimators, and Rogan-Gladen TPR/TNR bias-corrected LLM judges.',
         deepDiveParagraphs: [
-          'For code generation and reasoning tasks, greedy decoding (pass@1) hides whether a model possesses a capability in its distribution. Chen et al. (Codex) introduced the unbiased pass@k estimator: generate n >= k samples per problem, count c passing samples, and compute pass@k = 1 - comb(n - c, k) / comb(n, k).',
+          'Pass@1 measures success on a single attempt under the decoding settings you chose. Pass@k asks whether at least one of k attempts succeeds. With n samples per problem, c passing samples and n ≥ k, the estimate is 1 − C(n − c, k) / C(n, k).',
           'When using an LLM-as-a-Judge for open-ended outputs, naive pairwise comparisons suffer from position bias (preferring the first option), verbosity bias (preferring longer answers), and self-preference bias. Instead of multi-point 1–10 scales (which have high variance), production evals use binary pass/fail criteria backed by a human-labeled alignment set to measure the judge\'s True Positive Rate (TPR) and True Negative Rate (TNR).',
         ],
         keyTakeaways: [
           'Always prefer deterministic code assertions (schema validation, execution sandbox tests, exact regex) before reaching for an LLM judge.',
           'Never ask an LLM judge to score on a vague 1-to-10 scale; use decomposed binary (PASS/FAIL) rubrics with reference examples.',
-          'Use the unbiased combinatorial pass@k estimator (with n >= 2k samples) to measure capability ceilings vs pass^k to measure production reliability.',
+          'Choose a metric that matches the user’s task. If users need three steps to succeed in sequence, evaluate the whole sequence.',
         ],
         mathFormulas: [
           {
@@ -884,7 +994,7 @@ class SparseAutoencoder(nn.Module):
               '┌──────────────────────────────────────────────────────────────────────┐',
               '│  Sample n=20 rollouts -> c=4 pass unit tests                         │',
               '│  pass@k: Probability at least 1 of k random rollouts passes          │',
-              '│  pass^k: (c/n)^k -> Probability ALL k consecutive runs succeed!      │',
+              '│  Independent attempts with success rate p: all k succeed with p^k.  │',
               '└──────────────────────────────────────────────────────────────────────┘',
             ].join('\n'),
             intuition:
@@ -896,6 +1006,23 @@ class SparseAutoencoder(nn.Module):
           },
         ],
         codeExamples: [
+          {
+            title: 'Check a parcel status with DeepEval',
+            language: 'python',
+            description: 'Install deepeval in a Python environment. These two recorded outputs demonstrate a pass and a failure without a model call.',
+            code: `from deepeval.metrics import ExactMatchMetric
+from deepeval.test_case import LLMTestCase
+
+for recorded_status in ["delayed", "delivered"]:
+    case = LLMTestCase(
+        input="The parcel missed its delivery date. Return its status.",
+        actual_output=recorded_status,
+        expected_output="delayed",
+    )
+    metric = ExactMatchMetric()
+    metric.measure(case)
+    print(recorded_status, metric.score)  # delayed: 1, delivered: 0`,
+          },
           {
             title: 'Unbiased pass@k & Rogan-Gladen LLM-Judge Bias Estimator',
             language: 'python',
@@ -917,11 +1044,16 @@ def corrected_true_success_rate(observed_pass_rate: float, tpr: float, tnr: floa
         ],
         pitfalls: [
           'Benchmark data contamination: Evaluating on public benchmarks leaked into pre-training corpora measures memorization rather than generalization.',
-          'Optimizing pass@k when users experience pass^1: A customer support agent that fails 1 out of 3 tool calls has a 70% pass@1 but only a 34% pass^3 reliability across a 3-turn workflow!',
+          'Three independent steps that each succeed 70% of the time all succeed together about 34% of the time. Real steps can depend on earlier outputs. Test complete support conversations to measure that workflow.',
         ],
       },
       {
         id: "wtf-is-prompt-injection",
+        libraries: [{
+          name: "OPA policy engine",
+          url: "https://www.openpolicyagent.org/docs",
+          purpose: "Enforce which tool actions are allowed even when untrusted text changes the model’s request.",
+        }],
         title: "WTF is prompt injection?",
         commandSlug: "wtf-is-prompt-injection",
         wtfQuestion: "What if a web page gives my assistant instructions?",
@@ -944,6 +1076,11 @@ def corrected_true_success_rate(observed_pass_rate: float, tpr: float, tnr: floa
       },
       {
         id: "wtf-is-jailbreaking",
+        libraries: [{
+          name: "Inspect AI",
+          url: "https://inspect.aisi.org.uk/",
+          purpose: "Organize safety evaluation cases, scorers and logs to compare model behavior across releases.",
+        }],
         title: "WTF is jailbreaking?",
         commandSlug: "wtf-is-jailbreaking",
         wtfQuestion: "Can a long conversation change how a model follows safety rules?",
@@ -966,6 +1103,11 @@ def corrected_true_success_rate(observed_pass_rate: float, tpr: float, tnr: floa
       },
       {
         id: "wtf-is-model-and-data-security",
+        libraries: [{
+          name: "Safetensors",
+          url: "https://huggingface.co/docs/safetensors/index",
+          purpose: "Load tensor weights in a format designed to avoid executing arbitrary code during deserialization.",
+        }],
         title: "How do I protect my model and my data?",
         commandSlug: "wtf-is-model-and-data-security",
         wtfQuestion: "Where does a private file go after I give it to an assistant?",
@@ -989,6 +1131,11 @@ def corrected_true_success_rate(observed_pass_rate: float, tpr: float, tnr: floa
       },
       {
         id: 'wtf-is-activation-steering',
+        libraries: [{
+          name: "TransformerLens",
+          url: "https://github.com/TransformerLensOrg/TransformerLens",
+          purpose: "Use activation hooks to inspect or modify an intermediate representation.",
+        }],
         title: 'WTF is Activation Steering, Guardrails & Prompt Injection?',
         commandSlug: 'wtf-is-activation-steering',
         wtfQuestion: 'How can you alter what an LLM thinks by adding a vector directly into its middle layers at runtime, and why is prompt injection so hard to patch?',
@@ -1083,6 +1230,11 @@ def attach_steering_hook(transformer_layer, steering_vec: torch.Tensor, alpha: f
     subTopics: [
       {
         id: 'wtf-is-vit-clip-vlm',
+        libraries: [{
+          name: "Transformers CLIP",
+          url: "https://huggingface.co/docs/transformers/model_doc/clip",
+          purpose: "Compare image and text embeddings in a shared representation.",
+        }],
         title: 'WTF is a Vision Transformer (ViT), CLIP/SigLIP & Vision-Language Model (VLM)?',
         commandSlug: 'wtf-is-vit-clip-vlm',
         wtfQuestion: 'How do you feed a 2D photograph into a 1D text Transformer so it can read charts, write UI code from screenshots, and locate objects?',
@@ -1160,6 +1312,11 @@ class VisionLanguageProjector(nn.Module):
       },
       {
         id: 'wtf-is-audio-rvq-world-vla',
+        libraries: [{
+          name: "EnCodec",
+          url: "https://github.com/facebookresearch/encodec",
+          purpose: "Inspect how an audio codec represents a waveform with discrete codes.",
+        }],
         title: 'WTF are Audio Codecs (RVQ), World Models (JEPA) & Robotics VLA Policies?',
         commandSlug: 'wtf-is-audio-rvq-world-vla',
         wtfQuestion: 'How do voice models stream speech in real time, and how do robot policies translate camera frames into smooth motor actions?',
@@ -1238,6 +1395,11 @@ class ResidualVectorQuantizer(nn.Module):
       },
       {
         id: "wtf-is-graph-engineering",
+        libraries: [{
+          name: "Neo4j Python driver",
+          url: "https://neo4j.com/docs/python-manual/current/",
+          purpose: "Query connected records and follow prerequisite relationships.",
+        }],
         title: "WTF is graph engineering?",
         commandSlug: "wtf-is-graph-engineering",
         wtfQuestion: "What must I learn before model training?",
@@ -1261,6 +1423,11 @@ class ResidualVectorQuantizer(nn.Module):
       },
       {
         id: 'wtf-is-gnn-geometric',
+        libraries: [{
+          name: "PyTorch Geometric",
+          url: "https://pytorch-geometric.readthedocs.io/en/latest/",
+          purpose: "Represent a graph as nodes and edges and apply a message-passing layer.",
+        }],
         title: 'WTF are Graph Neural Networks (GNNs) & E(3)-Equivariant Molecular AI?',
         commandSlug: 'wtf-is-gnn-geometric',
         wtfQuestion: 'How do you run deep learning on molecules, social networks, and knowledge graphs that don\'t fit on a flat pixel grid?',
@@ -1369,6 +1536,11 @@ class EquivariantGNNLayer(nn.Module):
     subTopics: [
       {
         id: 'wtf-is-numpy-pytorch-sdk-internals',
+        libraries: [{
+          name: "NumPy array internals",
+          url: "https://numpy.org/doc/stable/dev/internals.html",
+          purpose: "Inspect how strides and data buffers allow multiple views of an array.",
+        }],
         title: 'WTF Happens Under the Hood of Python, NumPy, PyTorch (`torch.compile`), OpenAI SDK & DeepSeek?',
         commandSlug: 'wtf-is-numpy-pytorch-sdk-internals',
         wtfQuestion: 'Why is a NumPy array 100x faster than a Python list, what does `torch.compile` actually compile, and how does the OpenAI SDK talk to DeepSeek and vLLM?',
@@ -1455,6 +1627,11 @@ async def stream_reasoning_and_tools(prompt: str):
       },
       {
         id: "wtf-is-openclaw",
+        libraries: [{
+          name: "OpenClaw",
+          url: "https://docs.openclaw.ai/",
+          purpose: "Follow how the gateway connects a messaging channel to an assistant.",
+        }],
         title: "WTF is OpenClaw?",
         commandSlug: "wtf-is-openclaw",
         wtfQuestion: "How can I reach my own assistant from chat?",
@@ -1477,6 +1654,11 @@ async def stream_reasoning_and_tools(prompt: str):
       },
       {
         id: "wtf-is-hermes-agent",
+        libraries: [{
+          name: "Hermes Agent",
+          url: "https://github.com/NousResearch/hermes-agent",
+          purpose: "Inspect the agent’s skill and memory features before connecting personal data.",
+        }],
         title: "WTF is Hermes Agent?",
         commandSlug: "wtf-is-hermes-agent",
         wtfQuestion: "How can an assistant reuse a procedure next week?",
@@ -1499,6 +1681,11 @@ async def stream_reasoning_and_tools(prompt: str):
       },
       {
         id: "wtf-is-langchain",
+        libraries: [{
+          name: "LangChain",
+          url: "https://docs.langchain.com/oss/python/langchain/overview",
+          purpose: "Connect a chat model to a tool in a custom application.",
+        }],
         title: "WTF is LangChain?",
         commandSlug: "wtf-is-langchain",
         wtfQuestion: "How do I add an assistant to an existing product?",
@@ -1521,6 +1708,11 @@ async def stream_reasoning_and_tools(prompt: str):
       },
       {
         id: "wtf-is-langgraph",
+        libraries: [{
+          name: "LangGraph",
+          url: "https://docs.langchain.com/oss/python/langgraph/overview",
+          purpose: "Define workflow steps and checkpoints for a task that can pause and resume.",
+        }],
         title: "WTF is LangGraph?",
         commandSlug: "wtf-is-langgraph",
         wtfQuestion: "How can an automated task wait for a person and resume tomorrow?",
@@ -1543,6 +1735,11 @@ async def stream_reasoning_and_tools(prompt: str):
       },
       {
         id: 'wtf-is-multi-agent-orchestration',
+        libraries: [{
+          name: "LangGraph workflows and agents",
+          url: "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+          purpose: "Compare routing, parallel work and orchestrator-worker patterns.",
+        }],
         title: 'WTF is Multi-Agent Orchestration (Lead-Subagent, DAGs, Git Worktrees & MCP)?',
         commandSlug: 'wtf-is-multi-agent-orchestration',
         wtfQuestion: 'Why does a single monolithic agent fall apart on complex 20-file tasks, and how do we orchestrate parallel subagents without merge conflicts or context rot?',
@@ -1627,6 +1824,11 @@ async def orchestrate_feature(client, tasks: list[SubagentTask]):
       },
       {
         id: 'wtf-is-docker-cog-gpu-deploy',
+        libraries: [{
+          name: "Cog",
+          url: "https://github.com/replicate/cog",
+          purpose: "Package model dependencies and expose a prediction interface.",
+        }],
         title: 'WTF is Docker for AI, NVIDIA GPU Containers, Cog (`cog.yaml`) & Distributed 5D Training?',
         commandSlug: 'wtf-is-docker-cog-gpu-deploy',
         wtfQuestion: 'How do you package a messy PyTorch/CUDA project into a reproducible GPU container and scale it across multi-GPU servers?',

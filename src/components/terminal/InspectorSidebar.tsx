@@ -1,3 +1,4 @@
+import { CurriculumSymbol } from './CurriculumSymbol';
 import React from 'react';
 import { LearningResource, SubTopic, TaxonomyModule, WebGLSceneId } from '../../types';
 import { EcosystemToolBadge } from './EcosystemLogos';
@@ -110,7 +111,7 @@ export const InspectorSidebar: React.FC<InspectorSidebarProps> = ({
                 <span>[FREE ↗]</span>
               </div>
               <div className="text-[11px] text-[var(--text-primary)] font-semibold mt-0.5">
-                {res.title}
+                <CurriculumSymbol name={res.title + " " + res.authorOrOrg} />{res.title}
               </div>
               <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">
                 {res.authorOrOrg}

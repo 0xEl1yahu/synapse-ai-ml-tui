@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html, Line, QuadraticBezierLine } from '@react-three/drei';
+import { SceneLabel } from '../SceneLabel';
+import { Line, QuadraticBezierLine } from '@react-three/drei';
 import * as THREE from 'three';
 import { SceneControlConfig } from '../../../types';
 
@@ -105,7 +106,7 @@ export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config }
             </mesh>
 
             {/* Token Label & Live Softmax Weight Badge */}
-            <Html position={[0, -0.55, 0.55]} center distanceFactor={13} zIndexRange={[4, 0]}>
+            <SceneLabel position={[0, -0.55, 0.55]} distanceFactor={13}>
               <button
                 type="button"
                 onClick={(e) => {
@@ -127,7 +128,7 @@ export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config }
                   {idx <= activeQueryIdx ? `a=${(attnWeight * 100).toFixed(1)}%` : 'MASKED (-inf)'}
                 </div>
               </button>
-            </Html>
+            </SceneLabel>
           </group>
         );
       })}
@@ -218,11 +219,11 @@ export const AttentionRoPEScene: React.FC<AttentionRoPESceneProps> = ({ config }
           })}
         </group>
 
-        <Html position={[0, -2.05, 0]} center distanceFactor={14} zIndexRange={[4, 0]}>
+        <SceneLabel position={[0, -2.05, 0]} distanceFactor={14}>
           <div className="pointer-events-none border border-[#1E2430] bg-[#08090C]/90 px-2 py-0.5 font-mono text-[9px] text-[#06B6D4] whitespace-nowrap">
             RoPE PHASE RING: R(m*theta_i) // {isUniformEntropy ? 'WARN: HIGH_TEMP ENTROPY FLATTENING' : isArgmaxSpike ? 'MODE: HARD_ARGMAX_SPIKE' : 'CAUSAL_MASK: ACTIVE'}
           </div>
-        </Html>
+        </SceneLabel>
       </group>
     </group>
   );

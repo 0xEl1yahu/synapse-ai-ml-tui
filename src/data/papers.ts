@@ -10,6 +10,7 @@ export const CANONICAL_PAPERS: CanonicalPaper[] = [
     venueOrArxiv: 'NeurIPS 2017 // arXiv:1706.03762',
     url: 'https://arxiv.org/abs/1706.03762',
     moduleId: '03_sequence_arch',
+    subTopicId: 'wtf-is-attention',
     coupledSceneId: 'attention-rope',
     wtfInvention:
       'Replaced sequential RNNs entirely with parallelizable Scaled Dot-Product Multi-Head Self-Attention, enabling any token to attend to any other token in O(1) sequential operations.',
@@ -90,6 +91,7 @@ class MultiHeadSelfAttention(nn.Module):
     venueOrArxiv: 'CVPR 2016 // arXiv:1512.03385',
     url: 'https://arxiv.org/abs/1512.03385',
     moduleId: '02_deep_learning',
+    subTopicId: 'wtf-is-residual-rmsnorm',
     coupledSceneId: 'neural-lattice',
     wtfInvention:
       'Introduced the additive skip connection x_{l+1} = x_l + F(x_l), creating an unimpeded gradient superhighway (the Residual Stream) that allowed networks to scale from 16 layers to 152+ layers.',
@@ -152,6 +154,7 @@ class PreNormResidualBlock(nn.Module):
     venueOrArxiv: 'ICLR 2022 // arXiv:2106.09685',
     url: 'https://arxiv.org/abs/2106.09685',
     moduleId: '00_foundations',
+    subTopicId: 'wtf-is-vectors-svd',
     coupledSceneId: 'loss-landscape',
     wtfInvention:
       'Proved that fine-tuning weight updates have a tiny "intrinsic rank", allowing us to freeze the 70B base model and train two skinny rank-r matrices (Delta W = B A) using <1% of the parameters and VRAM.',
@@ -212,6 +215,7 @@ class LoRALinear(nn.Module):
     venueOrArxiv: 'NeurIPS 2022 // arXiv:2205.14135',
     url: 'https://arxiv.org/abs/2205.14135',
     moduleId: '06_ai_systems_ops',
+    subTopicId: 'wtf-is-flashattention-vllm',
     coupledSceneId: 'attention-rope',
     wtfInvention:
       'Used GPU SRAM tiling and an "online softmax" rescaling recurrence to compute exact self-attention without ever reading or writing the quadratic N x N attention matrix to slow GPU HBM VRAM.',
@@ -277,6 +281,7 @@ def flash_attention_online_reference(Q: torch.Tensor, K: torch.Tensor, V: torch.
     venueOrArxiv: 'Neurocomputing // arXiv:2104.09864',
     url: 'https://arxiv.org/abs/2104.09864',
     moduleId: '03_sequence_arch',
+    subTopicId: 'wtf-is-transformer-rope',
     coupledSceneId: 'attention-rope',
     wtfInvention:
       'Encoded token positions by rotating 2D pairs of Query and Key vectors in the complex plane by angle m*theta_i, so attention dot products depend strictly on relative token distance (m - n).',
@@ -331,6 +336,7 @@ def apply_rope(x: torch.Tensor, pos: torch.Tensor, base: float = 10000.0) -> tor
     venueOrArxiv: 'Nature / arXiv:2402.03300 & arXiv:2501.12948',
     url: 'https://arxiv.org/abs/2501.12948',
     moduleId: '05_post_training_rl',
+    subTopicId: 'wtf-is-reasoning-grpo',
     coupledSceneId: 'loss-landscape',
     wtfInvention:
       'Eliminated PPO\'s massive Value Critic network via Group Relative Policy Optimization (GRPO) and proved that pure RL against deterministic verifiers (RLVR) causes self-verification and reasoning chains to emerge naturally.',
@@ -387,6 +393,7 @@ def grpo_loss(logp_new, logp_old, logp_ref, rewards, eps: float = 0.2, beta: flo
     venueOrArxiv: 'NeurIPS 2023 // arXiv:2305.18290',
     url: 'https://arxiv.org/abs/2305.18290',
     moduleId: '05_post_training_rl',
+    subTopicId: 'wtf-is-rlhf-dpo',
     coupledSceneId: 'loss-landscape',
     wtfInvention:
       'Solved the KL-constrained RLHF objective in closed form so you can align an LLM directly on (chosen, rejected) preference pairs using simple binary cross-entropy—with zero RL loop or separate Reward Model.',
@@ -428,6 +435,7 @@ def dpo_loss(pi_w, pi_l, ref_w, ref_l, beta: float = 0.1):
     venueOrArxiv: 'ICLR 2023 // arXiv:2210.02747',
     url: 'https://arxiv.org/abs/2210.02747',
     moduleId: '04_generative_ai',
+    subTopicId: 'wtf-is-flow-matching',
     coupledSceneId: 'flow-matching',
     wtfInvention:
       'Replaced curved stochastic diffusion paths with straight-line Optimal Transport ODE trajectories x_t = (1-t)x_0 + t x_1, enabling 4-to-8 step generation of images, video, audio, and robot actions.',
@@ -469,6 +477,7 @@ def conditional_flow_matching_loss(v_net, x1: torch.Tensor):
     venueOrArxiv: 'SOSP 2023 // arXiv:2309.06180',
     url: 'https://arxiv.org/abs/2309.06180',
     moduleId: '06_ai_systems_ops',
+    subTopicId: 'wtf-is-flashattention-vllm',
     coupledSceneId: 'neural-lattice',
     wtfInvention:
       'Brought operating-system virtual memory paging to the GPU KV cache, storing Keys and Values in non-contiguous 16-token physical blocks to eliminate memory fragmentation and boost serving throughput by 2–4x.',
@@ -516,6 +525,7 @@ class KVBlockTable:
     venueOrArxiv: 'Transformer Circuits Thread // Anthropic 2022–2024',
     url: 'https://transformer-circuits.pub/2023/monosemantic-features/index.html',
     moduleId: '07_interp_evals',
+    subTopicId: 'wtf-is-superposition-sae',
     coupledSceneId: 'superposition-sae',
     wtfInvention:
       'Explained why individual neurons are polysemantic (packing M >> D sparse concepts into almost-orthogonal polytopes) and proved overcomplete Sparse Autoencoders (SAEs) can extract clean, steerable monosemantic features.',

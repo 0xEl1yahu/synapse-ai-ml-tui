@@ -1,3 +1,4 @@
+import { CurriculumSymbol } from './components/terminal/CurriculumSymbol';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ThemeId, TrackId, ViewMode, WebGLSceneId } from './types';
 import { TAXONOMY_MODULES, CLI_MAN_PAGES } from './data/taxonomy';
@@ -281,17 +282,14 @@ export default function App() {
   const filteredModulesForOverview = useMemo(() => {
     const q = overviewFilter.trim().toLowerCase();
     if (!q) return TAXONOMY_MODULES;
-    return TAXONOMY_MODULES.filter(
-      (m) =>
-        m.title.toLowerCase().includes(q) ||
-        m.subtitle.toLowerCase().includes(q) ||
-        m.subTopics.some(
-          (st) =>
-            st.title.toLowerCase().includes(q) ||
-            st.plainEnglish.toLowerCase().includes(q) ||
-            st.wtfQuestion.toLowerCase().includes(q)
-        )
-    );
+    return TAXONOMY_MODULES.flatMap(module => {
+      const topics = module.subTopics.filter(topic =>
+        [topic.title, topic.wtfQuestion, topic.plainEnglish, ...topic.libraries.map(lib => lib.name)]
+          .some(value => value.toLowerCase().includes(q))
+      );
+      if (topics.length) return [{ ...module, subTopics: topics }];
+      return [module.title, module.subtitle].some(value => value.toLowerCase().includes(q)) ? [module] : [];
+    });
   }, [overviewFilter]);
 
   return (
@@ -336,10 +334,8 @@ export default function App() {
         <main className="flex-1 min-w-0 h-full overflow-y-auto bg-[var(--bg-canvas)]">
           {activeView === 'overview' && (
             <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
-              {/* HERO SPLIT WORKBENCH: WTFIS.AI MANIFESTO + LIVE 3D WEBGL SANDBOX */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 border border-[var(--border-grid)] bg-[var(--bg-pane)]">
-                {/* Left Column: Mission & Philosophy */}
-                <div className="lg:col-span-6 p-5 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[var(--border-grid)] space-y-4">
+              <div className="flex flex-col border border-[var(--border-grid)] bg-[var(--bg-pane)]">
+                <div className="min-w-0 p-5 border-b border-[var(--border-grid)] space-y-4">
                   <div className="space-y-3">
                     <div className="inline-flex items-center gap-2 px-2.5 py-1 border border-[var(--accent-primary)] bg-[var(--accent-primary)]/10 font-mono text-[11px] text-[var(--accent-primary)]">
                       <WTFBrandLogo className="w-4 h-4 shrink-0" />
@@ -350,7 +346,7 @@ export default function App() {
                       LEARN IT. INTERACT WITH IT. BREAK IT. BUILD WITH IT.
                     </h1>
 
-                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                    <p className="max-w-prose text-sm text-[var(--text-secondary)] leading-relaxed">
                       Learn how an assistant finds a note, how a model recognizes a digit, or how to write your first line of Python. Each topic starts with a question you can explore at your own pace.
                     </p>
 
@@ -364,6 +360,7 @@ export default function App() {
                         </span>
                         <input
                           type="text"
+                          aria-label="Find a curriculum topic or library"
                           value={overviewFilter}
                           onChange={(e) => setOverviewFilter(e.target.value)}
                           placeholder="Filter topics: attention, backprop, agent harness, hessian, grpo, flow matching, sae..."
@@ -377,6 +374,18 @@ export default function App() {
                           [⌘K FULL_SEARCH]
                         </button>
                       </div>
+                      {overviewFilter.trim() && (
+                        <div className="border border-t-0 border-[var(--border-grid)] bg-[var(--bg-canvas)] max-h-52 overflow-y-auto p-2">
+                          {filteredModulesForOverview.length ? filteredModulesForOverview.flatMap(module =>
+                            module.subTopics.map(topic => (
+                              <button type="button" key={topic.id} onClick={() => handleSelectSubTopic(module.id, topic.id)}
+                                className="block w-full p-2 text-left text-sm hover:bg-[var(--bg-pane)] focus-visible:outline">
+                                <CurriculumSymbol name={topic.title} />{topic.title}
+                              </button>
+                            ))
+                          ) : <p role="status" className="p-2 text-sm">No lessons match “{overviewFilter.trim()}”. Try a topic or library name.</p>}
+                        </div>
+                      )}
                     </div>
 
                     {/* Featured "WTF is...?" Rapid-Launch Matrix */}
@@ -399,7 +408,7 @@ export default function App() {
                               </span>
                             </div>
                             <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] mt-0.5">
-                              {item.label}
+                              <CurriculumSymbol name={item.label} />{item.label}
                             </div>
                             <div className="text-[10px] text-[var(--text-secondary)] font-sans line-clamp-1 mt-0.5">
                               {item.question}
@@ -420,7 +429,7 @@ export default function App() {
                               className="p-2 border border-[var(--border-grid)] bg-[var(--bg-canvas)] hover:border-[var(--accent-primary)] text-left group transition-colors cursor-pointer"
                             >
                               <div className="text-[10px] text-[var(--accent-param)]">[{item.tag}]</div>
-                              <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] mt-0.5">{item.label}</div>
+                              <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] mt-0.5"><CurriculumSymbol name={item.label} />{item.label}</div>
                               <div className="text-[10px] text-[var(--text-secondary)] font-sans line-clamp-1 mt-0.5">{item.question}</div>
                             </button>
                           ))}
@@ -464,8 +473,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Right Column: Live Interactive 3D WebGL & Shader Sandbox */}
-                <div className="lg:col-span-6 flex flex-col">
+                <div className="min-w-0">
                   <WebGLViewportShell
                     activeScene={activeSceneId}
                     onSceneChange={setActiveSceneId}
@@ -606,7 +614,7 @@ export default function App() {
                                 <div className="min-w-0">
                                   <div className="font-mono text-xs font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] truncate">
                                     {isDone ? '[✓] ' : `[0${idx + 1}] `}
-                                    {st.title}
+                                    <CurriculumSymbol name={st.title} />{st.title}
                                   </div>
                                   <div className="text-[11px] text-[var(--text-secondary)] line-clamp-1 mt-0.5">
                                     {st.wtfQuestion}
@@ -636,7 +644,7 @@ export default function App() {
                                     >
                                       <div className="min-w-0">
                                         <div className="font-mono text-xs font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] truncate">
-                                          {isDone ? '[✓] ' : `[${String(idx + 1).padStart(2, '0')}] `}{st.title}
+                                          {isDone ? '[✓] ' : `[${String(idx + 1).padStart(2, '0')}] `}<CurriculumSymbol name={st.title} />{st.title}
                                         </div>
                                         <div className="text-[11px] text-[var(--text-secondary)] line-clamp-1 mt-0.5">{st.wtfQuestion}</div>
                                       </div>
@@ -739,11 +747,7 @@ export default function App() {
 
           {activeView === 'papers' && (
             <PaperDissectorPane
-              onOpenModule={(modId) => {
-                const m = TAXONOMY_MODULES.find((x) => x.id === modId) || TAXONOMY_MODULES[0];
-                const theory = m.subTopics.find(topic => topic.hasLab !== false) || m.subTopics[0];
-                handleSelectSubTopic(m.id, theory.id);
-              }}
+              onOpenModule={handleSelectSubTopic}
               onLaunch3DScene={(sceneId) => {
                 setActiveSceneId(sceneId);
                 setActiveView('webgl-lab');

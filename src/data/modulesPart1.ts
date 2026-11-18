@@ -31,6 +31,11 @@ export const MODULES_PART_1: TaxonomyModule[] = [
     subTopics: [
       {
         id: "wtf-is-python",
+        libraries: [{
+          name: "Python statistics",
+          url: "https://docs.python.org/3/library/statistics.html",
+          purpose: "Use mean to calculate the average delivery time from the lesson.",
+        }],
         title: "WTF is Python?",
         commandSlug: "wtf-is-python",
         wtfQuestion: "How can a few lines of Python calculate an average?",
@@ -55,6 +60,11 @@ export const MODULES_PART_1: TaxonomyModule[] = [
       },
       {
         id: 'wtf-is-vectors-svd',
+        libraries: [{
+          name: "NumPy linalg.svd",
+          url: "https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html",
+          purpose: "Decompose a matrix and reconstruct it with fewer singular values.",
+        }],
         title: 'WTF is a Matrix, SVD & Low-Rank Adaptation (LoRA)?',
         commandSlug: 'wtf-is-vectors-svd',
         wtfQuestion: 'What is a matrix actually doing to data, and why can we fine-tune a 70B LLM by updating less than 1% of its weights?',
@@ -171,6 +181,11 @@ print(f"Rank-{k} approximation error: {rel_error:.4f}")`,
       },
       {
         id: 'wtf-is-gradient-descent',
+        libraries: [{
+          name: "PyTorch autograd",
+          url: "https://docs.pytorch.org/docs/stable/autograd.html",
+          purpose: "Compute the gradient of a small loss function before taking a descent step.",
+        }],
         title: 'WTF is Gradient Descent, Jacobians & The Hessian?',
         commandSlug: 'wtf-is-gradient-descent',
         wtfQuestion: 'How do you find the bottom of a billion-dimensional canyon when you are blindfolded and can only feel the slope under your feet?',
@@ -275,6 +290,11 @@ print(f"Max sharpness lambda_max = {lam_max:.1f} -> Max stable LR = {max_lr:.4f}
       },
       {
         id: 'wtf-is-cross-entropy',
+        libraries: [{
+          name: "PyTorch CrossEntropyLoss",
+          url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html",
+          purpose: "Compare unnormalized class scores with the correct class label.",
+        }],
         title: 'WTF is Information Theory, Cross-Entropy & KL Divergence?',
         commandSlug: 'wtf-is-cross-entropy',
         wtfQuestion: 'Why do we train every LLM and classifier with Cross-Entropy instead of Mean Squared Error, and what does "bits of surprise" mean?',
@@ -409,6 +429,11 @@ print("Exact gradient dL/dz:", z.grad.round(decimals=4))`,
     subTopics: [
       {
         id: 'wtf-is-overfitting',
+        libraries: [{
+          name: "scikit-learn model selection",
+          url: "https://scikit-learn.org/stable/modules/cross_validation.html",
+          purpose: "Estimate how a fitted model performs on held-out folds.",
+        }],
         title: 'WTF is Overfitting, Bias-Variance & Double Descent?',
         commandSlug: 'wtf-is-overfitting',
         wtfQuestion: 'How can a model get 100% on its practice exam and fail completely in production—and why do massive neural networks break the classic textbook U-curve?',
@@ -496,6 +521,11 @@ for deg in [1, 3, 12]:
       },
       {
         id: 'wtf-is-gradient-boosting',
+        libraries: [{
+          name: "XGBoost",
+          url: "https://xgboost.readthedocs.io/en/stable/python/python_intro.html",
+          purpose: "Fit boosted trees and evaluate them on held-out rows.",
+        }],
         title: 'WTF is XGBoost & Second-Order Gradient Boosting?',
         commandSlug: 'wtf-is-gradient-boosting',
         wtfQuestion: 'Why do Gradient Boosted Decision Trees still crush deep neural networks on structured tabular spreadsheets?',
@@ -592,6 +622,11 @@ print(f"Optimal Split Threshold: {thresh} | Second-Order Gain: {gain:.4f}")`,
       },
       {
         id: 'wtf-is-embeddings-manifolds',
+        libraries: [{
+          name: "UMAP",
+          url: "https://umap-learn.readthedocs.io/en/latest/basic_usage.html",
+          purpose: "Project high-dimensional observations into two dimensions and inspect their neighborhoods.",
+        }],
         title: 'WTF is an Embedding Space, PCA & UMAP?',
         commandSlug: 'wtf-is-embeddings-manifolds',
         wtfQuestion: 'What does it actually mean to turn a paragraph or image into a 1536-dimensional vector, and how do we project it down to 3D without crushing its structure?',
@@ -703,6 +738,11 @@ print("Top-3 PCA variance captured:", np.round(var_ratio, 4))`,
     subTopics: [
       {
         id: 'wtf-is-backprop',
+        libraries: [{
+          name: "micrograd",
+          url: "https://github.com/karpathy/micrograd",
+          purpose: "Trace how a scalar computation graph accumulates gradients during a backward pass.",
+        }],
         title: 'WTF is a Neural Network & Backpropagation?',
         commandSlug: 'wtf-is-backprop',
         wtfQuestion: 'When a network with 10 billion weights makes a mistake, how does it know which exact weight in layer 3 caused the error?',
@@ -813,6 +853,11 @@ print("dL/dW1:\\n", W1.grad)`,
       },
       {
         id: 'wtf-is-residual-rmsnorm',
+        libraries: [{
+          name: "PyTorch RMSNorm",
+          url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.RMSNorm.html",
+          purpose: "Apply root mean square normalization to a hidden state.",
+        }],
         title: 'WTF are Residual Streams, RMSNorm & SwiGLU?',
         commandSlug: 'wtf-is-residual-rmsnorm',
         wtfQuestion: 'Why did networks deeper than 20 layers fail to train before 2015, and why does every modern LLM use Pre-RMSNorm and SwiGLU?',
@@ -907,6 +952,11 @@ print("Residual output shape & RMS:", out.shape, out.pow(2).mean().sqrt().item()
       },
       {
         id: 'wtf-is-adamw',
+        libraries: [{
+          name: "PyTorch AdamW",
+          url: "https://docs.pytorch.org/docs/stable/generated/torch.optim.AdamW.html",
+          purpose: "Compare the roles of learning rate and decoupled weight decay.",
+        }],
         title: 'WTF is an Optimizer (SGD, Momentum, AdamW & Muon)?',
         commandSlug: 'wtf-is-adamw',
         wtfQuestion: 'Why does plain SGD bounce wildly in narrow valleys, why did AdamW replace Adam, and how does Muon optimize matrices directly?',
@@ -1051,6 +1101,11 @@ print("Singular values after Newton-Schulz (target ~1.0):", S_after[:5].round(de
     subTopics: [
       {
         id: 'wtf-is-attention',
+        libraries: [{
+          name: "PyTorch scaled dot product attention",
+          url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+          purpose: "Apply an attention mask and compare the outputs for a short token sequence.",
+        }],
         title: 'WTF is Attention & KV-Cache Compression (MHA, GQA, MLA)?',
         commandSlug: 'wtf-is-attention',
         wtfQuestion: 'How do tokens dynamically look up information from earlier in a sentence, and why does the KV-Cache bottleneck every LLM server?',
@@ -1151,6 +1206,11 @@ print("GQA Output shape:", gqa(torch.randn(2, 16, 512)).shape)`,
       },
       {
         id: 'wtf-is-transformer-rope',
+        libraries: [{
+          name: "Transformers RoPE utilities",
+          url: "https://huggingface.co/docs/transformers/internal/rope_utils",
+          purpose: "Inspect how rotary embeddings are configured for transformer models.",
+        }],
         title: 'WTF is a Transformer & Rotary Position Embeddings (RoPE)?',
         commandSlug: 'wtf-is-transformer-rope',
         wtfQuestion: 'Since Attention processes all tokens in parallel like an unordered bag of words, how does a Transformer know word order and relative distance?',
@@ -1236,6 +1296,11 @@ print(f"Score at (10, 15): {score_a.item():.6f} | Score at (110, 115): {score_b.
       },
       {
         id: 'wtf-is-moe-ssm',
+        libraries: [{
+          name: "Mamba",
+          url: "https://github.com/state-spaces/mamba",
+          purpose: "Read the selective state space implementation and follow its sequence update.",
+        }],
         title: 'WTF is Mixture-of-Experts (MoE) & State-Space Models (Mamba-2)?',
         commandSlug: 'wtf-is-moe-ssm',
         wtfQuestion: 'How does DeepSeek-V3 have 671 Billion parameters while only running 37 Billion per token—and how does Mamba process million-token sequences in linear O(N) time?',

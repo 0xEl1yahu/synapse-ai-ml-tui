@@ -1,3 +1,4 @@
+import { CurriculumSymbol, hasCurriculumSymbol } from './CurriculumSymbol';
 import React from 'react';
 
 /**
@@ -146,7 +147,9 @@ export const EcosystemToolBadge: React.FC<{
 
   return (
     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[var(--bg-canvas)] border border-[var(--border-grid)] font-mono text-[11px] text-[var(--text-primary)]">
-      {logoEntry ? (
+      {hasCurriculumSymbol(name) ? (
+        <CurriculumSymbol name={name} />
+      ) : logoEntry ? (
         <img
           src={isLightMode ? logoEntry.light : logoEntry.dark}
           alt={name}
@@ -198,7 +201,12 @@ export const EcosystemLogoStrip: React.FC<{ isLightMode?: boolean }> = ({
     'PyTorch',
     'NumPy',
     'OpenAI GPT / SDK',
-    'Anthropic Claude / MCP',
+    'Claude',
+    'OpenClaw',
+    'Hermes Agent',
+    'LangChain',
+    'LangGraph',
+    'MCP',
     'DeepSeek R1 / MLA',
     'Hugging Face',
     'NVIDIA CUDA',

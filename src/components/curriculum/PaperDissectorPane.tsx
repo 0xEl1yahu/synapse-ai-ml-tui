@@ -4,7 +4,7 @@ import { CANONICAL_PAPERS } from '../../data/papers';
 
 export interface PaperDissectorPaneProps {
   papers?: CanonicalPaper[];
-  onOpenModule: (moduleId: string) => void;
+  onOpenModule: (moduleId: string, subTopicId: string) => void;
   onLaunch3DScene: (sceneId: WebGLSceneId) => void;
 }
 
@@ -151,10 +151,10 @@ export const PaperDissectorPane: React.FC<PaperDissectorPaneProps> = ({
 
             <button
               type="button"
-              onClick={() => onOpenModule(activePaper.moduleId)}
+              onClick={() => onOpenModule(activePaper.moduleId, activePaper.subTopicId)}
               className="w-full py-1.5 border border-[var(--border-grid)] bg-[var(--bg-canvas)] hover:border-[var(--accent-primary)] text-[var(--accent-primary)] font-semibold cursor-pointer"
             >
-              [JUMP_TO_FULL_CURRICULUM_MODULE ({activePaper.moduleId}) ❯]
+              [OPEN_RELATED_LESSON ❯]
             </button>
           </div>
 

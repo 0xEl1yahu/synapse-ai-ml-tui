@@ -56,15 +56,15 @@ const CHALLENGES: DiagnosticChallenge[] = [
       'The scaler reports seeing every row, including the rows reserved for validation.',
     buggyCode: [
       'def prepare_pipeline(X_raw, y):',
-      '    scaler = StandardScaler()',
-      '    X_scaled = scaler.fit_transform(X_raw)',
-      '    X_train, X_val, y_train, y_val = train_test_split(X_scaled, y, test_size=0.2)',
-      '    return XGBClassifier().fit(X_train, y_train)',
+      '    X_train, X_val, y_train, y_val = train_test_split(X_raw, y, test_size=0.2)',
+      '    scaler = StandardScaler().fit(X_raw)',
+      '    model = LogisticRegression().fit(scaler.transform(X_train), y_train)',
+      '    return model.score(scaler.transform(X_val), y_val)',
     ],
     bugLineIndex: 2,
     explanation:
-      'Calling fit_transform(X_raw) BEFORE train_test_split lets held-out feature values influence the training mean and variance. Always split first, then call scaler.fit_transform(X_train) and scaler.transform(X_val).',
-    fixedLine: '    # Split first! Then fit scaler strictly on X_train only.',
+      'Fitting the scaler on all rows includes the validation data in its mean and variance. Fit it on the training rows, then use those same statistics to transform both sets.',
+    fixedLine: '    scaler = StandardScaler().fit(X_train)',
   },
 ];
 

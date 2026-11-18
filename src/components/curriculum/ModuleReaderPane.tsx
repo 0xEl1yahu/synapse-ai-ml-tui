@@ -1,3 +1,4 @@
+import { CurriculumSymbol } from '../terminal/CurriculumSymbol';
 import React, { useState } from 'react';
 import { SubTopic, TaxonomyModule, WebGLSceneId } from '../../types';
 import { LEARNING_RESOURCES } from '../../data/resources';
@@ -162,7 +163,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
                 }`}
               >
                 <span className="mr-1.5">{isDone ? '[✓]' : `[0${idx + 1}]`}</span>
-                <span>{st.title}</span>
+                <span><CurriculumSymbol name={st.title} />{st.title}</span>
               </button>
             );
           })}
@@ -199,7 +200,7 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
             $ wtf {activeSubTopic.commandSlug.replace(/^wtf-is-/, '')}
           </div>
           <h1 className="text-xl md:text-2xl font-bold font-display text-[var(--text-primary)]">
-            {activeSubTopic.title}
+            <CurriculumSymbol name={activeSubTopic.title} />{activeSubTopic.title}
           </h1>
           <div className="mt-2 text-sm text-[var(--accent-warn)] font-mono">
             ❯ QUESTION: &quot;{activeSubTopic.wtfQuestion}&quot;
@@ -240,6 +241,19 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
                 </ul>
               </div>
             </div>
+            <section className="mt-4 border-t border-[var(--border-grid)] pt-3">
+              <h2 className="font-mono text-xs font-semibold text-[var(--accent-param)]">Tools and libraries</h2>
+              <ul className="mt-2 space-y-2 text-sm">
+                {activeSubTopic.libraries.map(library => (
+                  <li key={library.url}>
+                    <a className="font-semibold underline underline-offset-2" href={library.url} target="_blank" rel="noreferrer">
+                      <CurriculumSymbol name={library.name} />{library.name}
+                    </a>
+                    <p className="mt-0.5 text-[var(--text-secondary)]">{library.purpose}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
             {readings.length > 0 && (
               <div className="mt-4 border-t border-[var(--border-grid)] pt-3">
                 <div className="font-mono text-xs text-[var(--accent-param)]">READ_OR_WATCH_NEXT:</div>
@@ -395,10 +409,16 @@ export const ModuleReaderPane: React.FC<ModuleReaderPaneProps> = ({
             </div>
 
             {check && (
-              <details className="border border-[var(--border-grid)] bg-[var(--bg-pane)] p-4">
-                <summary className="cursor-pointer text-sm font-semibold">{check.question}</summary>
-                <p className="mt-2 text-sm leading-relaxed">{check.answer}</p>
-              </details>
+              <dl aria-label="Knowledge check" className="knowledge-check border border-[var(--border-grid)] bg-[var(--bg-pane)] p-4 text-sm leading-relaxed">
+                <dt className="font-semibold">
+                  <span className="font-mono" aria-label="Question">Q:</span>
+                  <span>{check.question}</span>
+                </dt>
+                <dd>
+                  <span className="font-mono font-semibold" aria-label="Answer">A:</span>
+                  <span>{check.answer}</span>
+                </dd>
+              </dl>
             )}
             {activeSubTopic.hasLab !== false && <BrokenModelDiagnostic />}
           </section>

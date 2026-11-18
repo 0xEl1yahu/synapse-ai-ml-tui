@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, ThreeEvent } from '@react-three/fiber';
-import { Html, Line } from '@react-three/drei';
+import { SceneLabel } from '../SceneLabel';
+import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { SceneControlConfig } from '../../../types';
 
@@ -274,7 +275,7 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
           emissive={isDiverging ? '#EF4444' : '#F59E0B'}
           emissiveIntensity={0.85}
         />
-        <Html position={[0, 0.45, 0]} center distanceFactor={13} zIndexRange={[4, 0]}>
+        <SceneLabel position={[0, 0.45, 0]} distanceFactor={13}>
           <div
             className={`pointer-events-none px-1.5 py-0.5 font-mono text-[9px] font-bold border whitespace-nowrap ${
               isDiverging
@@ -284,29 +285,29 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
           >
             {isDiverging ? '[!WARN: SGD_EXPLODED]' : 'SGD (VANILLA)'}
           </div>
-        </Html>
+        </SceneLabel>
       </mesh>
 
       {/* SGD + Momentum Sphere */}
       <mesh ref={momMeshRef} position={[spawnPoint[0], 1, spawnPoint[1]]}>
         <sphereGeometry args={[0.2, 16, 16]} />
         <meshStandardMaterial color="#06B6D4" emissive="#06B6D4" emissiveIntensity={0.8} />
-        <Html position={[0, -0.42, 0]} center distanceFactor={13} zIndexRange={[4, 0]}>
+        <SceneLabel position={[0, -0.42, 0]} distanceFactor={13}>
           <div className="pointer-events-none border border-[#06B6D4] bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#06B6D4] whitespace-nowrap">
             SGD+MOMENTUM
           </div>
-        </Html>
+        </SceneLabel>
       </mesh>
 
       {/* AdamW Optimizer Sphere */}
       <mesh ref={adamMeshRef} position={[spawnPoint[0], 1, spawnPoint[1]]}>
         <sphereGeometry args={[0.22, 16, 16]} />
         <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={0.95} />
-        <Html position={[0.45, 0.32, 0]} center distanceFactor={13} zIndexRange={[4, 0]}>
+        <SceneLabel position={[0.45, 0.32, 0]} distanceFactor={13}>
           <div className="pointer-events-none border border-[#10B981] bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#10B981] whitespace-nowrap">
             AdamW (ADAPTIVE)
           </div>
-        </Html>
+        </SceneLabel>
       </mesh>
 
       {/* Global Minimum Beacon */}
@@ -315,28 +316,26 @@ export const LossLandscapeScene: React.FC<LossLandscapeSceneProps> = ({ config }
           <cylinderGeometry args={[0.04, 0.04, 1.4, 8]} />
           <meshBasicMaterial color="#10B981" wireframe />
         </mesh>
-        <Html position={[0, 0.9, 0]} center distanceFactor={14} zIndexRange={[4, 0]}>
+        <SceneLabel position={[0, 0.9, 0]} distanceFactor={14}>
           <div className="pointer-events-none border border-[#10B981]/60 bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[9px] text-[#10B981] whitespace-nowrap">
             GLOBAL_MINIMUM L*(w)
           </div>
-        </Html>
+        </SceneLabel>
       </group>
 
       {/* Spawn Marker */}
-      <Html
+      <SceneLabel
         position={[
           spawnPoint[0],
           evalLoss(spawnPoint[0], spawnPoint[1], roughness) + 0.8,
           spawnPoint[1],
         ]}
-        center
         distanceFactor={15}
-        zIndexRange={[4, 0]}
       >
         <div className="pointer-events-none border border-[#1E2430] bg-[#08090C]/85 px-1.5 py-0.5 font-mono text-[9px] text-[#94A3B8] whitespace-nowrap">
           INIT w0=({spawnPoint[0].toFixed(1)}, {spawnPoint[1].toFixed(1)}) [CLICK TERRAIN TO RE-DROP]
         </div>
-      </Html>
+      </SceneLabel>
     </group>
   );
 };

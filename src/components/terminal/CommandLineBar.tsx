@@ -17,6 +17,12 @@ export interface CommandLineBarProps {
 }
 
 const TOPIC_ALIASES: Record<string, string> = {
+  skills: 'agent-skills',
+  'agent skills': 'agent-skills',
+  mcps: 'mcp',
+  'model context protocol': 'mcp',
+  deepeval: 'ai-evals',
+  deepevals: 'ai-evals',
   graphs: 'graph-engineering',
   harness: 'agent-harness',
   injection: 'prompt-injection',
@@ -172,7 +178,7 @@ export const CommandLineBar: React.FC<CommandLineBarProps> = ({
         onNavigateView('roadmap');
         return;
       }
-      if (arg.includes('resource')) {
+      if (arg === 'library' || arg.includes('resource')) {
         onNavigateView('resources');
         return;
       }

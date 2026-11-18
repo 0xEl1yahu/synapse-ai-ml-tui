@@ -128,3 +128,29 @@ kbd,
 .animate-cursor {
   animation: pulse-cursor 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+.curriculum-symbol {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: 0.4em;
+  object-fit: contain;
+  vertical-align: -0.12em;
+  flex: none;
+}
+
+.knowledge-check {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.knowledge-check > :is(dt, dd) {
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr);
+  gap: 0.8rem;
+}
+
+.knowledge-check dt .font-mono { color: var(--accent-warn); }
+.knowledge-check dd .font-mono { color: var(--accent-param); }
+[data-theme="paper-lab"] .knowledge-check dt .font-mono { color: #874400; }
+[data-theme="paper-lab"] .knowledge-check dd .font-mono { color: #075c83; }

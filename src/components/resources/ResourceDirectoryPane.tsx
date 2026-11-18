@@ -1,3 +1,4 @@
+import { CurriculumSymbol } from '../terminal/CurriculumSymbol';
 import React, { useState, useMemo, useEffect } from 'react';
 import { LearningResource, TaxonomyModule } from '../../types';
 
@@ -713,7 +714,7 @@ export const ResourceDirectoryPane: React.FC<ResourceDirectoryPaneProps> = ({
                         className="text-base font-bold leading-snug"
                         style={{ color: 'var(--text-primary)' }}
                       >
-                        {res.title}
+                        <CurriculumSymbol name={res.title + " " + res.authorOrOrg} />{res.title}
                       </h3>
                     </div>
 
@@ -888,7 +889,7 @@ export const ResourceDirectoryPane: React.FC<ResourceDirectoryPaneProps> = ({
                         className="font-sans font-bold text-sm"
                         style={{ color: 'var(--text-primary)' }}
                       >
-                        {res.title}
+                        <CurriculumSymbol name={res.title + " " + res.authorOrOrg} />{res.title}
                       </div>
                       <div
                         className="text-[11px] mt-0.5"

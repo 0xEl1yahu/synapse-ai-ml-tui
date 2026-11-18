@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html, Line } from '@react-three/drei';
+import { SceneLabel } from '../SceneLabel';
+import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { SceneControlConfig } from '../../../types';
 
@@ -250,7 +251,7 @@ export const LatentGalaxyScene: React.FC<LatentGalaxySceneProps> = ({ config }) 
               />
             </mesh>
 
-            <Html position={[0, 0.52, 0]} center distanceFactor={13} zIndexRange={[4, 0]}>
+            <SceneLabel position={[0, 0.52, 0]} distanceFactor={13}>
               <button
                 type="button"
                 onClick={(e) => {
@@ -266,7 +267,7 @@ export const LatentGalaxyScene: React.FC<LatentGalaxySceneProps> = ({ config }) 
                 {isSelected ? '>> ' : ''}
                 {anchor.token}
               </button>
-            </Html>
+            </SceneLabel>
           </group>
         );
       })}
@@ -297,14 +298,14 @@ export const LatentGalaxyScene: React.FC<LatentGalaxySceneProps> = ({ config }) 
               <boxGeometry args={[0.14, 0.14, 0.14]} />
               <meshBasicMaterial color={isCollapsed ? '#EF4444' : '#ECFDF5'} wireframe={config.wireframe} />
             </mesh>
-            <Html position={targetPos} center distanceFactor={14} zIndexRange={[4, 0]}>
+            <SceneLabel position={targetPos} distanceFactor={14}>
               <div className="pointer-events-none border border-[#1E2430] bg-[#08090C]/90 px-1.5 py-0.5 font-mono text-[8px] text-[#ECFDF5] whitespace-nowrap">
                 <span className="text-[#06B6D4]">#{idx + 1}</span> {nb.token}{' '}
                 <span className={isCollapsed ? 'text-[#EF4444] font-bold' : 'text-[#10B981] font-bold'}>
                   cos={effectiveSim}
                 </span>
               </div>
-            </Html>
+            </SceneLabel>
           </group>
         );
       })}

@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html, Line } from '@react-three/drei';
+import { SceneLabel } from '../SceneLabel';
+import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { SceneControlConfig } from '../../../types';
 
@@ -288,15 +289,13 @@ export const NeuralLatticeScene: React.FC<NeuralLatticeSceneProps> = ({ config }
 
       {/* Interactive 3D Terminal Inspector Badge for Selected Neuron */}
       {selectedNeuron && (
-        <Html
+        <SceneLabel
           position={[
             selectedNeuron.position[0],
             selectedNeuron.position[1] + 0.85,
             selectedNeuron.position[2],
           ]}
-          center
           distanceFactor={12}
-          zIndexRange={[4, 0]}
         >
           <div className="w-60 border border-[#10B981] bg-[#08090C]/95 p-2 font-mono text-[10px] text-[#ECFDF5] shadow-none select-none">
             <div className="flex items-center justify-between border-b border-[#1E2430] pb-1">
@@ -372,7 +371,7 @@ export const NeuralLatticeScene: React.FC<NeuralLatticeSceneProps> = ({ config }
               </button>
             </div>
           </div>
-        </Html>
+        </SceneLabel>
       )}
     </group>
   );
