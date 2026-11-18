@@ -56,3 +56,26 @@ test('every lesson has a library and all assigned readings exist in the director
     for (const id of topic.readingIds ?? []) expect(readings.has(id), id).toBe(true);
   }
 });
+
+test('phone lab toolbar stays inside the viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Enter curriculum' }).click();
+  await page.getByRole('button', { name: /04: (3D_LAB|AI_SYSTEMS_LAB)/ }).click();
+  const reset = page.getByRole('button', { name: '[RESET]', exact: true });
+  await expect(reset).toBeVisible();
+  expect(await reset.evaluate(el => el.getBoundingClientRect().right)).toBeLessThanOrEqual(320);
+});
+
+test('breaking one lab preserves the baseline of other scenes', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Enter curriculum' }).click();
+  await page.getByRole('button', { name: /04: (3D_LAB|AI_SYSTEMS_LAB)/ }).click();
+  await page.getByRole('button', { name: /BREAK_IT_PRESET/ }).click();
+  await page.getByRole('button', { name: /03:EMBEDDING_MANIFOLD/ }).click();
+  await expect(page.getByText(/INSTABILITY_TRIGGERED|simulated exploding gradients/i)).toHaveCount(0);
+  await page.getByRole('button', { name: /01:NEURAL_NET_LAB/ }).click();
+  await expect(page.getByText(/simulated exploding gradients/i)).toBeVisible();
+  await page.getByRole('button', { name: '[RESET]', exact: true }).click();
+  await expect(page.getByText(/simulated exploding gradients/i)).toHaveCount(0);
+});
