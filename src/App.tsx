@@ -1,5 +1,6 @@
 import { CurriculumSymbol } from './components/terminal/CurriculumSymbol';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { readStorage, writeStorage } from './storage';
 import { ThemeId, TrackId, ViewMode, WebGLSceneId } from './types';
 import { TAXONOMY_MODULES, CLI_MAN_PAGES } from './data/taxonomy';
 import { ROADMAP_NODES, MILESTONE_PROJECTS, TRACK_DEFINITIONS } from './data/tracks';
@@ -136,7 +137,11 @@ const FEATURED_WTF_QUESTIONS: {
   },
 ];
 
-export default function App() {
+export default function App({ focusOnEntry = false }: { focusOnEntry?: boolean }) {
+  const overviewHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (focusOnEntry) overviewHeading.current?.focus({ preventScroll: true });
+  }, [focusOnEntry]);
   const [activeView, setActiveView] = useState<ViewMode>('overview');
   const [activeModuleId, setActiveModuleId] = useState<string>(TAXONOMY_MODULES[0].id);
   const [activeSubTopicId, setActiveSubTopicId] = useState<string>(
@@ -149,18 +154,18 @@ export default function App() {
   const [resourceSearchRequest, setResourceSearchRequest] = useState<string>('');
 
   const [activeTheme, setActiveTheme] = useState<ThemeId>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.THEME) as ThemeId | null;
+    const saved = readStorage('localStorage', STORAGE_KEYS.THEME) as ThemeId | null;
     return saved || 'phosphor';
   });
 
   const [activeTrack, setActiveTrack] = useState<TrackId>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.TRACK) as TrackId | null;
+    const saved = readStorage('localStorage', STORAGE_KEYS.TRACK) as TrackId | null;
     return saved || 'builder';
   });
 
   const [completedSubTopics, setCompletedSubTopics] = useState<string[]>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEYS.SUBTOPICS);
+      const raw = readStorage('localStorage', STORAGE_KEYS.SUBTOPICS);
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
@@ -169,7 +174,7 @@ export default function App() {
 
   const [completedRoadmapNodes, setCompletedRoadmapNodes] = useState<string[]>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEYS.ROADMAP);
+      const raw = readStorage('localStorage', STORAGE_KEYS.ROADMAP);
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
@@ -177,7 +182,7 @@ export default function App() {
   });
   const [completedProjects, setCompletedProjects] = useState<string[]>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEYS.PROJECTS);
+      const raw = readStorage('localStorage', STORAGE_KEYS.PROJECTS);
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
@@ -186,23 +191,23 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', activeTheme);
-    localStorage.setItem(STORAGE_KEYS.THEME, activeTheme);
+    writeStorage('localStorage', STORAGE_KEYS.THEME, activeTheme);
   }, [activeTheme]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.TRACK, activeTrack);
+    writeStorage('localStorage', STORAGE_KEYS.TRACK, activeTrack);
   }, [activeTrack]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.SUBTOPICS, JSON.stringify(completedSubTopics));
+    writeStorage('localStorage', STORAGE_KEYS.SUBTOPICS, JSON.stringify(completedSubTopics));
   }, [completedSubTopics]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.ROADMAP, JSON.stringify(completedRoadmapNodes));
+    writeStorage('localStorage', STORAGE_KEYS.ROADMAP, JSON.stringify(completedRoadmapNodes));
   }, [completedRoadmapNodes]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(completedProjects));
+    writeStorage('localStorage', STORAGE_KEYS.PROJECTS, JSON.stringify(completedProjects));
   }, [completedProjects]);
 
   const handleToggleProjectComplete = (projectId: string) => {
@@ -342,7 +347,7 @@ export default function App() {
                       <span>WTFIS.AI // 100% FREE &amp; OPEN AI/ML ENGINEERING PLAYGROUND</span>
                     </div>
 
-                    <h1 className="text-2xl md:text-3xl font-bold font-display tracking-tight text-[var(--text-primary)] leading-tight">
+                    <h1 ref={overviewHeading} tabIndex={-1} className="text-2xl md:text-3xl font-bold font-display tracking-tight text-[var(--text-primary)] leading-tight">
                       LEARN IT. INTERACT WITH IT. BREAK IT. BUILD WITH IT.
                     </h1>
 
